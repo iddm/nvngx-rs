@@ -11,6 +11,13 @@ rust-version = "1.57"
 repository = "https://github.com/iddm/nvngx-rs"
 documentation = "https://docs.rs/nvngx-rs"
 
+include = [
+    "DLSS/lib/Linux_x86_64/libnvsdk_ngx.a",
+    "DLSS/include/**/*",
+    "src/*",
+    "build.rs",
+]
+
 [build-dependencies]
 bindgen = "0.71"
 

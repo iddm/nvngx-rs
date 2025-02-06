@@ -45,33 +45,6 @@ fn compile_helpers() {
     // This is the path to the static library file.
     let lib_path = libdir_path.join(format!("{out_dir}/libngx_helpers.a"));
 
-    // let git_submodule_update_job = if is_docs_rs_build() {
-    //     std::process::Command::new("git")
-    //         .arg("clone")
-    //         .arg("--recursive")
-    //         .arg("--depth")
-    //         .arg("1")
-    //         .arg("https://github.com/NVIDIA/DLSS.git")
-    //         .current_dir(&out_dir)
-    //         .output()
-    // } else {
-    let git_submodule_update_job = std::process::Command::new("git")
-        .arg("submodule")
-        .arg("update")
-        .arg("--init")
-        .arg("--recursive")
-        .arg("--depth")
-        .arg("1")
-        .output()
-        // }
-        .expect("run git successfully");
-
-    if !git_submodule_update_job.status.success() {
-        let stdout = String::from_utf8(git_submodule_update_job.stdout).unwrap();
-        let stderr = String::from_utf8(git_submodule_update_job.stderr).unwrap();
-        panic!("could not checkout the submodules.\nStdout:\n{stdout}\n\nStderr:\n{stderr}");
-    }
-
     // Run `clang` to compile the source code file into an object file.
     let compile_job = std::process::Command::new("clang")
         .arg("-g")
