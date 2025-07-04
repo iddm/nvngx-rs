@@ -1,6 +1,6 @@
 //! The errors the NGX crate might have.
 
-use crate::bindings;
+use crate as bindings;
 
 /// The result type used within the crate.
 pub type Result<T = ()> = std::result::Result<T, Error>;
@@ -69,7 +69,7 @@ impl std::fmt::Display for bindings::NVSDK_NGX_Result {
 
 #[cfg(test)]
 mod tests {
-    use crate::bindings;
+    use crate as bindings;
 
     #[test]
     fn test_error_message() {

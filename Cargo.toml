@@ -1,23 +1,6 @@
-[package]
-name = "nvngx"
-version = "0.1.3"
-edition = "2021"
-authors = ["Victor Polevoy <maintainer@vpolevoy.com>"]
-description = "NVIDIA NGX bindings."
-readme = "README.md"
-license = "MIT"
-keywords = ["nvidia", "ngx", "DLSS", "upscaling", "supersampling"]
-rust-version = "1.57"
-repository = "https://github.com/iddm/nvngx-rs"
-documentation = "https://docs.rs/nvngx-rs"
+[workspace]
+members = ["crates/*"]
+resolver = "2"
 
-[build-dependencies]
-bindgen = "0.69"
-
-[dependencies]
-widestring = "1"
-libc = "0.2"
-ash = "0.37"
-log = "0.4"
-uuid = { version = "1", features = ["v4"] }
-derive_builder = "0.12"
+[workspace.package]
+version = "0.3.1"

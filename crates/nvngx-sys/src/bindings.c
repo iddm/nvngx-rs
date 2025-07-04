@@ -20,6 +20,8 @@ NVSDK_NGX_Resource_VK HELPERS_NVSDK_NGX_Create_ImageView_Resource_VK(
     );
 }
 
+// Super-Sampling
+
 NVSDK_NGX_Result HELPERS_NGX_DLSS_GET_OPTIMAL_SETTINGS(
     NVSDK_NGX_Parameter *pInParams,
     unsigned int InUserSelectedWidth,
@@ -178,4 +180,37 @@ NVSDK_NGX_Result HELPERS_NGX_VULKAN_EVALUATE_DLSS_EXT(
 
     int val = NVSDK_NGX_VULKAN_EvaluateFeature_C(InCmdList, pInHandle, pInParams, NULL);
     return val;
+}
+
+// Ray Reconstruction
+NVSDK_NGX_Result HELPERS_NGX_VULKAN_CREATE_DLSSD_EXT1(
+    VkDevice InDevice,
+    VkCommandBuffer InCmdList,
+    unsigned int InCreationNodeMask,
+    unsigned int InVisibilityNodeMask,
+    NVSDK_NGX_Handle **ppOutHandle,
+    NVSDK_NGX_Parameter *pInParams,
+    NVSDK_NGX_DLSSD_Create_Params *pInDlssDCreateParams) {
+    return NGX_VULKAN_CREATE_DLSSD_EXT1(
+        InDevice,
+        InCmdList,
+        InCreationNodeMask,
+        InVisibilityNodeMask,
+        ppOutHandle,
+        pInParams,
+        pInDlssDCreateParams
+    );
+}
+
+NVSDK_NGX_Result HELPERS_NGX_VULKAN_EVALUATE_DLSSD_EXT(
+    VkCommandBuffer InCmdList,
+    NVSDK_NGX_Handle *pInHandle,
+    NVSDK_NGX_Parameter *pInParams,
+    NVSDK_NGX_VK_DLSSD_Eval_Params *pInDlssDEvalParams) {
+    return NGX_VULKAN_EVALUATE_DLSSD_EXT(
+        InCmdList,
+        pInHandle,
+        pInParams,
+        pInDlssDEvalParams
+    );
 }

@@ -12,12 +12,23 @@ fn library_path() -> String {
     // };
     // let path = format!("{DLSS_LIBRARY_PATH}/{path}/");
     let path = DLSS_LIBRARY_PATH.to_owned();
-    PathBuf::from(path)
+    let mut path = PathBuf::from(path)
         .canonicalize()
-        .expect("cannot canonicalize path")
-        .to_str()
-        .unwrap()
-        .to_owned()
+        .expect("cannot canonicalize path");
+
+    if is_docs_rs_build() {
+        path.push(std::env::var("OUT_DIR").unwrap());
+        path
+    } else {
+        path
+    }
+    .to_str()
+    .unwrap()
+    .to_owned()
+}
+
+fn is_docs_rs_build() -> bool {
+    std::env::var("DOCS_RS").is_ok()
 }
 
 fn compile_helpers() {
@@ -27,31 +38,17 @@ fn compile_helpers() {
         // path.
         .canonicalize()
         .expect("cannot canonicalize path");
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+    // panic!("outdir: {out_dir}");
     // This is the path to the intermediate object file for our library.
-    let obj_path = libdir_path.join("target/ngx_helpers.o");
+    let obj_path = libdir_path.join(format!("{out_dir}/ngx_helpers.o"));
     // This is the path to the static library file.
-    let lib_path = libdir_path.join("target/libngx_helpers.a");
-
-    let git_submodule_update_job = std::process::Command::new("git")
-        .arg("submodule")
-        .arg("update")
-        .arg("--init")
-        .arg("--recursive")
-        .arg("--depth")
-        .arg("1")
-        .output()
-        .expect("run git successfully");
-
-    if !git_submodule_update_job.status.success() {
-        let stdout = String::from_utf8(git_submodule_update_job.stdout).unwrap();
-        let stderr = String::from_utf8(git_submodule_update_job.stderr).unwrap();
-        panic!("could not checkout the submodules.\nStdout:\n{stdout}\n\nStderr:\n{stderr}");
-    }
+    let lib_path = libdir_path.join(format!("{out_dir}/libngx_helpers.a"));
 
     // Run `clang` to compile the source code file into an object file.
     let compile_job = std::process::Command::new("clang")
         .arg("-g")
-        .arg("-G0")
+        //.arg("-G0")
         .arg("-c")
         .arg("-o")
         .arg(&obj_path)
@@ -82,7 +79,7 @@ fn compile_helpers() {
     // Link against the built helpers wrapper.
     println!(
         "cargo:rustc-link-search={}",
-        libdir_path.join("target/").to_str().unwrap()
+        libdir_path.join(out_dir).to_str().unwrap()
     );
     println!("cargo:rustc-link-lib=ngx_helpers");
 }

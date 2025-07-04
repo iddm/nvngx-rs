@@ -1,3 +1,3 @@
 [submodule "DLSS"]
-	path = DLSS
+	path = crates/nvngx-sys/DLSS
 	url = https://github.com/NVIDIA/DLSS.git
