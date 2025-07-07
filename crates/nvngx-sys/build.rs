@@ -1,50 +1,69 @@
-use std::path::PathBuf;
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 
-const DLSS_LIBRARY_PATH: &str = "DLSS/lib/Linux_x86_64";
 const SOURCE_FILE_PATH: &str = "src/bindings.c";
 
-fn library_path() -> String {
-    // let path = match DLSS_LIBRARY_TYPE {
-    //     DlssLibraryType::Development => "dev",
-    //     DlssLibraryType::Release => "rel",
-    // };
-    // let path = format!("{DLSS_LIBRARY_PATH}/{path}/");
-    let path = DLSS_LIBRARY_PATH.to_owned();
-    let mut path = PathBuf::from(path)
-        .canonicalize()
-        .expect("cannot canonicalize path");
-
-    if is_docs_rs_build() {
-        path.push(std::env::var("OUT_DIR").unwrap());
-        path
-    } else {
-        path
+fn vulkan_sdk() -> Option<PathBuf> {
+    // Mostly on Windows, the Vulkan headers don't exist in a common location but can be found based
+    // on VULKAN_SDK, set by the Vulkan SDK installer.
+    match env::var("VULKAN_SDK") {
+        Ok(v) => Some(PathBuf::from(v)),
+        // TODO: On Windows, perhaps this should be an error with a link to the SDK installation?
+        Err(env::VarError::NotPresent) if cfg!(windows) => {
+            panic!("On Windows, the VULKAN_SDK environment variable must be set")
+        }
+        Err(env::VarError::NotPresent) => None,
+        Err(env::VarError::NotUnicode(e)) => {
+            panic!("VULKAN_SDK environment variable is not Unicode: {e:?}")
+        }
     }
-    .to_str()
-    .unwrap()
-    .to_owned()
-}
-
-fn is_docs_rs_build() -> bool {
-    std::env::var("DOCS_RS").is_ok()
 }
 
 fn compile_helpers() {
-    cc::Build::new()
-        .file(SOURCE_FILE_PATH)
-        .compile("ngx_helpers");
+    let mut build = cc::Build::new();
+    build.file(SOURCE_FILE_PATH);
+    if let Some(vulkan_sdk) = vulkan_sdk() {
+        build.include(vulkan_sdk.join("Include"));
+    }
+    build.compile("ngx_helpers");
 }
 
 fn main() {
     compile_helpers();
 
-    // Tell cargo to look for shared libraries in the specified directory
-    println!("cargo:rustc-link-search={}", library_path());
-
     // Tell cargo to tell rustc to link to the libraries.
-    println!("cargo:rustc-link-lib=nvsdk_ngx");
-    println!("cargo:rustc-link-lib=stdc++");
-    println!("cargo:rustc-link-lib=dl");
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let dlss_library_path = Path::new(match target_os.as_str() {
+        "windows" => "DLSS/lib/Windows_x86_64",
+        "linux" => "DLSS/lib/Linux_x86_64",
+        x => todo!("No libraries for {x}"),
+    });
+
+    // Make the path relative to the crate source, where the DLSS submodule exists
+    let dlss_library_path =
+        PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join(dlss_library_path);
+
+    // First link our Rust project against the right version of nvsdk_ngx
+    match target_os.as_str() {
+        "windows" => {
+            // TODO: Only one architecture is included (and for vs201x)
+            let link_library_path = dlss_library_path.join("x64");
+            let windows_mt_suffix = windows_mt_suffix();
+            // TODO select debug and/or _iterator0/1 when /MTd or /MDd are set.
+            let dbg_suffix = if true { "" } else { "_dbg" };
+            println!("cargo:rustc-link-lib=nvsdk_ngx{windows_mt_suffix}{dbg_suffix}");
+            println!("cargo:rustc-link-search={}", link_library_path.display());
+        }
+        "linux" => {
+            // On Linux there is only one link-library
+            println!("cargo:rustc-link-lib=nvsdk_ngx");
+            println!("cargo:rustc-link-lib=stdc++");
+            println!("cargo:rustc-link-search={}", dlss_library_path.display());
+        }
+        x => todo!("No libraries for {x}"),
+    }
 
     #[cfg(feature = "generate-bindings")]
     generate_bindings();
@@ -63,7 +82,7 @@ fn generate_bindings() {
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
-    let bindings = bindgen::Builder::default()
+    let mut bindings = bindgen::Builder::default()
         .rust_target(msrv)
         // The input header we would like to generate
         // bindings for.
@@ -95,15 +114,28 @@ fn generate_bindings() {
         .disable_nested_struct_naming()
         .default_enum_style(bindgen::EnumVariation::Rust {
             non_exhaustive: true,
-        })
-        // Finish the builder and generate the bindings.
-        .generate()
-        // Unwrap the Result and panic on failure.
-        .expect("Unable to generate bindings");
+        });
+
+    if let Some(vulkan_sdk) = vulkan_sdk() {
+        bindings = bindings.clang_arg(format!("-I{}", vulkan_sdk.join("include").display()))
+    }
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
     let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
     bindings
+        // Finish the builder and generate the bindings.
+        .generate()
+        // Unwrap the Result and panic on failure.
+        .expect("Unable to generate bindings")
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
+}
+
+fn windows_mt_suffix() -> &'static str {
+    let target_features = env::var("CARGO_CFG_TARGET_FEATURE").unwrap();
+    if target_features.contains("crt-static") {
+        "_s"
+    } else {
+        "_d"
+    }
 }

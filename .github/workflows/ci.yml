@@ -19,8 +19,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          # Windows support for this crate is pending
-          # - windows-2025 # 2025 for winget
+          - windows-2025 # 2025 for winget
 
         toolchain:
           - stable
@@ -42,7 +41,6 @@ jobs:
           override: true
 
       - name: Setup cache
-        if: runner.os != 'macOS'
         uses: actions/cache@v4
         with:
           path: |
@@ -54,9 +52,15 @@ jobs:
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
+
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Windows' }}
-        run: winget install --accept-package-agreements --accept-source-agreements -e KhronosGroup.VulkanSDK
+        # Normally the installer sets the VULKAN_SDK system environment variable to the installation location. GitHub Actions does not reimport
+        # this change in variables, requiring us to change it to known location intead and output the location ourselves below.
+        run: winget install --accept-package-agreements --accept-source-agreements -e KhronosGroup.VulkanSDK --location C:\VulkanSDK
+      - name: Make VULKAN_SDK environment variable available
+        if: ${{ runner.os == 'Windows' }}
+        run: echo "VULKAN_SDK=C:\VulkanSDK" >> $env:GITHUB_ENV
 
       - name: Build all features
         if: matrix.features == ''
@@ -121,9 +125,6 @@ jobs:
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
-      - name: Install Vulkan SDK
-        if: ${{ runner.os == 'Windows' }}
-        run: winget install --accept-package-agreements -e KhronosGroup.VulkanSDK
 
       - name: Run clippy with disallowed warnings
         run: cargo clippy --workspace --all-targets --all-features -- -Dwarnings
@@ -157,9 +158,6 @@ jobs:
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
-      - name: Install Vulkan SDK
-        if: ${{ runner.os == 'Windows' }}
-        run: winget install --accept-package-agreements -e KhronosGroup.VulkanSDK
 
       # Ensure that it still builds, while allowing warnings
       - run: cargo check --all-features
@@ -193,9 +191,6 @@ jobs:
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
-      - name: Install Vulkan SDK
-        if: ${{ runner.os == 'Windows' }}
-        run: winget install --accept-package-agreements -e KhronosGroup.VulkanSDK
 
       - name: Build docs
         env:
