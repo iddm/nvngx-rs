@@ -2,7 +2,7 @@
 
 use super::*;
 
-/// An NGX handle. Handle might be created and used by [`Feature::create`].
+/// An NGX handle. Handle might be created and used by [`Feature::new()`].
 #[repr(transparent)]
 #[derive(Debug)]
 pub struct FeatureHandle(pub(crate) *mut nvngx_sys::NVSDK_NGX_Handle);
@@ -280,8 +280,8 @@ impl FeatureParameters {
         .map(|_| ptr)
     }
 
-    /// Sets an [bool] value for the parameter named `name`. The
-    /// [bool] type isn't supported in NGX, but the semantics - are. The
+    /// Sets an [`bool`] value for the parameter named `name`. The
+    /// [`bool`] type isn't supported in NGX, but the semantics - are. The
     /// boolean values are stored as integers with value `1` being
     /// `true` and `0` being `false`.
     pub fn set_bool(&self, name: &FeatureParameterName, value: bool) {
@@ -294,8 +294,8 @@ impl FeatureParameters {
         }
     }
 
-    /// Returns a [bool] value of a parameter named `name`.
-    /// The [bool] type isn't supported in NGX, but the semantics - are.
+    /// Returns a [`bool`] value of a parameter named `name`.
+    /// The [`bool`] type isn't supported in NGX, but the semantics - are.
     /// The boolean values are stored as integers with value `1` being
     /// `true` and `0` being `false`.
     pub fn get_bool(&self, name: &FeatureParameterName) -> Result<bool> {
@@ -306,12 +306,12 @@ impl FeatureParameters {
         .map(|_| value == 1)
     }
 
-    /// Sets an [f32] value for the parameter named `name`.
+    /// Sets an [`f32`] value for the parameter named `name`.
     pub fn set_f32(&self, name: &FeatureParameterName, value: f32) {
         unsafe { nvngx_sys::NVSDK_NGX_Parameter_SetF(self.0, name.as_ptr().cast(), value) }
     }
 
-    /// Returns a [f32] value of a parameter named `name`.
+    /// Returns a [`f32`] value of a parameter named `name`.
     pub fn get_f32(&self, name: &FeatureParameterName) -> Result<f32> {
         let mut value = 0f32;
         Result::from(unsafe {
@@ -320,12 +320,12 @@ impl FeatureParameters {
         .map(|_| value)
     }
 
-    /// Sets an [u32] value for the parameter named `name`.
+    /// Sets an [`u32`] value for the parameter named `name`.
     pub fn set_u32(&self, name: &FeatureParameterName, value: u32) {
         unsafe { nvngx_sys::NVSDK_NGX_Parameter_SetUI(self.0, name.as_ptr().cast(), value) }
     }
 
-    /// Returns a [u32] value of a parameter named `name`.
+    /// Returns a [`u32`] value of a parameter named `name`.
     pub fn get_u32(&self, name: &FeatureParameterName) -> Result<u32> {
         let mut value = 0u32;
         Result::from(unsafe {
@@ -334,12 +334,12 @@ impl FeatureParameters {
         .map(|_| value)
     }
 
-    /// Sets an [f64] value for the parameter named `name`.
+    /// Sets an [`f64`] value for the parameter named `name`.
     pub fn set_f64(&self, name: &FeatureParameterName, value: f64) {
         unsafe { nvngx_sys::NVSDK_NGX_Parameter_SetD(self.0, name.as_ptr().cast(), value) }
     }
 
-    /// Returns a [f64] value of a parameter named `name`.
+    /// Returns a [`f64`] value of a parameter named `name`.
     pub fn get_f64(&self, name: &FeatureParameterName) -> Result<f64> {
         let mut value = 0f64;
         Result::from(unsafe {
@@ -348,12 +348,12 @@ impl FeatureParameters {
         .map(|_| value)
     }
 
-    /// Sets an [i32] value for the parameter named `name`.
+    /// Sets an [`i32`] value for the parameter named `name`.
     pub fn set_i32(&self, name: &FeatureParameterName, value: i32) {
         unsafe { nvngx_sys::NVSDK_NGX_Parameter_SetI(self.0, name.as_ptr().cast(), value) }
     }
 
-    /// Returns a [i32] value of a parameter named `name`.
+    /// Returns a [`i32`] value of a parameter named `name`.
     pub fn get_i32(&self, name: &FeatureParameterName) -> Result<i32> {
         let mut value = 0i32;
         Result::from(unsafe {
@@ -362,12 +362,12 @@ impl FeatureParameters {
         .map(|_| value)
     }
 
-    /// Sets an [u64] value for the parameter named `name`.
+    /// Sets an [`u64`] value for the parameter named `name`.
     pub fn set_u64(&self, name: &FeatureParameterName, value: u64) {
         unsafe { nvngx_sys::NVSDK_NGX_Parameter_SetULL(self.0, name.as_ptr().cast(), value) }
     }
 
-    /// Returns a [u64] value of a parameter named `name`.
+    /// Returns a [`u64`] value of a parameter named `name`.
     pub fn get_u64(&self, name: &FeatureParameterName) -> Result<u64> {
         let mut value = 0u64;
         Result::from(unsafe {
@@ -380,7 +380,7 @@ impl FeatureParameters {
         .map(|_| value)
     }
 
-    /// Returns `Ok` if the parameters claim to support the
+    /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
     pub fn supports_super_sampling(&self) -> Result<()> {
         if self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_NeedsUpdatedDriver)? {
@@ -399,8 +399,8 @@ impl FeatureParameters {
         }
     }
 
-    /// Returns `Ok` if the parameters claim to support the
-    /// ray reconstruction feature ([`nvngx_sys::NVSDK_NGX_Feature_RayReconstruction`]).
+    /// Returns [`Ok`] if the parameters claim to support the
+    /// ray reconstruction feature ([`nvngx_sys::NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction`]).
     pub fn supports_ray_reconstruction(&self) -> Result<()> {
         if self
             .get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_NeedsUpdatedDriver)?
@@ -422,26 +422,26 @@ impl FeatureParameters {
         }
     }
 
-    /// Returns `Ok` if the parameters claim to support the
+    /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
     pub fn supports_super_sampling_static() -> Result<()> {
         Self::get_capability_parameters()?.supports_super_sampling()
     }
 
-    /// Returns `Ok` if the parameters claim to support the
+    /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
     pub fn supports_ray_reconstruction_static() -> Result<()> {
         Self::get_capability_parameters()?.supports_ray_reconstruction()
     }
 
-    /// Returns `true` if the SuperSampling feature is initialised
+    /// Returns [`true`] if the SuperSampling feature is initialised
     /// correctly.
     pub fn is_super_sampling_initialised(&self) -> bool {
         self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_FeatureInitResult)
             .unwrap_or(false)
     }
 
-    /// Returns `true` if the Ray Reconstruction feature is initialised
+    /// Returns [`true`] if the Ray Reconstruction feature is initialised
     /// correctly.
     pub fn is_ray_reconstruction_initialised(&self) -> bool {
         self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_FeatureInitResult)
