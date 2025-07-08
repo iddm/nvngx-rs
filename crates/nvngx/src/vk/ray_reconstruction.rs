@@ -30,6 +30,7 @@ pub struct RayReconstructionCreateParameters(pub(crate) nvngx_sys::NVSDK_NGX_DLS
 impl RayReconstructionCreateParameters {
     /// Creates a new set of create parameters for the SuperSampling
     /// feature.
+    #[allow(clippy::too_many_arguments, reason = "Struct constructor")]
     pub fn new(
         render_width: u32,
         render_height: u32,
@@ -40,24 +41,23 @@ impl RayReconstructionCreateParameters {
         roughness_mode: Option<NVSDK_NGX_DLSS_Roughness_Mode>,
         depth_type: Option<NVSDK_NGX_DLSS_Depth_Type>,
     ) -> Self {
-        let mut params: NVSDK_NGX_DLSSD_Create_Params = unsafe { std::mem::zeroed() };
-        params.InWidth = render_width;
-        params.InHeight = render_height;
-        params.InTargetWidth = target_width;
-        params.InTargetHeight = target_height;
-
-        if let Some(quality_value) = quality_value {
-            params.InPerfQualityValue = quality_value;
-        }
-
-        params.InDenoiseMode = denoise_mode
-            .unwrap_or(NVSDK_NGX_DLSS_Denoise_Mode::NVSDK_NGX_DLSS_Denoise_Mode_DLUnified);
-        params.InRoughnessMode = roughness_mode
-            .unwrap_or(NVSDK_NGX_DLSS_Roughness_Mode::NVSDK_NGX_DLSS_Roughness_Mode_Unpacked);
-        params.InUseHWDepth =
-            depth_type.unwrap_or(NVSDK_NGX_DLSS_Depth_Type::NVSDK_NGX_DLSS_Depth_Type_Linear);
-
-        Self(params)
+        Self(NVSDK_NGX_DLSSD_Create_Params {
+            InWidth: render_width,
+            InHeight: render_height,
+            InTargetWidth: target_width,
+            InTargetHeight: target_height,
+            // Equivalent to 0
+            InPerfQualityValue: quality_value
+                .unwrap_or(NVSDK_NGX_PerfQuality_Value::NVSDK_NGX_PerfQuality_Value_MaxPerf),
+            InDenoiseMode: denoise_mode
+                .unwrap_or(NVSDK_NGX_DLSS_Denoise_Mode::NVSDK_NGX_DLSS_Denoise_Mode_DLUnified),
+            InRoughnessMode: roughness_mode
+                .unwrap_or(NVSDK_NGX_DLSS_Roughness_Mode::NVSDK_NGX_DLSS_Roughness_Mode_Unpacked),
+            InUseHWDepth: depth_type
+                .unwrap_or(NVSDK_NGX_DLSS_Depth_Type::NVSDK_NGX_DLSS_Depth_Type_Linear),
+            InFeatureCreateFlags: 0,
+            InEnableOutputSubrects: false,
+        })
     }
 }
 
