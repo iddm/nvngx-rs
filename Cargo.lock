@@ -41,6 +41,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "bindgen"
+version = "0.72.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f72209734318d0b619a5e0f5129918b848c416e122a3c4ce054e03cb87b726f"
+dependencies = [
+ "bitflags",
+ "cexpr",
+ "clang-sys",
+ "itertools",
+ "log",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rustc-hash",
+ "shlex",
+ "syn 2.0.98",
+]
+
+[[package]]
 name = "bitflags"
 version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -255,7 +275,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96bc9b11de45736fe7dacf652b91e881f7d058bed87c13a62d167d93f0216679"
 dependencies = [
- "bindgen",
+ "bindgen 0.71.1",
  "libc",
  "widestring",
 ]
@@ -264,7 +284,7 @@ dependencies = [
 name = "nvngx-sys"
 version = "0.3.1"
 dependencies = [
- "bindgen",
+ "bindgen 0.72.0",
  "libc",
  "widestring",
 ]
