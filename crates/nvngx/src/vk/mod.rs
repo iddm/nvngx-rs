@@ -355,52 +355,6 @@ impl From<VkImageResourceDescription> for NVSDK_NGX_Resource_VK {
     }
 }
 
-// #[derive(Debug)]
-// pub struct FeatureCommonInfo {
-//     path_list_info:,
-
-// }
-
-// /// Contains information common to all features, used by NGX in
-// /// determining requested feature availability.
-// #[derive(Debug, Clone)]
-// pub struct FeatureDiscoveryBuilder {
-//     /// API Struct version number.
-//     sdk_version: Option<bindings::NVSDK_NGX_Version>,
-//     /// Valid NVSDK_NGX_Feature enum corresponding to DLSS v3 Feature
-//     /// which is being queried for availability.
-//     feature_type: Option<bindings::NVSDK_NGX_Feature>,
-//     /// Unique Id provided by NVIDIA corresponding to a particular
-//     /// Application or alternatively custom Id set by Engine.
-//     application_identifier: Option<bindings::NVSDK_NGX_Application_Identifier>,
-//     /// Folder to store logs and other temporary files (write access
-//     /// required), normally this would be a location in Documents or
-//     /// ProgramData.
-//     application_data_path: Option<widestring::WideCString>,
-//     /// Contains information common to all features, presently only a
-//     /// list of all paths feature dlls can be located in, other than the
-//     /// default path - application directory.
-//     common_info: Option<FeatureCommonInfo>,
-// }
-
-// impl FeatureDiscoveryBuilder {
-//     /// Creates a new feature discovery builder. The created feature
-//     /// discovery builder contains blanket values.
-//     pub fn new() -> Self {
-//         Self(bindings::NVSDK_NGX_FeatureDiscoveryInfo {
-//             SDKVersion: bindings::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
-//             FeatureID: bindings::NVSDK_NGX_Feature::NVSDK_NGX_Feature_Reserved_Unknown,
-
-//         })
-//     }
-
-//     /// Consumes the builder and obtains the requirements for the
-//     /// requested feature based on the information provided.
-//     pub fn get_requirements(self) -> Result<FeatureRequirement> {
-//         unimplemented!()
-//     }
-// }
-
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;

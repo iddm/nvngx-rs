@@ -244,16 +244,14 @@ dependencies = [
  "ash",
  "derive_builder",
  "log",
- "nvngx-sys 0.3.0",
+ "nvngx-sys 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid",
  "widestring",
 ]
 
 [[package]]
 name = "nvngx-sys"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96bc9b11de45736fe7dacf652b91e881f7d058bed87c13a62d167d93f0216679"
+version = "0.3.2"
 dependencies = [
  "bindgen",
  "libc",
@@ -263,6 +261,8 @@ dependencies = [
 [[package]]
 name = "nvngx-sys"
 version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a4be7030f255fb9d0c76909bd99289ddc1a1119f4f5f05a5b8cafdb4bf2c294"
 dependencies = [
  "bindgen",
  "libc",
@@ -364,6 +364,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "test_features"
+version = "0.1.0"
+dependencies = [
+ "ash",
+ "nvngx",
 ]
 
 [[package]]

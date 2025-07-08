@@ -90,6 +90,35 @@ impl Default for RayReconstructionEvaluationParameters {
     }
 }
 
+/*
+Streamline sets for DLSSD:
+
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ReflectedAlbedo, ctx.cachedVkResource(reflectedAlbedo));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorBeforeParticles, ctx.cachedVkResource(colorBeforeParticles));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorBeforeTransparency, ctx.cachedVkResource(colorBeforeTransparency));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorBeforeFog, ctx.cachedVkResource(colorBeforeFog));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_DiffuseHitDistance, ctx.cachedVkResource(diffuseHitDistance));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_SpecularHitDistance, ctx.cachedVkResource(specularHitDistance));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_DiffuseRayDirection, ctx.cachedVkResource(diffuseRayDirection));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_SpecularRayDirection, ctx.cachedVkResource(specularRayDirection));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_DiffuseRayDirectionHitDistance, ctx.cachedVkResource(diffuseRayDirectionHitDistance));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_SpecularRayDirectionHitDistance, ctx.cachedVkResource(specularRayDirectionHitDistance));
+
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorAfterParticles, ctx.cachedVkResource(colorAfterParticles));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorAfterTransparency, ctx.cachedVkResource(colorAfterTransparency));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorAfterFog, ctx.cachedVkResource(colorAfterFog));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ScreenSpaceSubsurfaceScatteringGuide, ctx.cachedVkResource(screenSpaceSubsurfaceScatteringGuide));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorBeforeScreenSpaceSubsurfaceScattering, ctx.cachedVkResource(colorBeforeScreenSpaceSubsurfaceScattering));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorAfterScreenSpaceSubsurfaceScattering, ctx.cachedVkResource(colorAfterScreenSpaceSubsurfaceScattering));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ScreenSpaceRefractionGuide, ctx.cachedVkResource(screenSpaceRefractionGuide));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorBeforeScreenSpaceRefraction, ctx.cachedVkResource(colorBeforeScreenSpaceRefraction));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorAfterScreenSpaceRefraction, ctx.cachedVkResource(colorAfterScreenSpaceRefraction));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_DepthOfFieldGuide, ctx.cachedVkResource(depthOfFieldGuide));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorBeforeDepthOfField, ctx.cachedVkResource(colorBeforeDepthOfField));
+    ctx.ngxContext->params->Set(NVSDK_NGX_Parameter_DLSSD_ColorAfterDepthOfField, ctx.cachedVkResource(colorAfterDepthOfField));
+
+*/
+
 impl RayReconstructionEvaluationParameters {
     /// Creates a new set of evaluation parameters for SuperSampling.
     pub fn new() -> Self {
@@ -106,6 +135,85 @@ impl RayReconstructionEvaluationParameters {
     pub fn set_color_output(&mut self, description: VkImageResourceDescription) {
         self.output_color_resource = description.into();
         self.parameters.pInOutput = std::ptr::addr_of_mut!(self.output_color_resource);
+    }
+
+    /// Sets the **Diffuse Albedo** (Diffuse) material.
+    /// This is the diffuse component of Reflectance material. Any
+    /// standard 3-channel format is provided at input resolution.
+    pub fn set_diffuse_reflectance(&mut self, description: VkImageResourceDescription) {
+        // TODO:
+        // self.parameters.pInDiffuseAlbedo = std::ptr::addr_of_mut!(description.into());
+    }
+
+    /// Sets the **Specular Albedo** (Diffuse) material.
+    ///
+    /// This is the specular component of Reflectance material. Any standard 3-channel format
+    /// is provided at input resolution.
+    pub fn set_specular_reflectance(&mut self, description: VkImageResourceDescription) {
+        // TODO:
+        // self.parameters.pInSpecularAlbedo = std::ptr::addr_of_mut!(description.into());
+    }
+
+    /// Sets the **Shading Normals** (Normalized). Can be View Space or
+    /// World Space. RGB16_FLOAT or RGB32_FLOAT provided at input
+    /// resolution.
+    pub fn set_shading_normals(&mut self, description: VkImageResourceDescription) {
+        // TODO:
+        // self.parameters.pInNormals = std::ptr::addr_of_mut!(description.into());
+    }
+
+    /// Sets the **linear roughness**.
+    ///
+    /// Linear Roughness of surface material is provided at input resolution. As a standalone
+    /// texture, you are encouraged to use a single channel format. Otherwise, it should be
+    /// written into the R channel of that texture. Alternatively, you can pack Roughness into
+    /// the Alpha channel of the Normals.
+    ///
+    /// When packing Roughness into the Alpha channel of the Normals, you must set the
+    /// InRoughnessMode parameter of the NVSDK_NGX_DLSSD_Create_Params at Feature Creation to
+    /// NVSDK_NGX_DLSS_Roughness_Mode_Packed.
+    pub fn set_linear_roughness(&mut self, description: VkImageResourceDescription) {
+        // TODO:
+        // self.parameters.pInRoughness = std::ptr::addr_of_mut!(description.into());
+    }
+
+    /// Sets the **Specular Motion Vector Reflections**.
+    ///
+    /// DLSS-RR uses Specular Motion Vectors to improve image quality of reflections during
+    /// motion. The application can either provide these directly or, alternatively, provide
+    /// Specular Hit Distance with 1 and 2 matrices.
+    /// This refers to the dense motion vector field for Reflections (Virtually Reflected
+    /// Geometries). For example, this could include camera motion or the motion of dynamic
+    /// objects. RG16_FLOAT or RG32_FLOAT is provided at input resolution.
+    pub fn set_specular_motion_vectors(&mut self, description: VkImageResourceDescription) {
+        // TODO:
+        // self.parameters.pInSpecMV = std::ptr::addr_of_mut!(description.into());
+    }
+
+    // /// Sets the specular hit distance (FP16 or FP32).
+    // ///
+    // /// This is the World Space distance between the Specular Ray Origin and Hit Point.
+    // /// Specular Ray Origin must be on the Primary Surface. Floating Point Scalar Value (FP16,
+    // /// or FP32).
+    // /// Additionally, the application needs to provide its World To View Matrix and View To Clip
+    // /// Space Matrix.
+
+    // pub fn set_specular_hit_distance(&mut self, distance: f32) {
+    //     // TODO:
+    //     // self.parameters.pInSpecHitDistance = std::ptr::addr_of_mut!(description.into());
+    // }
+
+    /// Sets the transparency overlay.
+    ///
+    /// A buffer that has particles or other transparent effects rendered into it instead of
+    /// passing it as part of the input color.
+    /// Single standard 4-channel input – where RGB must be premultiplied with Alpha, Alpha
+    /// channel is the blending factor.
+    /// Or 2 separate standard 3-channel inputs - One representing color (RcGcBc), other
+    /// representing alpha (RaGaBa)
+    pub fn set_transparency_overlay(&mut self, description: VkImageResourceDescription) {
+        // TODO:
+        // self.parameters.pInTranslucency = std::ptr::addr_of_mut!(description.into());
     }
 
     /// Sets the motion vectors.

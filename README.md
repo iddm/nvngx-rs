@@ -144,6 +144,25 @@ fn update_upscaling_configuration_parameters(&mut self) -> Result {
 }
 ```
 
+## Ray Reconstruction example
+
+The RR feature requires almost the same input as DLSS, with addition
+of a few more parameters to update on each frame.
+
+The integration of RR must happen before DLSS if the latter is used,
+so the actual Ray Reconstruction as a process occurs before upscaling.
+
+That said, if both are used, the rendered image goes first into the
+ray reconstruction stage, then the output from this stage goes into
+the DLSS stage as an input, and then the output of the DLSS stage is
+the ray-reconstructed and DLSS-upscaled output that can be either
+presented or additionally post-processed.
+
+Obviously, for the RR stage, the input and output images must be of
+the same extend and the colour space.
+
+TODO
+
 ## License
 
 MIT
