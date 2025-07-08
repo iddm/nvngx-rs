@@ -1387,16 +1387,6 @@ impl Default for NVSDK_NGX_FeatureRequirement {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ID3D11Resource {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ID3D12Resource {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct NVSDK_NGX_Feature_Create_Params {
     pub InWidth: ::std::os::raw::c_uint,
     pub InHeight: ::std::os::raw::c_uint,
@@ -1550,6 +1540,13 @@ impl Default for NVSDK_NGX_DLDenoise_Create_Params {
 pub struct NVSDK_NGX_Parameter {
     _unused: [u8; 0],
 }
+pub type PFN_NVSDK_NGX_Parameter_SetULL = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        InValue: ::std::os::raw::c_ulonglong,
+    ),
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_SetULL(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1557,6 +1554,13 @@ extern "C" {
         InValue: ::std::os::raw::c_ulonglong,
     );
 }
+pub type PFN_NVSDK_NGX_Parameter_SetF = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        InValue: f32,
+    ),
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_SetF(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1564,6 +1568,13 @@ extern "C" {
         InValue: f32,
     );
 }
+pub type PFN_NVSDK_NGX_Parameter_SetD = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        InValue: f64,
+    ),
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_SetD(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1571,6 +1582,13 @@ extern "C" {
         InValue: f64,
     );
 }
+pub type PFN_NVSDK_NGX_Parameter_SetUI = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        InValue: ::std::os::raw::c_uint,
+    ),
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_SetUI(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1578,6 +1596,13 @@ extern "C" {
         InValue: ::std::os::raw::c_uint,
     );
 }
+pub type PFN_NVSDK_NGX_Parameter_SetI = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        InValue: ::std::os::raw::c_int,
+    ),
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_SetI(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1585,20 +1610,13 @@ extern "C" {
         InValue: ::std::os::raw::c_int,
     );
 }
-extern "C" {
-    pub fn NVSDK_NGX_Parameter_SetD3d11Resource(
+pub type PFN_NVSDK_NGX_Parameter_SetVoidPointer = ::std::option::Option<
+    unsafe extern "C" fn(
         InParameter: *mut NVSDK_NGX_Parameter,
         InName: *const ::std::os::raw::c_char,
-        InValue: *mut ID3D11Resource,
-    );
-}
-extern "C" {
-    pub fn NVSDK_NGX_Parameter_SetD3d12Resource(
-        InParameter: *mut NVSDK_NGX_Parameter,
-        InName: *const ::std::os::raw::c_char,
-        InValue: *mut ID3D12Resource,
-    );
-}
+        InValue: *mut ::std::os::raw::c_void,
+    ),
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_SetVoidPointer(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1606,6 +1624,13 @@ extern "C" {
         InValue: *mut ::std::os::raw::c_void,
     );
 }
+pub type PFN_NVSDK_NGX_Parameter_GetULL = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        OutValue: *mut ::std::os::raw::c_ulonglong,
+    ) -> NVSDK_NGX_Result,
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_GetULL(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1613,6 +1638,13 @@ extern "C" {
         OutValue: *mut ::std::os::raw::c_ulonglong,
     ) -> NVSDK_NGX_Result;
 }
+pub type PFN_NVSDK_NGX_Parameter_GetF = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        OutValue: *mut f32,
+    ) -> NVSDK_NGX_Result,
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_GetF(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1620,6 +1652,13 @@ extern "C" {
         OutValue: *mut f32,
     ) -> NVSDK_NGX_Result;
 }
+pub type PFN_NVSDK_NGX_Parameter_GetD = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        OutValue: *mut f64,
+    ) -> NVSDK_NGX_Result,
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_GetD(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1627,6 +1666,13 @@ extern "C" {
         OutValue: *mut f64,
     ) -> NVSDK_NGX_Result;
 }
+pub type PFN_NVSDK_NGX_Parameter_GetUI = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        OutValue: *mut ::std::os::raw::c_uint,
+    ) -> NVSDK_NGX_Result,
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_GetUI(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1634,6 +1680,13 @@ extern "C" {
         OutValue: *mut ::std::os::raw::c_uint,
     ) -> NVSDK_NGX_Result;
 }
+pub type PFN_NVSDK_NGX_Parameter_GetI = ::std::option::Option<
+    unsafe extern "C" fn(
+        InParameter: *mut NVSDK_NGX_Parameter,
+        InName: *const ::std::os::raw::c_char,
+        OutValue: *mut ::std::os::raw::c_int,
+    ) -> NVSDK_NGX_Result,
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_GetI(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -1641,20 +1694,13 @@ extern "C" {
         OutValue: *mut ::std::os::raw::c_int,
     ) -> NVSDK_NGX_Result;
 }
-extern "C" {
-    pub fn NVSDK_NGX_Parameter_GetD3d11Resource(
+pub type PFN_NVSDK_NGX_Parameter_GetVoidPointer = ::std::option::Option<
+    unsafe extern "C" fn(
         InParameter: *mut NVSDK_NGX_Parameter,
         InName: *const ::std::os::raw::c_char,
-        OutValue: *mut *mut ID3D11Resource,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_Parameter_GetD3d12Resource(
-        InParameter: *mut NVSDK_NGX_Parameter,
-        InName: *const ::std::os::raw::c_char,
-        OutValue: *mut *mut ID3D12Resource,
-    ) -> NVSDK_NGX_Result;
-}
+        OutValue: *mut *mut ::std::os::raw::c_void,
+    ) -> NVSDK_NGX_Result,
+>;
 extern "C" {
     pub fn NVSDK_NGX_Parameter_GetVoidPointer(
         InParameter: *mut NVSDK_NGX_Parameter,
@@ -2003,1104 +2049,18 @@ extern "C" {
 extern "C" {
     pub fn GetNGXResultAsString(InNGXResult: NVSDK_NGX_Result) -> *const wchar_t;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IDXGIAdapter {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ID3D11Device {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ID3D11DeviceContext {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ID3D12Device {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ID3D12GraphicsCommandList {
-    _unused: [u8; 0],
-}
-pub type CUtexObject = ::std::os::raw::c_ulonglong;
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_Init(
-        InApplicationId: ::std::os::raw::c_ulonglong,
-        InApplicationDataPath: *const wchar_t,
-        InDevice: *mut ID3D11Device,
-        InFeatureInfo: *const NVSDK_NGX_FeatureCommonInfo,
-        InSDKVersion: NVSDK_NGX_Version,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_Init(
-        InApplicationId: ::std::os::raw::c_ulonglong,
-        InApplicationDataPath: *const wchar_t,
-        InDevice: *mut ID3D12Device,
-        InFeatureInfo: *const NVSDK_NGX_FeatureCommonInfo,
-        InSDKVersion: NVSDK_NGX_Version,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_Init(
-        InApplicationId: ::std::os::raw::c_ulonglong,
-        InApplicationDataPath: *const wchar_t,
-        InFeatureInfo: *const NVSDK_NGX_FeatureCommonInfo,
-        InSDKVersion: NVSDK_NGX_Version,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_Init_with_ProjectID(
-        InProjectId: *const ::std::os::raw::c_char,
-        InEngineType: NVSDK_NGX_EngineType,
-        InEngineVersion: *const ::std::os::raw::c_char,
-        InApplicationDataPath: *const wchar_t,
-        InDevice: *mut ID3D11Device,
-        InFeatureInfo: *const NVSDK_NGX_FeatureCommonInfo,
-        InSDKVersion: NVSDK_NGX_Version,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_Init_with_ProjectID(
-        InProjectId: *const ::std::os::raw::c_char,
-        InEngineType: NVSDK_NGX_EngineType,
-        InEngineVersion: *const ::std::os::raw::c_char,
-        InApplicationDataPath: *const wchar_t,
-        InDevice: *mut ID3D12Device,
-        InFeatureInfo: *const NVSDK_NGX_FeatureCommonInfo,
-        InSDKVersion: NVSDK_NGX_Version,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_Init_with_ProjectID(
-        InProjectId: *const ::std::os::raw::c_char,
-        InEngineType: NVSDK_NGX_EngineType,
-        InEngineVersion: *const ::std::os::raw::c_char,
-        InApplicationDataPath: *const wchar_t,
-        InFeatureInfo: *const NVSDK_NGX_FeatureCommonInfo,
-        InSDKVersion: NVSDK_NGX_Version,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_Shutdown1(InDevice: *mut ID3D11Device) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_Shutdown1(InDevice: *mut ID3D12Device) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_Shutdown() -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_AllocateParameters(
-        OutParameters: *mut *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_AllocateParameters(
-        OutParameters: *mut *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_AllocateParameters(
-        OutParameters: *mut *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_GetCapabilityParameters(
-        OutParameters: *mut *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_GetCapabilityParameters(
-        OutParameters: *mut *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_GetCapabilityParameters(
-        OutParameters: *mut *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_DestroyParameters(
-        InParameters: *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_DestroyParameters(
-        InParameters: *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_DestroyParameters(
-        InParameters: *mut NVSDK_NGX_Parameter,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_GetScratchBufferSize(
-        InFeatureId: NVSDK_NGX_Feature,
-        InParameters: *const NVSDK_NGX_Parameter,
-        OutSizeInBytes: *mut usize,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_GetScratchBufferSize(
-        InFeatureId: NVSDK_NGX_Feature,
-        InParameters: *const NVSDK_NGX_Parameter,
-        OutSizeInBytes: *mut usize,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_GetScratchBufferSize(
-        InFeatureId: NVSDK_NGX_Feature,
-        InParameters: *const NVSDK_NGX_Parameter,
-        OutSizeInBytes: *mut usize,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_CreateFeature(
-        InDevCtx: *mut ID3D11DeviceContext,
-        InFeatureID: NVSDK_NGX_Feature,
-        InParameters: *mut NVSDK_NGX_Parameter,
-        OutHandle: *mut *mut NVSDK_NGX_Handle,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_CreateFeature(
-        InCmdList: *mut ID3D12GraphicsCommandList,
-        InFeatureID: NVSDK_NGX_Feature,
-        InParameters: *mut NVSDK_NGX_Parameter,
-        OutHandle: *mut *mut NVSDK_NGX_Handle,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_CreateFeature(
-        InFeatureID: NVSDK_NGX_Feature,
-        InParameters: *const NVSDK_NGX_Parameter,
-        OutHandle: *mut *mut NVSDK_NGX_Handle,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_ReleaseFeature(InHandle: *mut NVSDK_NGX_Handle) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_ReleaseFeature(InHandle: *mut NVSDK_NGX_Handle) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_ReleaseFeature(InHandle: *mut NVSDK_NGX_Handle) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_GetFeatureRequirements(
-        Adapter: *mut IDXGIAdapter,
-        FeatureDiscoveryInfo: *const NVSDK_NGX_FeatureDiscoveryInfo,
-        OutSupported: *mut NVSDK_NGX_FeatureRequirement,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_GetFeatureRequirements(
-        Adapter: *mut IDXGIAdapter,
-        FeatureDiscoveryInfo: *const NVSDK_NGX_FeatureDiscoveryInfo,
-        OutSupported: *mut NVSDK_NGX_FeatureRequirement,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D11_EvaluateFeature_C(
-        InDevCtx: *mut ID3D11DeviceContext,
-        InFeatureHandle: *const NVSDK_NGX_Handle,
-        InParameters: *const NVSDK_NGX_Parameter,
-        InCallback: PFN_NVSDK_NGX_ProgressCallback_C,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_D3D12_EvaluateFeature_C(
-        InCmdList: *mut ID3D12GraphicsCommandList,
-        InFeatureHandle: *const NVSDK_NGX_Handle,
-        InParameters: *const NVSDK_NGX_Parameter,
-        InCallback: PFN_NVSDK_NGX_ProgressCallback_C,
-    ) -> NVSDK_NGX_Result;
-}
-extern "C" {
-    pub fn NVSDK_NGX_CUDA_EvaluateFeature_C(
-        InFeatureHandle: *const NVSDK_NGX_Handle,
-        InParameters: *const NVSDK_NGX_Parameter,
-        InCallback: PFN_NVSDK_NGX_ProgressCallback_C,
-    ) -> NVSDK_NGX_Result;
-}
 extern "C" {
     pub fn NVSDK_NGX_UpdateFeature(
         ApplicationId: *const NVSDK_NGX_Application_Identifier,
         FeatureID: NVSDK_NGX_Feature,
     ) -> NVSDK_NGX_Result;
 }
-#[doc = " D3D11"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D11_Feature_Eval_Params {
-    pub pInColor: *mut ID3D11Resource,
-    pub pInOutput: *mut ID3D11Resource,
-    #[doc = " OPTIONAL for DLSS"]
-    pub InSharpness: f32,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D11_Feature_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D11_Feature_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D11_Feature_Eval_Params>(),
-        24usize,
-        "Size of NVSDK_NGX_D3D11_Feature_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D11_Feature_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D11_Feature_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInColor) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D11_Feature_Eval_Params::pInColor"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInOutput) as usize - ptr as usize },
-        8usize,
-        "Offset of field: NVSDK_NGX_D3D11_Feature_Eval_Params::pInOutput"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InSharpness) as usize - ptr as usize },
-        16usize,
-        "Offset of field: NVSDK_NGX_D3D11_Feature_Eval_Params::InSharpness"
-    );
-}
-impl Default for NVSDK_NGX_D3D11_Feature_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_CUDA_Feature_Eval_Params {
-    pub pInColor: *mut CUtexObject,
-    pub pInOutput: *mut CUtexObject,
-    #[doc = " OPTIONAL for DLSS"]
-    pub InSharpness: f32,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_CUDA_Feature_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_CUDA_Feature_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_CUDA_Feature_Eval_Params>(),
-        24usize,
-        "Size of NVSDK_NGX_CUDA_Feature_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_CUDA_Feature_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_CUDA_Feature_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInColor) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_CUDA_Feature_Eval_Params::pInColor"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInOutput) as usize - ptr as usize },
-        8usize,
-        "Offset of field: NVSDK_NGX_CUDA_Feature_Eval_Params::pInOutput"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InSharpness) as usize - ptr as usize },
-        16usize,
-        "Offset of field: NVSDK_NGX_CUDA_Feature_Eval_Params::InSharpness"
-    );
-}
-impl Default for NVSDK_NGX_CUDA_Feature_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D11_GBuffer {
-    pub pInAttrib: [*mut ID3D11Resource; 16usize],
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D11_GBuffer() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D11_GBuffer> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D11_GBuffer>(),
-        128usize,
-        "Size of NVSDK_NGX_D3D11_GBuffer"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D11_GBuffer>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D11_GBuffer"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInAttrib) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D11_GBuffer::pInAttrib"
-    );
-}
-impl Default for NVSDK_NGX_D3D11_GBuffer {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D11_DLSS_Eval_Params {
-    pub Feature: NVSDK_NGX_D3D11_Feature_Eval_Params,
-    pub pInDepth: *mut ID3D11Resource,
-    pub pInMotionVectors: *mut ID3D11Resource,
-    pub InJitterOffsetX: f32,
-    pub InJitterOffsetY: f32,
-    pub InRenderSubrectDimensions: NVSDK_NGX_Dimensions,
-    #[doc = " OPTIONAL - leave to 0/0.0f if unused"]
-    pub InReset: ::std::os::raw::c_int,
-    pub InMVScaleX: f32,
-    pub InMVScaleY: f32,
-    pub pInTransparencyMask: *mut ID3D11Resource,
-    pub pInExposureTexture: *mut ID3D11Resource,
-    pub pInBiasCurrentColorMask: *mut ID3D11Resource,
-    pub InColorSubrectBase: NVSDK_NGX_Coordinates,
-    pub InDepthSubrectBase: NVSDK_NGX_Coordinates,
-    pub InMVSubrectBase: NVSDK_NGX_Coordinates,
-    pub InTranslucencySubrectBase: NVSDK_NGX_Coordinates,
-    pub InBiasCurrentColorSubrectBase: NVSDK_NGX_Coordinates,
-    pub InOutputSubrectBase: NVSDK_NGX_Coordinates,
-    pub InPreExposure: f32,
-    pub InExposureScale: f32,
-    pub InIndicatorInvertXAxis: ::std::os::raw::c_int,
-    pub InIndicatorInvertYAxis: ::std::os::raw::c_int,
-    #[doc = " OPTIONAL - only for research purposes"]
-    pub GBufferSurface: NVSDK_NGX_D3D11_GBuffer,
-    pub InToneMapperType: NVSDK_NGX_ToneMapperType,
-    pub pInMotionVectors3D: *mut ID3D11Resource,
-    pub pInIsParticleMask: *mut ID3D11Resource,
-    pub pInAnimatedTextureMask: *mut ID3D11Resource,
-    pub pInDepthHighRes: *mut ID3D11Resource,
-    pub pInPositionViewSpace: *mut ID3D11Resource,
-    pub InFrameTimeDeltaInMsec: f32,
-    pub pInRayTracingHitDistance: *mut ID3D11Resource,
-    pub pInMotionVectorsReflections: *mut ID3D11Resource,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D11_DLSS_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D11_DLSS_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D11_DLSS_Eval_Params>(),
-        360usize,
-        "Size of NVSDK_NGX_D3D11_DLSS_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D11_DLSS_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D11_DLSS_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).Feature) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::Feature"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInDepth) as usize - ptr as usize },
-        24usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInDepth"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInMotionVectors) as usize - ptr as usize },
-        32usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInMotionVectors"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InJitterOffsetX) as usize - ptr as usize },
-        40usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InJitterOffsetX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InJitterOffsetY) as usize - ptr as usize },
-        44usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InJitterOffsetY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRenderSubrectDimensions) as usize - ptr as usize },
-        48usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InRenderSubrectDimensions"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InReset) as usize - ptr as usize },
-        56usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InReset"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InMVScaleX) as usize - ptr as usize },
-        60usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InMVScaleX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InMVScaleY) as usize - ptr as usize },
-        64usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InMVScaleY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInTransparencyMask) as usize - ptr as usize },
-        72usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInTransparencyMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInExposureTexture) as usize - ptr as usize },
-        80usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInExposureTexture"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInBiasCurrentColorMask) as usize - ptr as usize },
-        88usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInBiasCurrentColorMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InColorSubrectBase) as usize - ptr as usize },
-        96usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InColorSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InDepthSubrectBase) as usize - ptr as usize },
-        104usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InDepthSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InMVSubrectBase) as usize - ptr as usize },
-        112usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InMVSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InTranslucencySubrectBase) as usize - ptr as usize },
-        120usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InTranslucencySubrectBase"
-    );
-    assert_eq!(
-        unsafe {
-            ::std::ptr::addr_of!((*ptr).InBiasCurrentColorSubrectBase) as usize - ptr as usize
-        },
-        128usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InBiasCurrentColorSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InOutputSubrectBase) as usize - ptr as usize },
-        136usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InOutputSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InPreExposure) as usize - ptr as usize },
-        144usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InPreExposure"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InExposureScale) as usize - ptr as usize },
-        148usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InExposureScale"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InIndicatorInvertXAxis) as usize - ptr as usize },
-        152usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InIndicatorInvertXAxis"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InIndicatorInvertYAxis) as usize - ptr as usize },
-        156usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InIndicatorInvertYAxis"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).GBufferSurface) as usize - ptr as usize },
-        160usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::GBufferSurface"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InToneMapperType) as usize - ptr as usize },
-        288usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InToneMapperType"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInMotionVectors3D) as usize - ptr as usize },
-        296usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInMotionVectors3D"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInIsParticleMask) as usize - ptr as usize },
-        304usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInIsParticleMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInAnimatedTextureMask) as usize - ptr as usize },
-        312usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInAnimatedTextureMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInDepthHighRes) as usize - ptr as usize },
-        320usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInDepthHighRes"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInPositionViewSpace) as usize - ptr as usize },
-        328usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInPositionViewSpace"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InFrameTimeDeltaInMsec) as usize - ptr as usize },
-        336usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::InFrameTimeDeltaInMsec"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInRayTracingHitDistance) as usize - ptr as usize },
-        344usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInRayTracingHitDistance"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInMotionVectorsReflections) as usize - ptr as usize },
-        352usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLSS_Eval_Params::pInMotionVectorsReflections"
-    );
-}
-impl Default for NVSDK_NGX_D3D11_DLSS_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D11_DLISP_Eval_Params {
-    pub Feature: NVSDK_NGX_D3D11_Feature_Eval_Params,
-    #[doc = " OPTIONAL - leave to 0/0.0f if unused"]
-    pub InRectX: ::std::os::raw::c_uint,
-    pub InRectY: ::std::os::raw::c_uint,
-    pub InRectW: ::std::os::raw::c_uint,
-    pub InRectH: ::std::os::raw::c_uint,
-    pub InDenoise: f32,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D11_DLISP_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D11_DLISP_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D11_DLISP_Eval_Params>(),
-        48usize,
-        "Size of NVSDK_NGX_D3D11_DLISP_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D11_DLISP_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D11_DLISP_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).Feature) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLISP_Eval_Params::Feature"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectX) as usize - ptr as usize },
-        24usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLISP_Eval_Params::InRectX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectY) as usize - ptr as usize },
-        28usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLISP_Eval_Params::InRectY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectW) as usize - ptr as usize },
-        32usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLISP_Eval_Params::InRectW"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectH) as usize - ptr as usize },
-        36usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLISP_Eval_Params::InRectH"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InDenoise) as usize - ptr as usize },
-        40usize,
-        "Offset of field: NVSDK_NGX_D3D11_DLISP_Eval_Params::InDenoise"
-    );
-}
-impl Default for NVSDK_NGX_D3D11_DLISP_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_CUDA_DLISP_Eval_Params {
-    pub Feature: NVSDK_NGX_CUDA_Feature_Eval_Params,
-    #[doc = " OPTIONAL - leave to 0/0.0f if unused"]
-    pub InRectX: ::std::os::raw::c_uint,
-    pub InRectY: ::std::os::raw::c_uint,
-    pub InRectW: ::std::os::raw::c_uint,
-    pub InRectH: ::std::os::raw::c_uint,
-    pub InDenoise: f32,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_CUDA_DLISP_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_CUDA_DLISP_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_CUDA_DLISP_Eval_Params>(),
-        48usize,
-        "Size of NVSDK_NGX_CUDA_DLISP_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_CUDA_DLISP_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_CUDA_DLISP_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).Feature) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_CUDA_DLISP_Eval_Params::Feature"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectX) as usize - ptr as usize },
-        24usize,
-        "Offset of field: NVSDK_NGX_CUDA_DLISP_Eval_Params::InRectX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectY) as usize - ptr as usize },
-        28usize,
-        "Offset of field: NVSDK_NGX_CUDA_DLISP_Eval_Params::InRectY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectW) as usize - ptr as usize },
-        32usize,
-        "Offset of field: NVSDK_NGX_CUDA_DLISP_Eval_Params::InRectW"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectH) as usize - ptr as usize },
-        36usize,
-        "Offset of field: NVSDK_NGX_CUDA_DLISP_Eval_Params::InRectH"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InDenoise) as usize - ptr as usize },
-        40usize,
-        "Offset of field: NVSDK_NGX_CUDA_DLISP_Eval_Params::InDenoise"
-    );
-}
-impl Default for NVSDK_NGX_CUDA_DLISP_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = " D3D12"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D12_Feature_Eval_Params {
-    pub pInColor: *mut ID3D12Resource,
-    pub pInOutput: *mut ID3D12Resource,
-    #[doc = " OPTIONAL for DLSS"]
-    pub InSharpness: f32,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D12_Feature_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D12_Feature_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D12_Feature_Eval_Params>(),
-        24usize,
-        "Size of NVSDK_NGX_D3D12_Feature_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D12_Feature_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D12_Feature_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInColor) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D12_Feature_Eval_Params::pInColor"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInOutput) as usize - ptr as usize },
-        8usize,
-        "Offset of field: NVSDK_NGX_D3D12_Feature_Eval_Params::pInOutput"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InSharpness) as usize - ptr as usize },
-        16usize,
-        "Offset of field: NVSDK_NGX_D3D12_Feature_Eval_Params::InSharpness"
-    );
-}
-impl Default for NVSDK_NGX_D3D12_Feature_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D12_GBuffer {
-    pub pInAttrib: [*mut ID3D12Resource; 16usize],
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D12_GBuffer() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D12_GBuffer> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D12_GBuffer>(),
-        128usize,
-        "Size of NVSDK_NGX_D3D12_GBuffer"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D12_GBuffer>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D12_GBuffer"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInAttrib) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D12_GBuffer::pInAttrib"
-    );
-}
-impl Default for NVSDK_NGX_D3D12_GBuffer {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D12_DLSS_Eval_Params {
-    pub Feature: NVSDK_NGX_D3D12_Feature_Eval_Params,
-    pub pInDepth: *mut ID3D12Resource,
-    pub pInMotionVectors: *mut ID3D12Resource,
-    pub InJitterOffsetX: f32,
-    pub InJitterOffsetY: f32,
-    pub InRenderSubrectDimensions: NVSDK_NGX_Dimensions,
-    #[doc = " OPTIONAL - leave to 0/0.0f if unused"]
-    pub InReset: ::std::os::raw::c_int,
-    pub InMVScaleX: f32,
-    pub InMVScaleY: f32,
-    pub pInTransparencyMask: *mut ID3D12Resource,
-    pub pInExposureTexture: *mut ID3D12Resource,
-    pub pInBiasCurrentColorMask: *mut ID3D12Resource,
-    pub InColorSubrectBase: NVSDK_NGX_Coordinates,
-    pub InDepthSubrectBase: NVSDK_NGX_Coordinates,
-    pub InMVSubrectBase: NVSDK_NGX_Coordinates,
-    pub InTranslucencySubrectBase: NVSDK_NGX_Coordinates,
-    pub InBiasCurrentColorSubrectBase: NVSDK_NGX_Coordinates,
-    pub InOutputSubrectBase: NVSDK_NGX_Coordinates,
-    pub InPreExposure: f32,
-    pub InExposureScale: f32,
-    pub InIndicatorInvertXAxis: ::std::os::raw::c_int,
-    pub InIndicatorInvertYAxis: ::std::os::raw::c_int,
-    #[doc = " OPTIONAL - only for research purposes"]
-    pub GBufferSurface: NVSDK_NGX_D3D12_GBuffer,
-    pub InToneMapperType: NVSDK_NGX_ToneMapperType,
-    pub pInMotionVectors3D: *mut ID3D12Resource,
-    pub pInIsParticleMask: *mut ID3D12Resource,
-    pub pInAnimatedTextureMask: *mut ID3D12Resource,
-    pub pInDepthHighRes: *mut ID3D12Resource,
-    pub pInPositionViewSpace: *mut ID3D12Resource,
-    pub InFrameTimeDeltaInMsec: f32,
-    pub pInRayTracingHitDistance: *mut ID3D12Resource,
-    pub pInMotionVectorsReflections: *mut ID3D12Resource,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D12_DLSS_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D12_DLSS_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D12_DLSS_Eval_Params>(),
-        360usize,
-        "Size of NVSDK_NGX_D3D12_DLSS_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D12_DLSS_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D12_DLSS_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).Feature) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::Feature"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInDepth) as usize - ptr as usize },
-        24usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInDepth"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInMotionVectors) as usize - ptr as usize },
-        32usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInMotionVectors"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InJitterOffsetX) as usize - ptr as usize },
-        40usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InJitterOffsetX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InJitterOffsetY) as usize - ptr as usize },
-        44usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InJitterOffsetY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRenderSubrectDimensions) as usize - ptr as usize },
-        48usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InRenderSubrectDimensions"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InReset) as usize - ptr as usize },
-        56usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InReset"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InMVScaleX) as usize - ptr as usize },
-        60usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InMVScaleX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InMVScaleY) as usize - ptr as usize },
-        64usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InMVScaleY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInTransparencyMask) as usize - ptr as usize },
-        72usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInTransparencyMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInExposureTexture) as usize - ptr as usize },
-        80usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInExposureTexture"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInBiasCurrentColorMask) as usize - ptr as usize },
-        88usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInBiasCurrentColorMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InColorSubrectBase) as usize - ptr as usize },
-        96usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InColorSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InDepthSubrectBase) as usize - ptr as usize },
-        104usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InDepthSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InMVSubrectBase) as usize - ptr as usize },
-        112usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InMVSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InTranslucencySubrectBase) as usize - ptr as usize },
-        120usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InTranslucencySubrectBase"
-    );
-    assert_eq!(
-        unsafe {
-            ::std::ptr::addr_of!((*ptr).InBiasCurrentColorSubrectBase) as usize - ptr as usize
-        },
-        128usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InBiasCurrentColorSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InOutputSubrectBase) as usize - ptr as usize },
-        136usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InOutputSubrectBase"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InPreExposure) as usize - ptr as usize },
-        144usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InPreExposure"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InExposureScale) as usize - ptr as usize },
-        148usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InExposureScale"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InIndicatorInvertXAxis) as usize - ptr as usize },
-        152usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InIndicatorInvertXAxis"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InIndicatorInvertYAxis) as usize - ptr as usize },
-        156usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InIndicatorInvertYAxis"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).GBufferSurface) as usize - ptr as usize },
-        160usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::GBufferSurface"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InToneMapperType) as usize - ptr as usize },
-        288usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InToneMapperType"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInMotionVectors3D) as usize - ptr as usize },
-        296usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInMotionVectors3D"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInIsParticleMask) as usize - ptr as usize },
-        304usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInIsParticleMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInAnimatedTextureMask) as usize - ptr as usize },
-        312usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInAnimatedTextureMask"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInDepthHighRes) as usize - ptr as usize },
-        320usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInDepthHighRes"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInPositionViewSpace) as usize - ptr as usize },
-        328usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInPositionViewSpace"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InFrameTimeDeltaInMsec) as usize - ptr as usize },
-        336usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::InFrameTimeDeltaInMsec"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInRayTracingHitDistance) as usize - ptr as usize },
-        344usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInRayTracingHitDistance"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).pInMotionVectorsReflections) as usize - ptr as usize },
-        352usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLSS_Eval_Params::pInMotionVectorsReflections"
-    );
-}
-impl Default for NVSDK_NGX_D3D12_DLSS_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NVSDK_NGX_D3D12_DLISP_Eval_Params {
-    pub Feature: NVSDK_NGX_D3D12_Feature_Eval_Params,
-    #[doc = " OPTIONAL"]
-    pub InRectX: ::std::os::raw::c_uint,
-    pub InRectY: ::std::os::raw::c_uint,
-    pub InRectW: ::std::os::raw::c_uint,
-    pub InRectH: ::std::os::raw::c_uint,
-    pub InDenoise: f32,
-}
-#[test]
-fn bindgen_test_layout_NVSDK_NGX_D3D12_DLISP_Eval_Params() {
-    const UNINIT: ::std::mem::MaybeUninit<NVSDK_NGX_D3D12_DLISP_Eval_Params> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<NVSDK_NGX_D3D12_DLISP_Eval_Params>(),
-        48usize,
-        "Size of NVSDK_NGX_D3D12_DLISP_Eval_Params"
-    );
-    assert_eq!(
-        ::std::mem::align_of::<NVSDK_NGX_D3D12_DLISP_Eval_Params>(),
-        8usize,
-        "Alignment of NVSDK_NGX_D3D12_DLISP_Eval_Params"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).Feature) as usize - ptr as usize },
-        0usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLISP_Eval_Params::Feature"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectX) as usize - ptr as usize },
-        24usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLISP_Eval_Params::InRectX"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectY) as usize - ptr as usize },
-        28usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLISP_Eval_Params::InRectY"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectW) as usize - ptr as usize },
-        32usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLISP_Eval_Params::InRectW"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InRectH) as usize - ptr as usize },
-        36usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLISP_Eval_Params::InRectH"
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).InDenoise) as usize - ptr as usize },
-        40usize,
-        "Offset of field: NVSDK_NGX_D3D12_DLISP_Eval_Params::InDenoise"
-    );
-}
-impl Default for NVSDK_NGX_D3D12_DLISP_Eval_Params {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
+pub type PFN_NVSDK_NGX_DLSS_GetStatsCallback = ::std::option::Option<
+    unsafe extern "C" fn(InParams: *mut NVSDK_NGX_Parameter) -> NVSDK_NGX_Result,
+>;
+pub type PFN_NVSDK_NGX_DLSS_GetOptimalSettingsCallback = ::std::option::Option<
+    unsafe extern "C" fn(InParams: *mut NVSDK_NGX_Parameter) -> NVSDK_NGX_Result,
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct NVSDK_NGX_VK_Feature_Eval_Params {
