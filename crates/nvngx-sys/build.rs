@@ -111,6 +111,12 @@ fn main() {
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
+        // Types and functions defined by the SDK:
+        .allowlist_item("NVSDK_NGX_\\w+")
+        // Single exception for a function that doesn't adhere to the naming standard:
+        .allowlist_function("GetNGXResultAsString")
+        // Exportable symbols defined by our `bindings.c/h`, wrapping `static inline` helpers
+        .allowlist_function("HELPERS_NGX_\\w+")
         .impl_debug(true)
         .impl_partialeq(true)
         .prepend_enum_name(false)
