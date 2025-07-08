@@ -1,6 +1,5 @@
 //! Vulkan bindings to NGX.
 
-use std::mem::ManuallyDrop;
 use std::rc::Rc;
 
 use ash::vk::{self, Handle};
