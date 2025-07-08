@@ -149,10 +149,7 @@ impl System {
         let engine_version = std::ffi::CString::new(engine_version).unwrap();
         let application_data_path =
             widestring::WideString::from_str(application_data_path.to_str().unwrap());
-        #[allow(
-            clippy::missing_transmute_annotations,
-            reason = "Transmutes will be removed soon again"
-        )]
+        #[allow(clippy::missing_transmute_annotations)] // Transmutes will be removed soon again"
         Result::from(unsafe {
             nvngx_sys::NVSDK_NGX_VULKAN_Init_with_ProjectID(
                 project_id.as_ptr(),

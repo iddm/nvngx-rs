@@ -336,7 +336,7 @@ impl SuperSamplingFeature {
     }
 
     /// Returns the rendering resolution (input resolution) of the
-    /// image that needs to be upscaled to the [`Self::target_resolution`].
+    /// image that needs to be upscaled to the `target_resolution`.
     pub const fn get_rendering_resolution(&self) -> vk::Extent2D {
         self.rendering_resolution
     }
