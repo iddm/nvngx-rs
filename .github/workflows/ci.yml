@@ -61,6 +61,27 @@ jobs:
         if: matrix.features == ''
         run: cargo build --no-default-features
 
+  rustfmt:
+    name: Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
+          profile: minimal
+          override: true
+
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
+
   clippy:
     name: Run clippy
     runs-on: ubuntu-latest
@@ -89,7 +110,8 @@ jobs:
       - name: Install Vulkan loader
         run: sudo apt-get install libvulkan-dev
 
-      - run: cargo clippy
+      - name: Run clippy with disallowed warnings
+        run: cargo clippy --workspace --all-targets --all-features -- -Dwarnings
 
   MSRV:
     runs-on: ubuntu-latest
@@ -118,6 +140,7 @@ jobs:
       - name: Install Vulkan loader
         run: sudo apt-get install libvulkan-dev
 
+      # Ensure that it still builds, while allowing warnings
       - run: cargo check --all-features
 
   doc:
