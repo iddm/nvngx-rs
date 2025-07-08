@@ -132,38 +132,6 @@ pub struct System {
     device: vk::Device,
 }
 
-/// Current [`ash::Entry`] with which the NGX was associated.
-static mut ASH_ENTRY: Option<ManuallyDrop<ash::Entry>> = None;
-
-/// Current [`ash::Instance`] with which the NGX was associated.
-static mut ASH_INSTANCE: Option<ManuallyDrop<ash::Instance>> = None;
-
-unsafe extern "C" fn get_instance_proc_addr<T>(
-    instance: *mut T,
-    proc_name: *const i8,
-) -> Option<unsafe extern "C" fn()> {
-    ASH_ENTRY.as_ref().and_then(|e| {
-        let instance = instance as *mut u8;
-        let address = instance.offset_from(std::ptr::null::<u8>());
-        let raw_handle = address as u64;
-        e.get_instance_proc_addr(vk::Instance::from_raw(raw_handle), proc_name)
-            .map(|p| std::mem::transmute(p))
-    })
-}
-
-unsafe extern "C" fn get_device_proc_addr<T>(
-    logical_device: *mut T,
-    proc_name: *const i8,
-) -> Option<unsafe extern "C" fn()> {
-    ASH_INSTANCE.as_ref().and_then(|i| {
-        let logical_device = logical_device as *mut u8;
-        let address = logical_device.offset_from(std::ptr::null::<u8>());
-        let raw_handle = address as u64;
-        (i.fp_v1_0().get_device_proc_addr)(vk::Device::from_raw(raw_handle), proc_name)
-            .map(|p| std::mem::transmute(p))
-    })
-}
-
 impl System {
     /// Creates a new NVIDIA NGX system.
     pub fn new(
@@ -175,10 +143,6 @@ impl System {
         physical_device: vk::PhysicalDevice,
         logical_device: vk::Device,
     ) -> Result<Self> {
-        unsafe {
-            ASH_ENTRY = Some(ManuallyDrop::new(entry.clone()));
-            ASH_INSTANCE = Some(ManuallyDrop::new(instance.clone()));
-        }
         let engine_type = nvngx_sys::NVSDK_NGX_EngineType::NVSDK_NGX_ENGINE_TYPE_CUSTOM;
         let project_id =
             std::ffi::CString::new(project_id.unwrap_or_else(uuid::Uuid::new_v4).to_string())
@@ -186,6 +150,10 @@ impl System {
         let engine_version = std::ffi::CString::new(engine_version).unwrap();
         let application_data_path =
             widestring::WideString::from_str(application_data_path.to_str().unwrap());
+        #[allow(
+            clippy::missing_transmute_annotations,
+            reason = "Transmutes will be removed soon again"
+        )]
         Result::from(unsafe {
             nvngx_sys::NVSDK_NGX_VULKAN_Init_with_ProjectID(
                 project_id.as_ptr(),
@@ -195,8 +163,12 @@ impl System {
                 instance.handle().as_pointer_mut(),
                 physical_device.as_pointer_mut(),
                 logical_device.as_pointer_mut(),
-                Some(get_instance_proc_addr),
-                Some(get_device_proc_addr),
+                // SAFETY: The C definition of these functions is identical/compatible, they just
+                // use a different "opaque" Rust wrapper type to define the type of `VkInstance`.
+                Some(std::mem::transmute(
+                    entry.static_fn().get_instance_proc_addr,
+                )),
+                Some(std::mem::transmute(instance.fp_v1_0().get_device_proc_addr)),
                 std::ptr::null(),
                 nvngx_sys::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
             )
