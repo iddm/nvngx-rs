@@ -2,11 +2,11 @@
 
 use std::rc::Rc;
 
-use ash::vk::{self, Handle};
+use ash::vk;
 use nvngx_sys::{
     NVSDK_NGX_Coordinates, NVSDK_NGX_Dimensions, NVSDK_NGX_Feature, NVSDK_NGX_ImageViewInfo_VK,
     NVSDK_NGX_PerfQuality_Value, NVSDK_NGX_Resource_VK, NVSDK_NGX_Resource_VK_Type,
-    NVSDK_NGX_Resource_VK__bindgen_ty_1, Result, VkFormat, VkImageSubresourceRange,
+    NVSDK_NGX_Resource_VK__bindgen_ty_1, Result,
 };
 
 pub mod feature;
@@ -16,24 +16,14 @@ pub use super_sampling::*;
 pub mod ray_reconstruction;
 pub use ray_reconstruction::*;
 
-/// Returns a mutable pointer for [`ash::vk::Handle`].
-fn ash_handle_to_pointer_mut<H: Handle + Copy, T>(ash_handle: &H) -> *mut T {
-    let address = ash_handle.as_raw();
-    let pointer = std::ptr::null_mut::<u8>();
-    let pointer = unsafe { pointer.add(address as _) };
-    pointer.cast()
-}
-
 fn convert_slice_of_strings_to_cstrings(data: &[String]) -> Result<Vec<std::ffi::CString>> {
     let strings: Vec<_> = data
         .iter()
         .cloned()
-        .filter_map(|s| std::ffi::CString::new(s).ok())
-        .collect();
-
-    if strings.len() != data.len() {
-        return Err("Couldn't convert the extensions to CStrings.".into());
-    }
+        .map(std::ffi::CString::new)
+        .collect::<Result<_, _>>()
+        // TODO: Add NulError to our Error enum?
+        .map_err(|_| "Couldn't convert the extensions to CStrings.".to_string())?;
 
     Ok(strings)
 }
@@ -68,10 +58,10 @@ impl RequiredExtensions {
         let mut device_count = 0u32;
         Result::from(unsafe {
             nvngx_sys::NVSDK_NGX_VULKAN_RequiredExtensions(
-                &mut instance_count as *mut _,
-                &mut instance_extensions as *mut _,
-                &mut device_count as *mut _,
-                &mut device_extensions as *mut _,
+                &mut instance_count,
+                &mut instance_extensions,
+                &mut device_count,
+                &mut device_extensions,
             )
         })?;
 
@@ -104,26 +94,6 @@ impl RequiredExtensions {
     }
 }
 
-/// Implementors of this trait can convert to a pointer of custom type
-/// `T` from their [`ash::vk::Handle::as_raw`].
-trait HandleToPointer<T> {
-    /// Converts the raw handle to any pointer.
-    ///
-    /// # Safety
-    ///
-    /// The pointer converted isn't checked, so use it on your own risk.
-    unsafe fn as_pointer_mut(&self) -> *mut T;
-}
-
-impl<T, H> HandleToPointer<T> for H
-where
-    H: Handle + Copy,
-{
-    unsafe fn as_pointer_mut(&self) -> *mut T {
-        ash_handle_to_pointer_mut(self)
-    }
-}
-
 /// NVIDIA NGX system.
 #[repr(transparent)]
 #[derive(Debug)]
@@ -149,22 +119,17 @@ impl System {
         let engine_version = std::ffi::CString::new(engine_version).unwrap();
         let application_data_path =
             widestring::WideString::from_str(application_data_path.to_str().unwrap());
-        #[allow(clippy::missing_transmute_annotations)] // Transmutes will be removed soon again"
         Result::from(unsafe {
             nvngx_sys::NVSDK_NGX_VULKAN_Init_with_ProjectID(
                 project_id.as_ptr(),
                 engine_type,
                 engine_version.as_ptr(),
                 application_data_path.as_ptr().cast(),
-                instance.handle().as_pointer_mut(),
-                physical_device.as_pointer_mut(),
-                logical_device.as_pointer_mut(),
-                // SAFETY: The C definition of these functions is identical/compatible, they just
-                // use a different "opaque" Rust wrapper type to define the type of `VkInstance`.
-                Some(std::mem::transmute(
-                    entry.static_fn().get_instance_proc_addr,
-                )),
-                Some(std::mem::transmute(instance.fp_v1_0().get_device_proc_addr)),
+                instance.handle(),
+                physical_device,
+                logical_device,
+                entry.static_fn().get_instance_proc_addr,
+                instance.fp_v1_0().get_device_proc_addr,
                 std::ptr::null(),
                 nvngx_sys::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
             )
@@ -175,7 +140,7 @@ impl System {
     }
 
     fn shutdown(&self) -> Result {
-        unsafe { nvngx_sys::NVSDK_NGX_VULKAN_Shutdown1(self.device.as_pointer_mut()) }.into()
+        unsafe { nvngx_sys::NVSDK_NGX_VULKAN_Shutdown1(self.device) }.into()
     }
 
     /// Creates a new [`Feature`] with the logical device used to create
@@ -292,28 +257,28 @@ impl VkImageResourceDescription {
 
 impl From<VkImageResourceDescription> for NVSDK_NGX_Resource_VK {
     fn from(value: VkImageResourceDescription) -> Self {
-        let vk_image_subresource_range = VkImageSubresourceRange {
-            aspectMask: value.subresource_range.aspect_mask.as_raw(),
-            baseMipLevel: value.subresource_range.base_mip_level,
-            baseArrayLayer: value.subresource_range.base_array_layer,
-            levelCount: value.subresource_range.level_count,
-            layerCount: value.subresource_range.layer_count,
+        let vk_image_subresource_range = vk::ImageSubresourceRange {
+            aspect_mask: value.subresource_range.aspect_mask,
+            base_mip_level: value.subresource_range.base_mip_level,
+            base_array_layer: value.subresource_range.base_array_layer,
+            level_count: value.subresource_range.level_count,
+            layer_count: value.subresource_range.layer_count,
         };
-        let mut vk_format: VkFormat = unsafe { std::mem::zeroed() };
-        unsafe {
-            let ptr = &mut vk_format as *mut _ as *mut i32;
-            *ptr = value.format.as_raw();
-        }
-        let image_resource = NVSDK_NGX_Resource_VK__bindgen_ty_1 {
-            ImageViewInfo: NVSDK_NGX_ImageViewInfo_VK {
-                ImageView: unsafe { value.image_view.as_pointer_mut() },
-                Image: unsafe { value.image.as_pointer_mut() },
-                SubresourceRange: vk_image_subresource_range,
-                Format: vk_format,
-                Width: value.width,
-                Height: value.height,
-            },
+
+        let image_view_info = NVSDK_NGX_ImageViewInfo_VK {
+            ImageView: value.image_view,
+            Image: value.image,
+            SubresourceRange: vk_image_subresource_range,
+            Format: value.format,
+            Width: value.width,
+            Height: value.height,
         };
+
+        // Cannot use a Rust `union` constructor because bindgen doesn't know
+        // our `Vk*` types anymore and wraps them in __BindgenUnionField:
+        // https://github.com/rust-lang/rust-bindgen/issues/2187#issuecomment-3048892937
+        let mut image_resource = NVSDK_NGX_Resource_VK__bindgen_ty_1::default();
+        unsafe { *image_resource.ImageViewInfo.as_mut() = image_view_info }
 
         Self {
             Resource: image_resource,
