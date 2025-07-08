@@ -63,7 +63,7 @@ impl RayReconstructionCreateParameters {
 
 /// The Ray Reconstruction evaluation parameters.
 ///
-/// Similar to [`crate::nvngx_sys::NVSDK_NGX_VK_DLSSD_Eval_Params`].
+/// Similar to [`nvngx_sys::NVSDK_NGX_VK_DLSSD_Eval_Params`].
 #[derive(Debug)]
 pub struct RayReconstructionEvaluationParameters {
     /// The vulkan resource which is an input to the evaluation
