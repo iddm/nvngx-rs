@@ -9,7 +9,6 @@ license = "MIT"
 keywords = ["nvidia", "ngx", "DLSS", "upscaling", "supersampling"]
 rust-version = "1.70"
 repository = "https://github.com/iddm/nvngx-rs"
-documentation = "https://docs.rs/nvngx-rs"
 
 [dependencies]
 widestring = "1"

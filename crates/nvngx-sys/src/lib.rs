@@ -1,4 +1,4 @@
-//! The `nvngx-sys` is a crate carefully wrapping the NVIDIA NGX library.
+//! [`nvngx-sys`] provides low-level "sys" bindings to the NVIDIA NGX library.
 
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]

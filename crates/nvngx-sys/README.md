@@ -1,6 +1,6 @@
 [![CI](https://github.com/iddm/nvngx-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/iddm/nvngx-rs/actions/workflows/ci.yml)
-[![Crates](https://img.shields.io/crates/v/nvngx-rs.svg)](https://crates.io/crates/nvngx)
-[![Docs](https://docs.rs/nvngx-rs/badge.svg)](https://docs.rs/nvngx)
+[![Crates](https://img.shields.io/crates/v/nvngx-sys.svg)](https://crates.io/crates/nvngx-sys)
+[![Docs](https://docs.rs/nvngx-sys/badge.svg)](https://docs.rs/nvngx-sys)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 # nvngx-sys
