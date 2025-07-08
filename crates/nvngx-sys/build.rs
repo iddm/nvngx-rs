@@ -79,14 +79,17 @@ fn generate_bindings() {
         .allowlist_function("HELPERS_NGX_\\w+")
         // Platform-specific type provided by libc
         .blocklist_type("wchar_t")
+        // Disable all Vulkan types which will be imported in-scope from the `ash` crate
+        .blocklist_type("Vk\\w+")
+        .blocklist_type("PFN_vk\\w+")
         .impl_debug(true)
         .impl_partialeq(true)
+        .derive_default(true)
         .prepend_enum_name(false)
         .generate_inline_functions(true)
         .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
+        .bitfield_enum("NVSDK_NGX_Feature_Support_Result")
         // .generate_cstr(true)
-        // .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
-        // .bitfield_enum("NVSDK_NGX_Result")
         .disable_name_namespacing()
         .disable_nested_struct_naming()
         .default_enum_style(bindgen::EnumVariation::Rust {

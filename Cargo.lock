@@ -252,6 +252,7 @@ dependencies = [
 name = "nvngx-sys"
 version = "0.3.1"
 dependencies = [
+ "ash",
  "bindgen",
  "cc",
  "libc",
