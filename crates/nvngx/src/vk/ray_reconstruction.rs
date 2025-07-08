@@ -30,7 +30,7 @@ pub struct RayReconstructionCreateParameters(pub(crate) nvngx_sys::NVSDK_NGX_DLS
 impl RayReconstructionCreateParameters {
     /// Creates a new set of create parameters for the SuperSampling
     /// feature.
-    #[allow(clippy::too_many_arguments, reason = "Struct constructor")]
+    #[allow(clippy::too_many_arguments)] // Struct constructor
     pub fn new(
         render_width: u32,
         render_height: u32,
@@ -243,7 +243,7 @@ impl RayReconstructionFeature {
     }
 
     /// Returns the rendering resolution (input resolution) of the
-    /// image that needs to be upscaled to the [`Self::target_resolution`].
+    /// image that needs to be upscaled to the `target_resolution`.
     pub const fn get_rendering_resolution(&self) -> vk::Extent2D {
         self.rendering_resolution
     }

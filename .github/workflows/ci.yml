@@ -1,6 +1,10 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * *'
 
 env:
   minrust: 1.70.0
@@ -8,21 +12,20 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        name:
+        os:
+          - ubuntu-latest
+          # Windows support for this crate is pending
+          # - windows-2025 # 2025 for winget
+
+        toolchain:
           - stable
           - beta
           - nightly
-
-        include:
-          - name: beta
-            toolchain: beta
-          - name: nightly
-            toolchain: nightly
 
     steps:
       - name: Checkout sources
@@ -48,8 +51,12 @@ jobs:
             target
           key: ${{ runner.os }}-test-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
 
-      - name: Install Vulkan loader
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Windows' }}
+        run: winget install --accept-package-agreements --accept-source-agreements -e KhronosGroup.VulkanSDK
 
       - name: Build all features
         if: matrix.features == ''
@@ -86,7 +93,7 @@ jobs:
 
   clippy:
     name: Run clippy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # TODO: Matrix to lint all platforms
 
     steps:
       - name: Checkout sources
@@ -111,14 +118,18 @@ jobs:
             target
           key: ${{ runner.os }}-clippy-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
 
-      - name: Install Vulkan loader
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Windows' }}
+        run: winget install --accept-package-agreements -e KhronosGroup.VulkanSDK
 
       - name: Run clippy with disallowed warnings
         run: cargo clippy --workspace --all-targets --all-features -- -Dwarnings
 
   MSRV:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # TODO: Matrix to lint all platforms
 
     steps:
       - name: Checkout sources
@@ -143,15 +154,19 @@ jobs:
             target
           key: ${{ runner.os }}-msrv-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
 
-      - name: Install Vulkan loader
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Windows' }}
+        run: winget install --accept-package-agreements -e KhronosGroup.VulkanSDK
 
       # Ensure that it still builds, while allowing warnings
       - run: cargo check --all-features
 
   doc:
     name: Build docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # TODO: Matrix to build docs for platforms
 
     steps:
       - name: Checkout sources
@@ -175,8 +190,12 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-docs-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
 
-      - name: Install Vulkan loader
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Windows' }}
+        run: winget install --accept-package-agreements -e KhronosGroup.VulkanSDK
 
       - name: Build docs
         env:
