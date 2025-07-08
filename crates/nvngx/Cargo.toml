@@ -7,7 +7,7 @@ description = "NVIDIA NGX bindings."
 readme = "README.md"
 license = "MIT"
 keywords = ["nvidia", "ngx", "DLSS", "upscaling", "supersampling"]
-rust-version = "1.57"
+rust-version = "1.70"
 repository = "https://github.com/iddm/nvngx-rs"
 documentation = "https://docs.rs/nvngx-rs"
 
@@ -17,5 +17,4 @@ ash = "0.37"
 log = "0.4"
 uuid = { version = "1", features = ["v4"] }
 derive_builder = "0.12"
-nvngx-sys = "0.3.0"
-# nvngx-sys = { path = "../nvngx-sys" }
+nvngx-sys = { version = "0.3.0",  path = "../nvngx-sys" }

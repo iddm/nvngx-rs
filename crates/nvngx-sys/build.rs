@@ -98,10 +98,13 @@ fn main() {
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed={HEADER_FILE_PATH}");
 
+    let msrv = bindgen::RustTarget::stable(70, 0).unwrap();
+
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
     let bindings = bindgen::Builder::default()
+        .rust_target(msrv)
         // The input header we would like to generate
         // bindings for.
         .header(HEADER_FILE_PATH)
