@@ -509,14 +509,12 @@ impl Feature {
         mut super_sampling_create_parameters: SuperSamplingCreateParameters,
     ) -> Result<SuperSamplingFeature> {
         let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_SuperSampling;
-        let rendering_resolution = vk::Extent2D::builder()
+        let rendering_resolution = vk::Extent2D::default()
             .width(super_sampling_create_parameters.0.Feature.InWidth)
-            .height(super_sampling_create_parameters.0.Feature.InHeight)
-            .build();
-        let target_resolution = vk::Extent2D::builder()
+            .height(super_sampling_create_parameters.0.Feature.InHeight);
+        let target_resolution = vk::Extent2D::default()
             .width(super_sampling_create_parameters.0.Feature.InTargetWidth)
-            .height(super_sampling_create_parameters.0.Feature.InTargetHeight)
-            .build();
+            .height(super_sampling_create_parameters.0.Feature.InTargetHeight);
         unsafe {
             let mut handle = FeatureHandle::new();
             Result::from(nvngx_sys::HELPERS_NGX_VULKAN_CREATE_DLSS_EXT1(
@@ -560,14 +558,12 @@ impl Feature {
         mut ray_reconstruction_create_parameters: RayReconstructionCreateParameters,
     ) -> Result<RayReconstructionFeature> {
         let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction;
-        let rendering_resolution = vk::Extent2D::builder()
+        let rendering_resolution = vk::Extent2D::default()
             .width(ray_reconstruction_create_parameters.0.InWidth)
-            .height(ray_reconstruction_create_parameters.0.InHeight)
-            .build();
-        let target_resolution = vk::Extent2D::builder()
+            .height(ray_reconstruction_create_parameters.0.InHeight);
+        let target_resolution = vk::Extent2D::default()
             .width(ray_reconstruction_create_parameters.0.InTargetWidth)
-            .height(ray_reconstruction_create_parameters.0.InTargetHeight)
-            .build();
+            .height(ray_reconstruction_create_parameters.0.InTargetHeight);
 
         unsafe {
             let mut handle = FeatureHandle::new();
