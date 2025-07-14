@@ -12,7 +12,7 @@ repository = "https://github.com/iddm/nvngx-rs"
 
 [dependencies]
 widestring = "1"
-ash = "0.37"
+ash = "0.38"
 log = "0.4"
 uuid = { version = "1", features = ["v4"] }
 derive_builder = "0.12"
