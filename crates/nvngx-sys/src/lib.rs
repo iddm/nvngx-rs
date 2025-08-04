@@ -5,7 +5,9 @@
 #![allow(non_snake_case)]
 #![allow(clippy::all)]
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+use libc::wchar_t;
+
+include!("bindings.rs");
 
 pub mod error;
 pub use error::*;

@@ -201,3 +201,21 @@ jobs:
         env:
           RUSTDOCFLAGS: -Dwarnings
         run: cargo doc --workspace --no-deps --all-features --document-private-items
+
+  generate-bindings:
+    name: Generate nvngx-sys bindings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Clean
+        run: rm -rf crates/nvngx-sys/src/bindings.rs
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install libvulkan-dev
+      - name: Generate
+        run: cargo b -p nvngx-sys -F generate-bindings
+      - name: Diff generated Rust code
+        run: test -z "$(git status --porcelain)" || (echo "::error::Generated files are different, please regenerate with cargo build -F generate-bindings!"; git diff; false)
