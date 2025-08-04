@@ -32,56 +32,9 @@ fn is_docs_rs_build() -> bool {
 }
 
 fn compile_helpers() {
-    // This is the directory where the `c` library is located.
-    let libdir_path = PathBuf::from("./")
-        // Canonicalize the path as `rustc-link-search` requires an absolute
-        // path.
-        .canonicalize()
-        .expect("cannot canonicalize path");
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    // panic!("outdir: {out_dir}");
-    // This is the path to the intermediate object file for our library.
-    let obj_path = libdir_path.join(format!("{out_dir}/ngx_helpers.o"));
-    // This is the path to the static library file.
-    let lib_path = libdir_path.join(format!("{out_dir}/libngx_helpers.a"));
-
-    // Run `clang` to compile the source code file into an object file.
-    let compile_job = std::process::Command::new("clang")
-        .arg("-g")
-        //.arg("-G0")
-        .arg("-c")
-        .arg("-o")
-        .arg(&obj_path)
-        .arg(libdir_path.join(SOURCE_FILE_PATH))
-        .output()
-        .expect("compile using `clang`");
-
-    if !compile_job.status.success() {
-        let stdout = String::from_utf8(compile_job.stdout).unwrap();
-        let stderr = String::from_utf8(compile_job.stderr).unwrap();
-        panic!("could not compile object file.\nStdout:\n{stdout}\n\nStderr:\n{stderr}");
-    }
-
-    // Run `ar` to generate the static library.
-    if !std::process::Command::new("ar")
-        .arg("rcs")
-        .arg(lib_path)
-        .arg(obj_path)
-        .output()
-        .expect("could not spawn `ar`")
-        .status
-        .success()
-    {
-        // Panic if the command was not successful.
-        panic!("could not emit library file");
-    }
-
-    // Link against the built helpers wrapper.
-    println!(
-        "cargo:rustc-link-search={}",
-        libdir_path.join(out_dir).to_str().unwrap()
-    );
-    println!("cargo:rustc-link-lib=ngx_helpers");
+    cc::Build::new()
+        .file(SOURCE_FILE_PATH)
+        .compile("ngx_helpers");
 }
 
 fn main() {

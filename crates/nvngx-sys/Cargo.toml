@@ -19,6 +19,7 @@ include = [
 
 [build-dependencies]
 bindgen = "0.72"
+cc = "1"
 
 [dependencies]
 widestring = "1"
