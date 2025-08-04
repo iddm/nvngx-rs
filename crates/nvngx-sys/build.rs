@@ -1,8 +1,6 @@
-use std::env;
 use std::path::PathBuf;
 
 const DLSS_LIBRARY_PATH: &str = "DLSS/lib/Linux_x86_64";
-const HEADER_FILE_PATH: &str = "src/bindings.h";
 const SOURCE_FILE_PATH: &str = "src/bindings.c";
 
 fn library_path() -> String {
@@ -48,6 +46,15 @@ fn main() {
     println!("cargo:rustc-link-lib=stdc++");
     println!("cargo:rustc-link-lib=dl");
 
+    #[cfg(feature = "generate-bindings")]
+    generate_bindings();
+}
+
+#[cfg(feature = "generate-bindings")]
+fn generate_bindings() {
+    use std::env;
+    const HEADER_FILE_PATH: &str = "src/bindings.h";
+
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed={HEADER_FILE_PATH}");
 
@@ -70,6 +77,8 @@ fn main() {
         .allowlist_function("GetNGXResultAsString")
         // Exportable symbols defined by our `bindings.c/h`, wrapping `static inline` helpers
         .allowlist_function("HELPERS_NGX_\\w+")
+        // Platform-specific type provided by libc
+        .blocklist_type("wchar_t")
         .impl_debug(true)
         .impl_partialeq(true)
         .prepend_enum_name(false)
@@ -89,7 +98,7 @@ fn main() {
         .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");

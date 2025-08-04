@@ -18,9 +18,13 @@ include = [
 ]
 
 [build-dependencies]
-bindgen = "0.72"
+bindgen = { version = "0.72", optional = true }
 cc = "1"
 
 [dependencies]
 widestring = "1"
 libc = "0.2"
+
+[features]
+# Update generated bindings in the build scripts
+generate-bindings = ["dep:bindgen"]
