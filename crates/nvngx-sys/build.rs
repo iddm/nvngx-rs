@@ -92,21 +92,25 @@ fn generate_bindings() {
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         // Types and functions defined by the SDK:
-        .allowlist_item("NVSDK_NGX_\\w+")
+        .allowlist_item(r"(PFN_)?NVSDK_NGX_\w+")
         // Single exception for a function that doesn't adhere to the naming standard:
         .allowlist_function("GetNGXResultAsString")
         // Exportable symbols defined by our `bindings.c/h`, wrapping `static inline` helpers
-        .allowlist_function("HELPERS_NGX_\\w+")
-        // Platform-specific type provided by libc
-        .blocklist_type("wchar_t")
+        .allowlist_function(r"HELPERS_NGX_\w+")
+        // Disallow DirectX and CUDA APIs, for which we do not yet provide/implement bindings
+        .blocklist_item(r"\w+D3[Dd]1[12]\w+")
+        .blocklist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
+        .blocklist_item(r"\w+CUDA\w+")
+        // Disallow all other dependencies, like those from libc or Vulkan.
+        .allowlist_recursively(false)
         .impl_debug(true)
         .impl_partialeq(true)
+        .derive_default(true)
         .prepend_enum_name(false)
         .generate_inline_functions(true)
         .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
+        .bitfield_enum("NVSDK_NGX_Feature_Support_Result")
         // .generate_cstr(true)
-        // .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
-        // .bitfield_enum("NVSDK_NGX_Result")
         .disable_name_namespacing()
         .disable_nested_struct_naming()
         .default_enum_style(bindgen::EnumVariation::Rust {
