@@ -1,6 +1,33 @@
-//! Describes NGX features and their parameters.
+//! Directx features and parameters
+
+use std::rc::Rc;
 
 use super::{super::ngx::FeatureParameters, *};
+
+/// Extent2D imitating vulkans struct
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq, Hash)] // prob dont need all of them but this is how vk initializes theirs
+pub struct Extent2D {
+    /// Extent2D imitating vulkans struct
+    pub width: u32,
+    /// Extent2D imitating vulkans struct
+    pub height: u32,
+}
+
+/// Extent2D imitating vulkans struct
+impl Extent2D {
+    #[inline]
+    /// Extent2D imitating vulkans struct
+    pub fn width(mut self, width: u32) -> Self {
+        self.width = width;
+        self
+    }
+    #[inline]
+    /// Extent2D imitating vulkans struct
+    pub fn height(mut self, height: u32) -> Self {
+        self.height = height;
+        self
+    }
+}
 
 /// An NGX handle. Handle might be created and used by [`Feature::new()`].
 #[repr(transparent)]
@@ -20,7 +47,7 @@ impl FeatureHandle {
 
     // TODO: This should be unsafe, take Self (and write self.0=null()), or inlined into drop().
     fn release(&mut self) -> Result {
-        unsafe { nvngx_sys::vulkan::NVSDK_NGX_VULKAN_ReleaseFeature(self.0) }.into()
+        unsafe { nvngx_sys::directx::NVSDK_NGX_D3D12_ReleaseFeature(self.0) }.into()
     }
 }
 
@@ -58,10 +85,10 @@ impl FeatureParameters {
     /// does not support this API call is being used. In such a case, NVSDK_NGX_GetParameters
     /// may be used as a fallback.
     /// This function may only be called after a successful call into NVSDK_NGX_Init.
-    pub fn vk_new(&self) -> Result<Self> {
+    pub fn dx_new(&self) -> Result<Self> {
         let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
         Result::from(unsafe {
-            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_AllocateParameters(&mut ptr as *mut _)
+            nvngx_sys::directx::NVSDK_NGX_D3D12_AllocateParameters(&mut ptr as *mut _)
         })
         .map(|_| Self(ptr))
     }
@@ -89,29 +116,29 @@ impl FeatureParameters {
     /// If NVSDK_NGX_GetCapabilityParameters fails with NVSDK_NGX_Result_FAIL_OutOfDate,
     /// NVSDK_NGX_GetParameters may be used as a fallback, to get a parameter map pre-populated
     /// with NGX capabilities and available features.
-    pub fn vk_get_capability_parameters() -> Result<Self> {
+    pub fn dx_get_capability_parameters() -> Result<Self> {
         let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
         Result::from(unsafe {
-            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_GetCapabilityParameters(&mut ptr as *mut _)
+            nvngx_sys::directx::NVSDK_NGX_D3D12_GetCapabilityParameters(&mut ptr as *mut _)
         })
         .map(|_| Self(ptr))
     }
 
     /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
-    pub fn vk_supports_super_sampling_static() -> Result<()> {
-        Self::vk_get_capability_parameters()?.supports_super_sampling()
+    pub fn dx_supports_super_sampling_static() -> Result<()> {
+        Self::dx_get_capability_parameters()?.supports_super_sampling()
     }
 
     /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
-    pub fn vk_supports_ray_reconstruction_static() -> Result<()> {
-        Self::vk_get_capability_parameters()?.supports_ray_reconstruction()
+    pub fn dx_supports_ray_reconstruction_static() -> Result<()> {
+        Self::dx_get_capability_parameters()?.supports_ray_reconstruction()
     }
 
     // /// Deallocates the feature parameter set.
-    // fn vk_release(&self) -> Result {
-    //  unsafe { nvngx_sys::vulkan::NVSDK_NGX_VULKAN_DestroyParameters(self.0) }.into()
+    // fn dx_release(&self) -> Result {
+    //     unsafe { nvngx_sys::directx::NVSDK_NGX_D3D12_DestroyParameters(self.0) }.into()
     // }
 }
 
@@ -129,16 +156,14 @@ pub struct Feature {
 impl Feature {
     /// Creates a new feature.
     pub fn new(
-        device: vk::Device,
-        command_buffer: vk::CommandBuffer,
+        command_buffer: &ID3D12GraphicsCommandList,
         feature_type: NVSDK_NGX_Feature,
         parameters: FeatureParameters,
     ) -> Result<Self> {
         let mut handle = FeatureHandle::new();
         Result::from(unsafe {
-            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_CreateFeature1(
-                device,
-                command_buffer,
+            nvngx_sys::directx::NVSDK_NGX_D3D12_CreateFeature(
+                command_buffer.as_raw().cast(),
                 feature_type,
                 parameters.0,
                 &mut handle.0 as *mut _,
@@ -153,23 +178,21 @@ impl Feature {
 
     /// Creates a new SuperSampling feature.
     pub fn new_super_sampling(
-        device: vk::Device,
-        command_buffer: vk::CommandBuffer,
+        command_buffer: &ID3D12GraphicsCommandList,
         parameters: FeatureParameters,
         mut super_sampling_create_parameters: SuperSamplingCreateParameters,
     ) -> Result<SuperSamplingFeature> {
         let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_SuperSampling;
-        let rendering_resolution = vk::Extent2D::default()
+        let rendering_resolution = Extent2D::default()
             .width(super_sampling_create_parameters.0.Feature.InWidth)
             .height(super_sampling_create_parameters.0.Feature.InHeight);
-        let target_resolution = vk::Extent2D::default()
+        let target_resolution = Extent2D::default()
             .width(super_sampling_create_parameters.0.Feature.InTargetWidth)
             .height(super_sampling_create_parameters.0.Feature.InTargetHeight);
         unsafe {
             let mut handle = FeatureHandle::new();
-            Result::from(nvngx_sys::vulkan::HELPERS_NGX_VULKAN_CREATE_DLSS_EXT1(
-                device,
-                command_buffer,
+            Result::from(nvngx_sys::directx::HELPERS_NGX_D3D12_CREATE_DLSS_EXT(
+                command_buffer.as_raw().cast(),
                 1,
                 1,
                 &mut handle.0 as *mut _,
@@ -192,53 +215,51 @@ impl Feature {
 
     /// Creates the Frame Generation feature.
     pub fn new_frame_generation(
-        device: vk::Device,
-        command_buffer: vk::CommandBuffer,
+        command_buffer: &ID3D12GraphicsCommandList,
         parameters: FeatureParameters,
     ) -> Result<Self> {
         let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration;
-        Self::new(device, command_buffer, feature_type, parameters)
+        Self::new(command_buffer, feature_type, parameters)
     }
 
+    // TODO: IMPLEMENT RR AND TURN ON AGAIN ***************************************
     /// Creates the Ray Reconstruction feature.
-    pub fn new_ray_reconstruction(
-        device: vk::Device,
-        command_buffer: vk::CommandBuffer,
-        parameters: FeatureParameters,
-        mut ray_reconstruction_create_parameters: RayReconstructionCreateParameters,
-    ) -> Result<RayReconstructionFeature> {
-        let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction;
-        let rendering_resolution = vk::Extent2D::default()
-            .width(ray_reconstruction_create_parameters.0.InWidth)
-            .height(ray_reconstruction_create_parameters.0.InHeight);
-        let target_resolution = vk::Extent2D::default()
-            .width(ray_reconstruction_create_parameters.0.InTargetWidth)
-            .height(ray_reconstruction_create_parameters.0.InTargetHeight);
+    // pub fn new_ray_reconstruction(
+    //     command_buffer:  &ID3D12GraphicsCommandList,
+    //     parameters: FeatureParameters,
+    //     mut ray_reconstruction_create_parameters: RayReconstructionCreateParameters,
+    // ) -> Result<RayReconstructionFeature> {
+    //     let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction;
+    //     let rendering_resolution = vk::Extent2D::default()
+    //         .width(ray_reconstruction_create_parameters.0.InWidth)
+    //         .height(ray_reconstruction_create_parameters.0.InHeight);
+    //     let target_resolution = vk::Extent2D::default()
+    //         .width(ray_reconstruction_create_parameters.0.InTargetWidth)
+    //         .height(ray_reconstruction_create_parameters.0.InTargetHeight);
 
-        unsafe {
-            let mut handle = FeatureHandle::new();
-            Result::from(nvngx_sys::vulkan::HELPERS_NGX_VULKAN_CREATE_DLSSD_EXT1(
-                device,
-                command_buffer,
-                1,
-                1,
-                &mut handle.0 as *mut _,
-                parameters.0,
-                &mut ray_reconstruction_create_parameters.0 as *mut _,
-            ))
-            .and_then(|_| {
-                RayReconstructionFeature::new(
-                    Self {
-                        handle: handle.into(),
-                        feature_type,
-                        parameters: parameters.into(),
-                    },
-                    rendering_resolution,
-                    target_resolution,
-                )
-            })
-        }
-    }
+    //     unsafe {
+    //         let mut handle = FeatureHandle::new();
+    //         Result::from(nvngx_sys::directx::HELPERS_NGX_D3D12_CREATE_DLSSD_EXT(
+    // command_buffer.as_raw().cast(),
+    //             1,
+    //             1,
+    //             &mut handle.0 as *mut _,
+    //             parameters.0,
+    //             &mut ray_reconstruction_create_parameters.0 as *mut _,
+    //         ))
+    //         .and_then(|_| {
+    //             RayReconstructionFeature::new(
+    //                 Self {
+    //                     handle: handle.into(),
+    //                     feature_type,
+    //                     parameters: parameters.into(),
+    //                 },
+    //                 rendering_resolution,
+    //                 target_resolution,
+    //             )
+    //         })
+    //     }
+    // }
 
     /// Returns the parameters associated with this feature.
     pub fn get_parameters(&self) -> &FeatureParameters {
@@ -285,7 +306,7 @@ impl Feature {
     pub fn get_scratch_buffer_size(&self) -> Result<usize> {
         let mut size = 0usize;
         Result::from(unsafe {
-            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_GetScratchBufferSize(
+            nvngx_sys::directx::NVSDK_NGX_D3D12_GetScratchBufferSize(
                 self.feature_type,
                 self.parameters.0 as _,
                 &mut size as *mut _,
@@ -303,10 +324,10 @@ impl Feature {
     /// it can be benefitials to pass as many input buffers and parameters
     /// as possible (for example provide all render targets like color,
     /// albedo, normals, depth etc)
-    pub fn evaluate(&self, command_buffer: vk::CommandBuffer) -> Result {
+    pub fn evaluate(&self, command_buffer: &ID3D12GraphicsCommandList) -> Result {
         unsafe {
-            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_EvaluateFeature_C(
-                command_buffer,
+            nvngx_sys::directx::NVSDK_NGX_D3D12_EvaluateFeature_C(
+                command_buffer.as_raw().cast(),
                 self.handle.0,
                 self.parameters.0,
                 Some(feature_progress_callback),
