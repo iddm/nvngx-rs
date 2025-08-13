@@ -22,8 +22,7 @@ fn main() {
             // TODO: Only one architecture is included (and for vs201x)
             let link_library_path = dlss_library_path.join("x64");
             let windows_mt_suffix = windows_mt_suffix();
-            // TODO: When to use the _dbg version? Is it used for /MTd and /MDd respectively, or
-            // for the dev vs rel runtime DLL?
+            // TODO select debug and/or _iterator0/1 when /MTd or /MDd are set.
             let dbg_suffix = if true { "" } else { "_dbg" };
             println!("cargo:rustc-link-lib=nvsdk_ngx{windows_mt_suffix}{dbg_suffix}");
             println!("cargo:rustc-link-search={}", link_library_path.display());
@@ -120,10 +119,7 @@ fn compile_dx() {
 
         generate_bindings(HEADER_FILE_PATH)
             // Because of raw pointers, windows-rs COM wrappers cannot be used here
-            .allowlist_item(r"\w+D3[Dd]12\w+") // TODO: Replace with windows-rs/windows-sys
-            // .allowlist_function("NVSDK_NGX_.*D3[Dd]12_.*")
-            // .allowlist_function("HELPERS_NGX_D3D12_.*")
-            // .allowlist_type("PFN_NVSDK_NGX_D3[Dd]12.*")
+            .allowlist_item(r"\w+D3[Dd]12\w+")
             .allowlist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
             .allowlist_type("IUnknown")
             .allowlist_type("IDXGIAdapter")
