@@ -11,10 +11,11 @@ rust-version = "1.70"
 repository = "https://github.com/iddm/nvngx-rs"
 
 include = [
-    "DLSS/lib/Linux_x86_64/libnvsdk_ngx.a",
-    "DLSS/include/**/*",
-    "src/*",
-    "build.rs",
+    "/DLSS/lib/Windows_x86_64/x64/", # TODO: Skip _dbg variant?
+    "/DLSS/lib/Linux_x86_64/libnvsdk_ngx.a",
+    "/DLSS/include/",
+    "/src/",
+    "/build.rs",
 ]
 
 [build-dependencies]
@@ -24,8 +25,14 @@ cc = "1"
 [dependencies]
 widestring = "1"
 libc = "0.2"
-ash = { version = "0.38", default-features = false }
+ash = { version = "0.38", default-features = false, optional = true }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = ["Win32_Graphics_Direct3D12", "Win32_Graphics_Dxgi_Common"], optional = true }
 
 [features]
+default = ["dx", "vk"]
+vk = ["dep:ash"]
+dx = ["dep:windows"]
 # Update generated bindings in the build scripts
 generate-bindings = ["dep:bindgen"]
