@@ -214,7 +214,6 @@ impl FeatureParameters {
     /// If NVSDK_NGX_GetCapabilityParameters fails with NVSDK_NGX_Result_FAIL_OutOfDate,
     /// NVSDK_NGX_GetParameters may be used as a fallback, to get a parameter map pre-populated
     /// with NGX capabilities and available features.
-
     // pub fn get_capability_parameters() -> Result<Self> {
     //     let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
     //     Result::from(unsafe {

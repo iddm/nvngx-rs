@@ -206,7 +206,10 @@ jobs:
         with:
           submodules: true
       - name: Clean
-        run: rm -rf crates/nvngx-sys/src/bindings.rs
+        run: | 
+          rm -rf crates/nvngx-sys/src/ngx_bindings.rs
+          rm -rf crates/nvngx-sys/src/vk_bindings.rs
+          rm -rf crates/nvngx-sys/src/dx_bindings.rs
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev
