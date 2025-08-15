@@ -35,6 +35,9 @@ pub struct SuperSamplingOptimalSettings {
 impl SuperSamplingOptimalSettings {
     /// Returns a set of optimal settings for the desired parameter
     /// set, render dimensions and quality level.
+    /// # Safety
+    /// 
+    /// Parameters is a raw ptr and is therefor unsafe.
     pub unsafe fn get_optimal_settings(
         parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
         target_width: u32,
