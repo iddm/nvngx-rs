@@ -30,7 +30,7 @@ NVSDK_NGX_Result HELPERS_NGX_D3D12_CREATE_DLSSD_EXT(
     NVSDK_NGX_Parameter *pInParams,
     NVSDK_NGX_DLSSD_Create_Params *pInDlssDCreateParams) {
 
-    return HELPERS_NGX_D3D12_CREATE_DLSSD_EXT(
+    return NGX_D3D12_CREATE_DLSSD_EXT(
         pInCmdList,
         InCreationNodeMask,
         InVisibilityNodeMask,

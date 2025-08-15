@@ -1,7 +1,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![cfg(feature = "dx")]
+#![cfg(all(windows, feature = "dx"))]
 
 use widestring::WideChar as wchar_t;
 // Only import PODs (Plain Old Datastructures) in scope. The interface types
