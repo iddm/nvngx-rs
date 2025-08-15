@@ -35,7 +35,7 @@ pub type DlssFeature = SuperSamplingFeature;
 //     pub dynamic_max_render_height: u32,
 // }
 
-/// Create parameters for the SuperSampling feature.
+// /// Create parameters for the SuperSampling feature.
 // #[repr(transparent)]
 // #[derive(Debug)]
 // pub struct SuperSamplingCreateParameters(pub(crate) NVSDK_NGX_DLSS_Create_Params);

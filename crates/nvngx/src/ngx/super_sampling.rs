@@ -45,8 +45,8 @@ impl SuperSamplingOptimalSettings {
         settings.desired_quality_level = desired_quality_level;
         // The sharpness is deprecated, should stay zero.
         let mut sharpness = 0.0f32;
-        Result::from(unsafe {
-            nvngx_sys::HELPERS_NGX_DLSS_GET_OPTIMAL_SETTINGS(
+        unsafe {
+            Result::from(nvngx_sys::HELPERS_NGX_DLSS_GET_OPTIMAL_SETTINGS(
                 parameters,
                 target_width,
                 target_height,
@@ -58,8 +58,8 @@ impl SuperSamplingOptimalSettings {
                 &mut settings.dynamic_min_render_width,
                 &mut settings.dynamic_min_render_height,
                 &mut sharpness as *mut _,
-            )
-        })?;
+            ))
+        }?;
 
         if settings.render_height == 0 || settings.render_width == 0 {
             return Err(nvngx_sys::Error::Other(format!(
@@ -99,7 +99,7 @@ impl SuperSamplingCreateParameters {
         Self(params)
     }
 
-    ///
+    /// doc
     pub fn from_settings(
         target_width: u32,
         target_height: u32,
