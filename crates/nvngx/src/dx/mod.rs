@@ -1,5 +1,5 @@
 //! Directx bindings for NVNGX
-#![cfg(feature = "dx")]
+#![cfg(all(windows, feature = "dx"))]
 
 use nvngx_sys::{NVSDK_NGX_Feature, Result};
 use windows::{
