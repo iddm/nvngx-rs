@@ -183,7 +183,6 @@ impl FeatureParameters {
     /// does not support this API call is being used. In such a case, NVSDK_NGX_GetParameters
     /// may be used as a fallback.
     /// This function may only be called after a successful call into NVSDK_NGX_Init.
-
     // pub fn new(&self) -> Result<Self> {
     //     let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
     //     Result::from(unsafe {
