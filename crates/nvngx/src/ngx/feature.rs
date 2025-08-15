@@ -161,66 +161,66 @@ impl std::fmt::Debug for FeatureParameters {
 }
 
 impl FeatureParameters {
-    /// Create a new feature parameter set.
-    ///
-    /// # NVIDIA documentation
-    ///
-    /// This interface allows allocating a simple parameter setup using named fields, whose
-    /// lifetime the app must manage.
-    /// For example one can set width by calling Set(NVSDK_NGX_Parameter_Denoiser_Width,100) or
-    /// provide CUDA buffer pointer by calling Set(NVSDK_NGX_Parameter_Denoiser_Color,cudaBuffer)
-    /// For more details please see sample code.
-    /// Parameter maps output by NVSDK_NGX_AllocateParameters must NOT be freed using
-    /// the free/delete operator; to free a parameter map
-    /// output by NVSDK_NGX_AllocateParameters, NVSDK_NGX_DestroyParameters should be used.
-    /// Unlike with NVSDK_NGX_GetParameters, parameter maps allocated with NVSDK_NGX_AllocateParameters
-    /// must be destroyed by the app using NVSDK_NGX_DestroyParameters.
-    /// Also unlike with NVSDK_NGX_GetParameters, parameter maps output by NVSDK_NGX_AllocateParameters
-    /// do not come pre-populated with NGX capabilities and available features.
-    /// To create a new parameter map pre-populated with such information, NVSDK_NGX_GetCapabilityParameters
-    /// should be used.
-    /// This function may return NVSDK_NGX_Result_FAIL_OutOfDate if an older driver, which
-    /// does not support this API call is being used. In such a case, NVSDK_NGX_GetParameters
-    /// may be used as a fallback.
-    /// This function may only be called after a successful call into NVSDK_NGX_Init.
-    // pub fn new(&self) -> Result<Self> {
-    //     let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
-    //     Result::from(unsafe {
-    //         nvngx_sys::directx::NVSDK_NGX_D3D12_AllocateParameters(&mut ptr as *mut _)
-    //     })
-    //     .map(|_| Self(ptr))
-    // }
+    //  /// Create a new feature parameter set.
+    //  ///
+    //  /// # NVIDIA documentation
+    //  ///
+    //  /// This interface allows allocating a simple parameter setup using named fields, whose
+    //  /// lifetime the app must manage.
+    //  /// For example one can set width by calling Set(NVSDK_NGX_Parameter_Denoiser_Width,100) or
+    //  /// provide CUDA buffer pointer by calling Set(NVSDK_NGX_Parameter_Denoiser_Color,cudaBuffer)
+    //  /// For more details please see sample code.
+    //  /// Parameter maps output by NVSDK_NGX_AllocateParameters must NOT be freed using
+    //  /// the free/delete operator; to free a parameter map
+    //  /// output by NVSDK_NGX_AllocateParameters, NVSDK_NGX_DestroyParameters should be used.
+    //  /// Unlike with NVSDK_NGX_GetParameters, parameter maps allocated with NVSDK_NGX_AllocateParameters
+    //  /// must be destroyed by the app using NVSDK_NGX_DestroyParameters.
+    //  /// Also unlike with NVSDK_NGX_GetParameters, parameter maps output by NVSDK_NGX_AllocateParameters
+    //  /// do not come pre-populated with NGX capabilities and available features.
+    //  /// To create a new parameter map pre-populated with such information, NVSDK_NGX_GetCapabilityParameters
+    //  /// should be used.
+    //  /// This function may return NVSDK_NGX_Result_FAIL_OutOfDate if an older driver, which
+    //  /// does not support this API call is being used. In such a case, NVSDK_NGX_GetParameters
+    //  /// may be used as a fallback.
+    //  /// This function may only be called after a successful call into NVSDK_NGX_Init.
+    //  // pub fn new(&self) -> Result<Self> {
+    //  //     let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
+    //  //     Result::from(unsafe {
+    //  //         nvngx_sys::directx::NVSDK_NGX_D3D12_AllocateParameters(&mut ptr as *mut _)
+    //  //     })
+    //  //     .map(|_| Self(ptr))
+    //  // }
 
-    /// Get a feature parameter set populated with NGX and feature
-    /// capabilities.
-    ///
-    /// # NVIDIA documentation
-    ///
-    /// This interface allows the app to create a new parameter map
-    /// pre-populated with NGX capabilities and available features.
-    /// The output parameter map can also be used for any purpose
-    /// parameter maps output by NVSDK_NGX_AllocateParameters can be used for
-    /// but it is not recommended to use NVSDK_NGX_GetCapabilityParameters
-    /// unless querying NGX capabilities and available features
-    /// due to the overhead associated with pre-populating the parameter map.
-    /// Parameter maps output by NVSDK_NGX_GetCapabilityParameters must NOT be freed using
-    /// the free/delete operator; to free a parameter map
-    /// output by NVSDK_NGX_GetCapabilityParameters, NVSDK_NGX_DestroyParameters should be used.
-    /// Unlike with NVSDK_NGX_GetParameters, parameter maps allocated with NVSDK_NGX_GetCapabilityParameters
-    /// must be destroyed by the app using NVSDK_NGX_DestroyParameters.
-    /// This function may return NVSDK_NGX_Result_FAIL_OutOfDate if an older driver, which
-    /// does not support this API call is being used. This function may only be called
-    /// after a successful call into NVSDK_NGX_Init.
-    /// If NVSDK_NGX_GetCapabilityParameters fails with NVSDK_NGX_Result_FAIL_OutOfDate,
-    /// NVSDK_NGX_GetParameters may be used as a fallback, to get a parameter map pre-populated
-    /// with NGX capabilities and available features.
-    // pub fn get_capability_parameters() -> Result<Self> {
-    //     let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
-    //     Result::from(unsafe {
-    //         nvngx_sys::directx::NVSDK_NGX_D3D12_GetCapabilityParameters(&mut ptr as *mut _)
-    //     })
-    //     .map(|_| Self(ptr))
-    // }
+    //  /// Get a feature parameter set populated with NGX and feature
+    //  /// capabilities.
+    //  ///
+    //  /// # NVIDIA documentation
+    //  ///
+    //  /// This interface allows the app to create a new parameter map
+    //  /// pre-populated with NGX capabilities and available features.
+    //  /// The output parameter map can also be used for any purpose
+    //  /// parameter maps output by NVSDK_NGX_AllocateParameters can be used for
+    //  /// but it is not recommended to use NVSDK_NGX_GetCapabilityParameters
+    //  /// unless querying NGX capabilities and available features
+    //  /// due to the overhead associated with pre-populating the parameter map.
+    //  /// Parameter maps output by NVSDK_NGX_GetCapabilityParameters must NOT be freed using
+    //  /// the free/delete operator; to free a parameter map
+    //  /// output by NVSDK_NGX_GetCapabilityParameters, NVSDK_NGX_DestroyParameters should be used.
+    //  /// Unlike with NVSDK_NGX_GetParameters, parameter maps allocated with NVSDK_NGX_GetCapabilityParameters
+    //  /// must be destroyed by the app using NVSDK_NGX_DestroyParameters.
+    //  /// This function may return NVSDK_NGX_Result_FAIL_OutOfDate if an older driver, which
+    //  /// does not support this API call is being used. This function may only be called
+    //  /// after a successful call into NVSDK_NGX_Init.
+    //  /// If NVSDK_NGX_GetCapabilityParameters fails with NVSDK_NGX_Result_FAIL_OutOfDate,
+    //  /// NVSDK_NGX_GetParameters may be used as a fallback, to get a parameter map pre-populated
+    //  /// with NGX capabilities and available features.
+    //  // pub fn get_capability_parameters() -> Result<Self> {
+    //  //     let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
+    //  //     Result::from(unsafe {
+    //  //         nvngx_sys::directx::NVSDK_NGX_D3D12_GetCapabilityParameters(&mut ptr as *mut _)
+    //  //     })
+    //  //     .map(|_| Self(ptr))
+    //  // }
 
     /// Sets the value for the parameter named `name` to be a
     /// type-erased (`void *`) pointer.
