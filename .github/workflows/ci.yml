@@ -56,7 +56,7 @@ jobs:
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Windows' }}
         # Normally the installer sets the VULKAN_SDK system environment variable to the installation location. GitHub Actions does not reimport
-        # this change in variables, requiring us to change it to known location intead and output the location ourselves below.
+        # this change in variables, requiring us to change it to a known location instead and output the location ourselves below.
         run: winget install --accept-package-agreements --accept-source-agreements -e KhronosGroup.VulkanSDK --location C:\VulkanSDK
       - name: Make VULKAN_SDK environment variable available
         if: ${{ runner.os == 'Windows' }}

@@ -36,9 +36,9 @@ fn main() {
         x => todo!("No libraries for {x}"),
     }
 
-    // compile_general();
-    // #[cfg(feature = "dx")]
-    // compile_dx();
+    compile_general();
+    #[cfg(feature = "dx")]
+    compile_dx();
     #[cfg(feature = "vk")]
     compile_vk();
 }
@@ -76,61 +76,61 @@ fn generate_bindings(header: &str) -> bindgen::Builder {
         })
 }
 
-// fn compile_general() {
-//     const SOURCE: &str = "src/ngx_bindings.c";
-//     cc::Build::new().file(SOURCE).compile("ngx_bindings");
+fn compile_general() {
+    const SOURCE: &str = "src/ngx_bindings.c";
+    cc::Build::new().file(SOURCE).compile("ngx_bindings");
 
-//     #[cfg(feature = "generate-bindings")]
-//     {
-//         const HEADER: &str = "src/ngx_bindings.h";
-//         let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
+    #[cfg(feature = "generate-bindings")]
+    {
+        const HEADER: &str = "src/ngx_bindings.h";
+        let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
 
-//         generate_bindings(HEADER)
-//             // Types and functions defined by the SDK:
-//             .allowlist_item("(PFN_)?NVSDK_NGX_\\w+")
-//             // Single exception for a function that doesn't adhere to the naming standard:
-//             .allowlist_function("GetNGXResultAsString")
-//             // Exportable symbols defined by our `bindings.c/h`, wrapping `static inline` helpers
-//             .allowlist_item("HELPERS_NGX_\\w+")
-//             // Disallow DirectX and CUDA APIs, for which we do not yet provide/implement bindings
-//             .blocklist_item(r"\w+D3[Dd]1[12]\w+")
-//             .blocklist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
-//             .blocklist_item(r"\w+CUDA\w+")
-//             .blocklist_item(".*VK.*")
-//             .generate()
-//             .expect("Failed to generate generic bindings")
-//             .write_to_file(out_path.join("ngx_bindings.rs"))
-//             .expect("Failed to write generic bindings to file");
-//     }
-// }
+        generate_bindings(HEADER)
+            // Types and functions defined by the SDK:
+            .allowlist_item("(PFN_)?NVSDK_NGX_\\w+")
+            // Single exception for a function that doesn't adhere to the naming standard:
+            .allowlist_function("GetNGXResultAsString")
+            // Exportable symbols defined by our `bindings.c/h`, wrapping `static inline` helpers
+            .allowlist_item("HELPERS_NGX_\\w+")
+            // Disallow DirectX and CUDA APIs, for which we do not yet provide/implement bindings
+            .blocklist_item(r"\w+D3[Dd]1[12]\w+")
+            .blocklist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
+            .blocklist_item(r"\w+CUDA\w+")
+            .blocklist_item(".*VK.*")
+            .generate()
+            .expect("Failed to generate generic bindings")
+            .write_to_file(out_path.join("ngx_bindings.rs"))
+            .expect("Failed to write generic bindings to file");
+    }
+}
 
-// #[cfg(feature = "dx")]
-// fn compile_dx() {
-//     const SOURCE_FILE_PATH: &str = "src/dx_helpers.c";
+#[cfg(feature = "dx")]
+fn compile_dx() {
+    const SOURCE_FILE_PATH: &str = "src/dx_helpers.c";
 
-//     cc::Build::new()
-//         .file(SOURCE_FILE_PATH)
-//         .compile("dx_helpers");
+    cc::Build::new()
+        .file(SOURCE_FILE_PATH)
+        .compile("dx_helpers");
 
-//     #[cfg(feature = "generate-bindings")]
-//     {
-//         const HEADER_FILE_PATH: &str = "src/dx_wrapper.h";
-//         let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
+    #[cfg(feature = "generate-bindings")]
+    {
+        const HEADER_FILE_PATH: &str = "src/dx_wrapper.h";
+        let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
 
-//         generate_bindings(HEADER_FILE_PATH)
-//             // Because of raw pointers, windows-rs COM wrappers cannot be used here
-//             .allowlist_item(r"\w+D3[Dd]12\w+")
-//             .allowlist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
-//             .allowlist_type("IUnknown")
-//             .allowlist_type("IDXGIAdapter")
-//             .generate()
-//             // Unwrap the Result and panic on failure.
-//             .expect("Unable to generate bindings")
-//             // Write the bindings to the $OUT_DIR/bindings.rs file.
-//             .write_to_file(out_path.join("dx_bindings.rs"))
-//             .expect("Couldn't write bindings!");
-//     }
-// }
+        generate_bindings(HEADER_FILE_PATH)
+            // Because of raw pointers, windows-rs COM wrappers cannot be used here
+            .allowlist_item(r"\w+D3[Dd]12\w+")
+            .allowlist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
+            .allowlist_type("IUnknown")
+            .allowlist_type("IDXGIAdapter")
+            .generate()
+            // Unwrap the Result and panic on failure.
+            .expect("Unable to generate bindings")
+            // Write the bindings to the $OUT_DIR/bindings.rs file.
+            .write_to_file(out_path.join("dx_bindings.rs"))
+            .expect("Couldn't write bindings!");
+    }
+}
 
 #[cfg(feature = "vk")]
 fn vulkan_sdk() -> Option<PathBuf> {
@@ -138,7 +138,6 @@ fn vulkan_sdk() -> Option<PathBuf> {
     // on VULKAN_SDK, set by the Vulkan SDK installer.
     match env::var("VULKAN_SDK") {
         Ok(v) => Some(PathBuf::from(v)),
-        // TODO: On Windows, perhaps this should be an error with a link to the SDK installation?
         Err(env::VarError::NotPresent) if cfg!(windows) => {
             panic!("On Windows, the VULKAN_SDK environment variable must be set")
         }

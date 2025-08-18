@@ -6,7 +6,7 @@
 use widestring::WideChar as wchar_t;
 // Only import PODs (Plain Old Datastructures) in scope. The interface types
 // from the Windows crate are ABI-incompatible because they already own the
-// pointer inside (i.e. a Rust ID3D12Device is equivalent to a ComPtr<ID3D12Device> in Rust).
+// pointer inside (i.e. a Rust ID3D12Device is equivalent to a ComPtr<ID3D12Device> in C++).
 use windows::Win32::Graphics::Direct3D12::{D3D12_HEAP_PROPERTIES, D3D12_RESOURCE_DESC};
 
 // helper struct for initialization. Should be ABI compatible
