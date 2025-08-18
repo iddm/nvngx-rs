@@ -210,11 +210,6 @@ jobs:
           rm -rf crates/nvngx-sys/src/ngx_bindings.rs
           rm -rf crates/nvngx-sys/src/vk_bindings.rs
           rm -rf crates/nvngx-sys/src/dx_bindings.rs
-      - name: Show Clang version
-        run: |
-          clang --version
-          clang++ --version
-          llvm-config --version || true
       - name: Install Vulkan SDK
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libvulkan-dev

@@ -86,6 +86,10 @@ fn compile_general() {
         let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
 
         generate_bindings(HEADER)
+            .default_enum_style(bindgen::EnumVariation::Rust {
+                non_exhaustive: false,
+            })
+            .size_t_is_usize(true)
             // Types and functions defined by the SDK:
             .allowlist_item("(PFN_)?NVSDK_NGX_\\w+")
             // Single exception for a function that doesn't adhere to the naming standard:
