@@ -539,6 +539,7 @@ pub const NVSDK_NGX_Parameter_RayReconstruction_Hint_Render_Preset_UltraPerforma
 pub const NVSDK_NGX_Parameter_RayReconstruction_Hint_Render_Preset_UltraQuality: &[u8; 50] =
     b"RayReconstruction.Hint.Render.Preset.UltraQuality\0";
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_DLSS_Hint_Render_Preset {
     NVSDK_NGX_DLSS_Hint_Render_Preset_Default = 0,
@@ -564,11 +565,13 @@ pub struct NVSDK_NGX_FeatureCommonInfo_Internal {
     _unused: [u8; 0],
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Version {
     NVSDK_NGX_Version_API = 21,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Result {
     NVSDK_NGX_Result_Success = 1,
@@ -593,6 +596,7 @@ pub enum NVSDK_NGX_Result {
     NVSDK_NGX_Result_FAIL_NotImplemented = -1160773614,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Feature {
     NVSDK_NGX_Feature_Reserved0 = 0,
@@ -618,6 +622,7 @@ pub enum NVSDK_NGX_Feature {
     NVSDK_NGX_Feature_Reserved_Unknown = 32766,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Buffer_Format {
     NVSDK_NGX_Buffer_Format_Unknown = 0,
@@ -629,6 +634,7 @@ pub enum NVSDK_NGX_Buffer_Format {
     NVSDK_NGX_Buffer_Format_RGBA32F = 6,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_PerfQuality_Value {
     NVSDK_NGX_PerfQuality_Value_MaxPerf = 0,
@@ -639,12 +645,14 @@ pub enum NVSDK_NGX_PerfQuality_Value {
     NVSDK_NGX_PerfQuality_Value_DLAA = 5,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_RTX_Value {
     NVSDK_NGX_RTX_Value_Off = 0,
     NVSDK_NGX_RTX_Value_On = 1,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_DLSS_Mode {
     NVSDK_NGX_DLSS_Mode_Off = 0,
@@ -678,6 +686,7 @@ fn bindgen_test_layout_NVSDK_NGX_Handle() {
     );
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_GPU_Arch {
     NVSDK_NGX_GPU_Arch_NotSupported = 0,
@@ -742,6 +751,7 @@ impl ::std::ops::BitAndAssign for NVSDK_NGX_DLSS_Feature_Flags {
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct NVSDK_NGX_DLSS_Feature_Flags(pub ::std::os::raw::c_int);
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_ToneMapperType {
     NVSDK_NGX_TONEMAPPER_STRING = 0,
@@ -751,6 +761,7 @@ pub enum NVSDK_NGX_ToneMapperType {
     NVSDK_NGX_TONEMAPPERTYPE_NUM = 4,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_GBufferType {
     NVSDK_NGX_GBUFFER_ALBEDO = 0,
@@ -911,6 +922,7 @@ impl Default for NVSDK_NGX_PathListInfo {
     }
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Logging_Level {
     NVSDK_NGX_LOGGING_LEVEL_OFF = 0,
@@ -1020,6 +1032,7 @@ impl Default for NVSDK_NGX_FeatureCommonInfo {
     }
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Opt_Level {
     NVSDK_NGX_OPT_LEVEL_UNDEFINED = 0,
@@ -1028,6 +1041,7 @@ pub enum NVSDK_NGX_Opt_Level {
     NVSDK_NGX_OPT_LEVEL_RELEASE = 40,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_EngineType {
     NVSDK_NGX_ENGINE_TYPE_CUSTOM = 0,
@@ -1037,6 +1051,7 @@ pub enum NVSDK_NGX_EngineType {
     NVSDK_NGX_ENGINE_COUNT = 4,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Feature_Support_Result {
     NVSDK_NGX_FeatureSupportResult_Supported = 0,
@@ -1047,6 +1062,7 @@ pub enum NVSDK_NGX_Feature_Support_Result {
     NVSDK_NGX_FeatureSupportResult_NotImplemented = 16,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_Application_Identifier_Type {
     NVSDK_NGX_Application_Identifier_Type_Application_Id = 0,
@@ -1638,24 +1654,28 @@ pub type PFN_NVSDK_NGX_DLSS_GetOptimalSettingsCallback = ::std::option::Option<
     unsafe extern "C" fn(InParams: *mut NVSDK_NGX_Parameter) -> NVSDK_NGX_Result,
 >;
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_DLSS_Denoise_Mode {
     NVSDK_NGX_DLSS_Denoise_Mode_Off = 0,
     NVSDK_NGX_DLSS_Denoise_Mode_DLUnified = 1,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_DLSS_Roughness_Mode {
     NVSDK_NGX_DLSS_Roughness_Mode_Unpacked = 0,
     NVSDK_NGX_DLSS_Roughness_Mode_Packed = 1,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_DLSS_Depth_Type {
     NVSDK_NGX_DLSS_Depth_Type_Linear = 0,
     NVSDK_NGX_DLSS_Depth_Type_HW = 1,
 }
 #[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum NVSDK_NGX_RayReconstruction_Hint_Render_Preset {
     NVSDK_NGX_RayReconstruction_Hint_Render_Preset_Default = 0,
