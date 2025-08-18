@@ -11,7 +11,7 @@ rust-version = "1.70"
 repository = "https://github.com/iddm/nvngx-rs"
 
 include = [
-    "/DLSS/lib/Windows_x86_64/x64/", # TODO: Skip _dbg variant?
+    "/DLSS/lib/Windows_x86_64/x64/",
     "/DLSS/lib/Linux_x86_64/libnvsdk_ngx.a",
     "/DLSS/include/",
     "/src/",

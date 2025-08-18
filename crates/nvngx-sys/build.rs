@@ -138,7 +138,6 @@ fn vulkan_sdk() -> Option<PathBuf> {
     // on VULKAN_SDK, set by the Vulkan SDK installer.
     match env::var("VULKAN_SDK") {
         Ok(v) => Some(PathBuf::from(v)),
-        // TODO: On Windows, perhaps this should be an error with a link to the SDK installation?
         Err(env::VarError::NotPresent) if cfg!(windows) => {
             panic!("On Windows, the VULKAN_SDK environment variable must be set")
         }

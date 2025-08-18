@@ -5,7 +5,7 @@ use std::rc::Rc;
 use super::{super::ngx::FeatureParameters, *};
 
 /// Extent2D imitating vulkans struct
-#[derive(Debug, Copy, Clone, Default, PartialEq, Eq, Hash)] // prob dont need all of them but this is how vk initializes theirs
+#[derive(Default, Copy, Clone, Debug)]
 pub struct Extent2D {
     /// Extent2D imitating vulkans struct
     pub width: u32,
