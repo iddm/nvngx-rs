@@ -71,9 +71,7 @@ fn generate_bindings(header: &str) -> bindgen::Builder {
         .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
         .disable_name_namespacing()
         .disable_nested_struct_naming()
-        .default_enum_style(bindgen::EnumVariation::Rust {
-            non_exhaustive: true,
-        })
+        .default_enum_style(bindgen::EnumVariation::NewType { is_bitfield: false, is_global: false })
 }
 
 fn compile_general() {
@@ -86,7 +84,6 @@ fn compile_general() {
         let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src");
 
         generate_bindings(HEADER)
-            .clang_arg("-fno-signed-char")
             // Types and functions defined by the SDK:
             .allowlist_item("(PFN_)?NVSDK_NGX_\\w+")
             // Single exception for a function that doesn't adhere to the naming standard:

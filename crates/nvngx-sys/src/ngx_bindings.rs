@@ -538,128 +538,163 @@ pub const NVSDK_NGX_Parameter_RayReconstruction_Hint_Render_Preset_UltraPerforma
     b"RayReconstruction.Hint.Render.Preset.UltraPerformance\0";
 pub const NVSDK_NGX_Parameter_RayReconstruction_Hint_Render_Preset_UltraQuality: &[u8; 50] =
     b"RayReconstruction.Hint.Render.Preset.UltraQuality\0";
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_DLSS_Hint_Render_Preset {
-    NVSDK_NGX_DLSS_Hint_Render_Preset_Default = 0,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_A = 1,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_B = 2,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_C = 3,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_D = 4,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_E = 5,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_F = 6,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_G = 7,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_H_Reserved = 8,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_I_Reserved = 9,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_J = 10,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_K = 11,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_L = 12,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_M = 13,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_N = 14,
-    NVSDK_NGX_DLSS_Hint_Render_Preset_O = 15,
+impl NVSDK_NGX_DLSS_Hint_Render_Preset {
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_Default: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(0);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_A: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(1);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_B: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(2);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_C: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(3);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_D: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(4);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_E: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(5);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_F: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(6);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_G: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(7);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_H_Reserved: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(8);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_I_Reserved: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(9);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_J: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(10);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_K: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(11);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_L: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(12);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_M: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(13);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_N: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(14);
+    pub const NVSDK_NGX_DLSS_Hint_Render_Preset_O: NVSDK_NGX_DLSS_Hint_Render_Preset =
+        NVSDK_NGX_DLSS_Hint_Render_Preset(15);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_DLSS_Hint_Render_Preset(pub ::std::os::raw::c_int);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct NVSDK_NGX_FeatureCommonInfo_Internal {
     _unused: [u8; 0],
 }
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Version {
-    NVSDK_NGX_Version_API = 21,
+impl NVSDK_NGX_Version {
+    pub const NVSDK_NGX_Version_API: NVSDK_NGX_Version = NVSDK_NGX_Version(21);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Result {
-    NVSDK_NGX_Result_Success = 1,
-    NVSDK_NGX_Result_Fail = -1160773632,
-    NVSDK_NGX_Result_FAIL_FeatureNotSupported = -1160773631,
-    NVSDK_NGX_Result_FAIL_PlatformError = -1160773630,
-    NVSDK_NGX_Result_FAIL_FeatureAlreadyExists = -1160773629,
-    NVSDK_NGX_Result_FAIL_FeatureNotFound = -1160773628,
-    NVSDK_NGX_Result_FAIL_InvalidParameter = -1160773627,
-    NVSDK_NGX_Result_FAIL_ScratchBufferTooSmall = -1160773626,
-    NVSDK_NGX_Result_FAIL_NotInitialized = -1160773625,
-    NVSDK_NGX_Result_FAIL_UnsupportedInputFormat = -1160773624,
-    NVSDK_NGX_Result_FAIL_RWFlagMissing = -1160773623,
-    NVSDK_NGX_Result_FAIL_MissingInput = -1160773622,
-    NVSDK_NGX_Result_FAIL_UnableToInitializeFeature = -1160773621,
-    NVSDK_NGX_Result_FAIL_OutOfDate = -1160773620,
-    NVSDK_NGX_Result_FAIL_OutOfGPUMemory = -1160773619,
-    NVSDK_NGX_Result_FAIL_UnsupportedFormat = -1160773618,
-    NVSDK_NGX_Result_FAIL_UnableToWriteToAppDataPath = -1160773617,
-    NVSDK_NGX_Result_FAIL_UnsupportedParameter = -1160773616,
-    NVSDK_NGX_Result_FAIL_Denied = -1160773615,
-    NVSDK_NGX_Result_FAIL_NotImplemented = -1160773614,
+pub struct NVSDK_NGX_Version(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_Result {
+    pub const NVSDK_NGX_Result_Success: NVSDK_NGX_Result = NVSDK_NGX_Result(1);
+    pub const NVSDK_NGX_Result_Fail: NVSDK_NGX_Result = NVSDK_NGX_Result(-1160773632);
+    pub const NVSDK_NGX_Result_FAIL_FeatureNotSupported: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773631);
+    pub const NVSDK_NGX_Result_FAIL_PlatformError: NVSDK_NGX_Result = NVSDK_NGX_Result(-1160773630);
+    pub const NVSDK_NGX_Result_FAIL_FeatureAlreadyExists: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773629);
+    pub const NVSDK_NGX_Result_FAIL_FeatureNotFound: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773628);
+    pub const NVSDK_NGX_Result_FAIL_InvalidParameter: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773627);
+    pub const NVSDK_NGX_Result_FAIL_ScratchBufferTooSmall: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773626);
+    pub const NVSDK_NGX_Result_FAIL_NotInitialized: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773625);
+    pub const NVSDK_NGX_Result_FAIL_UnsupportedInputFormat: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773624);
+    pub const NVSDK_NGX_Result_FAIL_RWFlagMissing: NVSDK_NGX_Result = NVSDK_NGX_Result(-1160773623);
+    pub const NVSDK_NGX_Result_FAIL_MissingInput: NVSDK_NGX_Result = NVSDK_NGX_Result(-1160773622);
+    pub const NVSDK_NGX_Result_FAIL_UnableToInitializeFeature: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773621);
+    pub const NVSDK_NGX_Result_FAIL_OutOfDate: NVSDK_NGX_Result = NVSDK_NGX_Result(-1160773620);
+    pub const NVSDK_NGX_Result_FAIL_OutOfGPUMemory: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773619);
+    pub const NVSDK_NGX_Result_FAIL_UnsupportedFormat: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773618);
+    pub const NVSDK_NGX_Result_FAIL_UnableToWriteToAppDataPath: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773617);
+    pub const NVSDK_NGX_Result_FAIL_UnsupportedParameter: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773616);
+    pub const NVSDK_NGX_Result_FAIL_Denied: NVSDK_NGX_Result = NVSDK_NGX_Result(-1160773615);
+    pub const NVSDK_NGX_Result_FAIL_NotImplemented: NVSDK_NGX_Result =
+        NVSDK_NGX_Result(-1160773614);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Feature {
-    NVSDK_NGX_Feature_Reserved0 = 0,
-    NVSDK_NGX_Feature_SuperSampling = 1,
-    NVSDK_NGX_Feature_InPainting = 2,
-    NVSDK_NGX_Feature_ImageSuperResolution = 3,
-    NVSDK_NGX_Feature_SlowMotion = 4,
-    NVSDK_NGX_Feature_VideoSuperResolution = 5,
-    NVSDK_NGX_Feature_Reserved1 = 6,
-    NVSDK_NGX_Feature_Reserved2 = 7,
-    NVSDK_NGX_Feature_Reserved3 = 8,
-    NVSDK_NGX_Feature_ImageSignalProcessing = 9,
-    NVSDK_NGX_Feature_DeepResolve = 10,
-    NVSDK_NGX_Feature_FrameGeneration = 11,
-    NVSDK_NGX_Feature_DeepDVC = 12,
-    NVSDK_NGX_Feature_RayReconstruction = 13,
-    NVSDK_NGX_Feature_Reserved14 = 14,
-    NVSDK_NGX_Feature_Reserved15 = 15,
-    NVSDK_NGX_Feature_Reserved16 = 16,
-    NVSDK_NGX_Feature_Count = 17,
-    NVSDK_NGX_Feature_Reserved_SDK = 32764,
-    NVSDK_NGX_Feature_Reserved_Core = 32765,
-    NVSDK_NGX_Feature_Reserved_Unknown = 32766,
+pub struct NVSDK_NGX_Result(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_Feature {
+    pub const NVSDK_NGX_Feature_Reserved0: NVSDK_NGX_Feature = NVSDK_NGX_Feature(0);
+    pub const NVSDK_NGX_Feature_SuperSampling: NVSDK_NGX_Feature = NVSDK_NGX_Feature(1);
+    pub const NVSDK_NGX_Feature_InPainting: NVSDK_NGX_Feature = NVSDK_NGX_Feature(2);
+    pub const NVSDK_NGX_Feature_ImageSuperResolution: NVSDK_NGX_Feature = NVSDK_NGX_Feature(3);
+    pub const NVSDK_NGX_Feature_SlowMotion: NVSDK_NGX_Feature = NVSDK_NGX_Feature(4);
+    pub const NVSDK_NGX_Feature_VideoSuperResolution: NVSDK_NGX_Feature = NVSDK_NGX_Feature(5);
+    pub const NVSDK_NGX_Feature_Reserved1: NVSDK_NGX_Feature = NVSDK_NGX_Feature(6);
+    pub const NVSDK_NGX_Feature_Reserved2: NVSDK_NGX_Feature = NVSDK_NGX_Feature(7);
+    pub const NVSDK_NGX_Feature_Reserved3: NVSDK_NGX_Feature = NVSDK_NGX_Feature(8);
+    pub const NVSDK_NGX_Feature_ImageSignalProcessing: NVSDK_NGX_Feature = NVSDK_NGX_Feature(9);
+    pub const NVSDK_NGX_Feature_DeepResolve: NVSDK_NGX_Feature = NVSDK_NGX_Feature(10);
+    pub const NVSDK_NGX_Feature_FrameGeneration: NVSDK_NGX_Feature = NVSDK_NGX_Feature(11);
+    pub const NVSDK_NGX_Feature_DeepDVC: NVSDK_NGX_Feature = NVSDK_NGX_Feature(12);
+    pub const NVSDK_NGX_Feature_RayReconstruction: NVSDK_NGX_Feature = NVSDK_NGX_Feature(13);
+    pub const NVSDK_NGX_Feature_Reserved14: NVSDK_NGX_Feature = NVSDK_NGX_Feature(14);
+    pub const NVSDK_NGX_Feature_Reserved15: NVSDK_NGX_Feature = NVSDK_NGX_Feature(15);
+    pub const NVSDK_NGX_Feature_Reserved16: NVSDK_NGX_Feature = NVSDK_NGX_Feature(16);
+    pub const NVSDK_NGX_Feature_Count: NVSDK_NGX_Feature = NVSDK_NGX_Feature(17);
+    pub const NVSDK_NGX_Feature_Reserved_SDK: NVSDK_NGX_Feature = NVSDK_NGX_Feature(32764);
+    pub const NVSDK_NGX_Feature_Reserved_Core: NVSDK_NGX_Feature = NVSDK_NGX_Feature(32765);
+    pub const NVSDK_NGX_Feature_Reserved_Unknown: NVSDK_NGX_Feature = NVSDK_NGX_Feature(32766);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Buffer_Format {
-    NVSDK_NGX_Buffer_Format_Unknown = 0,
-    NVSDK_NGX_Buffer_Format_RGB8UI = 1,
-    NVSDK_NGX_Buffer_Format_RGB16F = 2,
-    NVSDK_NGX_Buffer_Format_RGB32F = 3,
-    NVSDK_NGX_Buffer_Format_RGBA8UI = 4,
-    NVSDK_NGX_Buffer_Format_RGBA16F = 5,
-    NVSDK_NGX_Buffer_Format_RGBA32F = 6,
+pub struct NVSDK_NGX_Feature(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_Buffer_Format {
+    pub const NVSDK_NGX_Buffer_Format_Unknown: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(0);
+    pub const NVSDK_NGX_Buffer_Format_RGB8UI: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(1);
+    pub const NVSDK_NGX_Buffer_Format_RGB16F: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(2);
+    pub const NVSDK_NGX_Buffer_Format_RGB32F: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(3);
+    pub const NVSDK_NGX_Buffer_Format_RGBA8UI: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(4);
+    pub const NVSDK_NGX_Buffer_Format_RGBA16F: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(5);
+    pub const NVSDK_NGX_Buffer_Format_RGBA32F: NVSDK_NGX_Buffer_Format = NVSDK_NGX_Buffer_Format(6);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_PerfQuality_Value {
-    NVSDK_NGX_PerfQuality_Value_MaxPerf = 0,
-    NVSDK_NGX_PerfQuality_Value_Balanced = 1,
-    NVSDK_NGX_PerfQuality_Value_MaxQuality = 2,
-    NVSDK_NGX_PerfQuality_Value_UltraPerformance = 3,
-    NVSDK_NGX_PerfQuality_Value_UltraQuality = 4,
-    NVSDK_NGX_PerfQuality_Value_DLAA = 5,
+pub struct NVSDK_NGX_Buffer_Format(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_PerfQuality_Value {
+    pub const NVSDK_NGX_PerfQuality_Value_MaxPerf: NVSDK_NGX_PerfQuality_Value =
+        NVSDK_NGX_PerfQuality_Value(0);
+    pub const NVSDK_NGX_PerfQuality_Value_Balanced: NVSDK_NGX_PerfQuality_Value =
+        NVSDK_NGX_PerfQuality_Value(1);
+    pub const NVSDK_NGX_PerfQuality_Value_MaxQuality: NVSDK_NGX_PerfQuality_Value =
+        NVSDK_NGX_PerfQuality_Value(2);
+    pub const NVSDK_NGX_PerfQuality_Value_UltraPerformance: NVSDK_NGX_PerfQuality_Value =
+        NVSDK_NGX_PerfQuality_Value(3);
+    pub const NVSDK_NGX_PerfQuality_Value_UltraQuality: NVSDK_NGX_PerfQuality_Value =
+        NVSDK_NGX_PerfQuality_Value(4);
+    pub const NVSDK_NGX_PerfQuality_Value_DLAA: NVSDK_NGX_PerfQuality_Value =
+        NVSDK_NGX_PerfQuality_Value(5);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_RTX_Value {
-    NVSDK_NGX_RTX_Value_Off = 0,
-    NVSDK_NGX_RTX_Value_On = 1,
+pub struct NVSDK_NGX_PerfQuality_Value(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_RTX_Value {
+    pub const NVSDK_NGX_RTX_Value_Off: NVSDK_NGX_RTX_Value = NVSDK_NGX_RTX_Value(0);
+    pub const NVSDK_NGX_RTX_Value_On: NVSDK_NGX_RTX_Value = NVSDK_NGX_RTX_Value(1);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_DLSS_Mode {
-    NVSDK_NGX_DLSS_Mode_Off = 0,
-    NVSDK_NGX_DLSS_Mode_DLSS_DLISP = 1,
-    NVSDK_NGX_DLSS_Mode_DLISP_Only = 2,
-    NVSDK_NGX_DLSS_Mode_DLSS = 3,
+pub struct NVSDK_NGX_RTX_Value(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_DLSS_Mode {
+    pub const NVSDK_NGX_DLSS_Mode_Off: NVSDK_NGX_DLSS_Mode = NVSDK_NGX_DLSS_Mode(0);
+    pub const NVSDK_NGX_DLSS_Mode_DLSS_DLISP: NVSDK_NGX_DLSS_Mode = NVSDK_NGX_DLSS_Mode(1);
+    pub const NVSDK_NGX_DLSS_Mode_DLISP_Only: NVSDK_NGX_DLSS_Mode = NVSDK_NGX_DLSS_Mode(2);
+    pub const NVSDK_NGX_DLSS_Mode_DLSS: NVSDK_NGX_DLSS_Mode = NVSDK_NGX_DLSS_Mode(3);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_DLSS_Mode(pub ::std::os::raw::c_int);
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct NVSDK_NGX_Handle {
@@ -685,20 +720,20 @@ fn bindgen_test_layout_NVSDK_NGX_Handle() {
         "Offset of field: NVSDK_NGX_Handle::Id"
     );
 }
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_GPU_Arch {
-    NVSDK_NGX_GPU_Arch_NotSupported = 0,
-    NVSDK_NGX_GPU_Arch_Volta = 320,
-    NVSDK_NGX_GPU_Arch_Turing = 352,
-    NVSDK_NGX_GPU_Arch_Ampere = 368,
-    NVSDK_NGX_GPU_Arch_Ada = 400,
-    NVSDK_NGX_GPU_Arch_Hopper = 384,
-    NVSDK_NGX_GPU_Arch_Blackwell = 416,
-    NVSDK_NGX_GPU_Arch_Blackwell2 = 432,
-    NVSDK_NGX_GPU_Arch_Unknown = 134217727,
+impl NVSDK_NGX_GPU_Arch {
+    pub const NVSDK_NGX_GPU_Arch_NotSupported: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(0);
+    pub const NVSDK_NGX_GPU_Arch_Volta: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(320);
+    pub const NVSDK_NGX_GPU_Arch_Turing: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(352);
+    pub const NVSDK_NGX_GPU_Arch_Ampere: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(368);
+    pub const NVSDK_NGX_GPU_Arch_Ada: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(400);
+    pub const NVSDK_NGX_GPU_Arch_Hopper: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(384);
+    pub const NVSDK_NGX_GPU_Arch_Blackwell: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(416);
+    pub const NVSDK_NGX_GPU_Arch_Blackwell2: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(432);
+    pub const NVSDK_NGX_GPU_Arch_Unknown: NVSDK_NGX_GPU_Arch = NVSDK_NGX_GPU_Arch(134217727);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_GPU_Arch(pub ::std::os::raw::c_int);
 impl NVSDK_NGX_DLSS_Feature_Flags {
     pub const NVSDK_NGX_DLSS_Feature_Flags_IsInvalid: NVSDK_NGX_DLSS_Feature_Flags =
         NVSDK_NGX_DLSS_Feature_Flags(-2147483648);
@@ -750,35 +785,36 @@ impl ::std::ops::BitAndAssign for NVSDK_NGX_DLSS_Feature_Flags {
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct NVSDK_NGX_DLSS_Feature_Flags(pub ::std::os::raw::c_int);
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_ToneMapperType {
-    NVSDK_NGX_TONEMAPPER_STRING = 0,
-    NVSDK_NGX_TONEMAPPER_REINHARD = 1,
-    NVSDK_NGX_TONEMAPPER_ONEOVERLUMA = 2,
-    NVSDK_NGX_TONEMAPPER_ACES = 3,
-    NVSDK_NGX_TONEMAPPERTYPE_NUM = 4,
+impl NVSDK_NGX_ToneMapperType {
+    pub const NVSDK_NGX_TONEMAPPER_STRING: NVSDK_NGX_ToneMapperType = NVSDK_NGX_ToneMapperType(0);
+    pub const NVSDK_NGX_TONEMAPPER_REINHARD: NVSDK_NGX_ToneMapperType = NVSDK_NGX_ToneMapperType(1);
+    pub const NVSDK_NGX_TONEMAPPER_ONEOVERLUMA: NVSDK_NGX_ToneMapperType =
+        NVSDK_NGX_ToneMapperType(2);
+    pub const NVSDK_NGX_TONEMAPPER_ACES: NVSDK_NGX_ToneMapperType = NVSDK_NGX_ToneMapperType(3);
+    pub const NVSDK_NGX_TONEMAPPERTYPE_NUM: NVSDK_NGX_ToneMapperType = NVSDK_NGX_ToneMapperType(4);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_GBufferType {
-    NVSDK_NGX_GBUFFER_ALBEDO = 0,
-    NVSDK_NGX_GBUFFER_ROUGHNESS = 1,
-    NVSDK_NGX_GBUFFER_METALLIC = 2,
-    NVSDK_NGX_GBUFFER_SPECULAR = 3,
-    NVSDK_NGX_GBUFFER_SUBSURFACE = 4,
-    NVSDK_NGX_GBUFFER_NORMALS = 5,
-    NVSDK_NGX_GBUFFER_SHADINGMODELID = 6,
-    NVSDK_NGX_GBUFFER_MATERIALID = 7,
-    NVSDK_NGX_GBUFFER_SPECULAR_ALBEDO = 8,
-    NVSDK_NGX_GBUFFER_INDIRECT_ALBEDO = 9,
-    NVSDK_NGX_GBUFFER_SPECULAR_MVEC = 10,
-    NVSDK_NGX_GBUFFER_DISOCCL_MASK = 11,
-    NVSDK_NGX_GBUFFER_EMISSIVE = 12,
-    NVSDK_NGX_GBUFFERTYPE_NUM = 16,
+pub struct NVSDK_NGX_ToneMapperType(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_GBufferType {
+    pub const NVSDK_NGX_GBUFFER_ALBEDO: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(0);
+    pub const NVSDK_NGX_GBUFFER_ROUGHNESS: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(1);
+    pub const NVSDK_NGX_GBUFFER_METALLIC: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(2);
+    pub const NVSDK_NGX_GBUFFER_SPECULAR: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(3);
+    pub const NVSDK_NGX_GBUFFER_SUBSURFACE: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(4);
+    pub const NVSDK_NGX_GBUFFER_NORMALS: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(5);
+    pub const NVSDK_NGX_GBUFFER_SHADINGMODELID: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(6);
+    pub const NVSDK_NGX_GBUFFER_MATERIALID: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(7);
+    pub const NVSDK_NGX_GBUFFER_SPECULAR_ALBEDO: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(8);
+    pub const NVSDK_NGX_GBUFFER_INDIRECT_ALBEDO: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(9);
+    pub const NVSDK_NGX_GBUFFER_SPECULAR_MVEC: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(10);
+    pub const NVSDK_NGX_GBUFFER_DISOCCL_MASK: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(11);
+    pub const NVSDK_NGX_GBUFFER_EMISSIVE: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(12);
+    pub const NVSDK_NGX_GBUFFERTYPE_NUM: NVSDK_NGX_GBufferType = NVSDK_NGX_GBufferType(16);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_GBufferType(pub ::std::os::raw::c_int);
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct NVSDK_NGX_Coordinates {
@@ -921,15 +957,15 @@ impl Default for NVSDK_NGX_PathListInfo {
         }
     }
 }
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Logging_Level {
-    NVSDK_NGX_LOGGING_LEVEL_OFF = 0,
-    NVSDK_NGX_LOGGING_LEVEL_ON = 1,
-    NVSDK_NGX_LOGGING_LEVEL_VERBOSE = 2,
-    NVSDK_NGX_LOGGING_LEVEL_NUM = 3,
+impl NVSDK_NGX_Logging_Level {
+    pub const NVSDK_NGX_LOGGING_LEVEL_OFF: NVSDK_NGX_Logging_Level = NVSDK_NGX_Logging_Level(0);
+    pub const NVSDK_NGX_LOGGING_LEVEL_ON: NVSDK_NGX_Logging_Level = NVSDK_NGX_Logging_Level(1);
+    pub const NVSDK_NGX_LOGGING_LEVEL_VERBOSE: NVSDK_NGX_Logging_Level = NVSDK_NGX_Logging_Level(2);
+    pub const NVSDK_NGX_LOGGING_LEVEL_NUM: NVSDK_NGX_Logging_Level = NVSDK_NGX_Logging_Level(3);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_Logging_Level(pub ::std::os::raw::c_int);
 pub type NVSDK_NGX_AppLogCallback = ::std::option::Option<
     unsafe extern "C" fn(
         message: *const ::std::os::raw::c_char,
@@ -1031,43 +1067,51 @@ impl Default for NVSDK_NGX_FeatureCommonInfo {
         }
     }
 }
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Opt_Level {
-    NVSDK_NGX_OPT_LEVEL_UNDEFINED = 0,
-    NVSDK_NGX_OPT_LEVEL_DEBUG = 20,
-    NVSDK_NGX_OPT_LEVEL_DEVELOP = 30,
-    NVSDK_NGX_OPT_LEVEL_RELEASE = 40,
+impl NVSDK_NGX_Opt_Level {
+    pub const NVSDK_NGX_OPT_LEVEL_UNDEFINED: NVSDK_NGX_Opt_Level = NVSDK_NGX_Opt_Level(0);
+    pub const NVSDK_NGX_OPT_LEVEL_DEBUG: NVSDK_NGX_Opt_Level = NVSDK_NGX_Opt_Level(20);
+    pub const NVSDK_NGX_OPT_LEVEL_DEVELOP: NVSDK_NGX_Opt_Level = NVSDK_NGX_Opt_Level(30);
+    pub const NVSDK_NGX_OPT_LEVEL_RELEASE: NVSDK_NGX_Opt_Level = NVSDK_NGX_Opt_Level(40);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_EngineType {
-    NVSDK_NGX_ENGINE_TYPE_CUSTOM = 0,
-    NVSDK_NGX_ENGINE_TYPE_UNREAL = 1,
-    NVSDK_NGX_ENGINE_TYPE_UNITY = 2,
-    NVSDK_NGX_ENGINE_TYPE_OMNIVERSE = 3,
-    NVSDK_NGX_ENGINE_COUNT = 4,
+pub struct NVSDK_NGX_Opt_Level(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_EngineType {
+    pub const NVSDK_NGX_ENGINE_TYPE_CUSTOM: NVSDK_NGX_EngineType = NVSDK_NGX_EngineType(0);
+    pub const NVSDK_NGX_ENGINE_TYPE_UNREAL: NVSDK_NGX_EngineType = NVSDK_NGX_EngineType(1);
+    pub const NVSDK_NGX_ENGINE_TYPE_UNITY: NVSDK_NGX_EngineType = NVSDK_NGX_EngineType(2);
+    pub const NVSDK_NGX_ENGINE_TYPE_OMNIVERSE: NVSDK_NGX_EngineType = NVSDK_NGX_EngineType(3);
+    pub const NVSDK_NGX_ENGINE_COUNT: NVSDK_NGX_EngineType = NVSDK_NGX_EngineType(4);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Feature_Support_Result {
-    NVSDK_NGX_FeatureSupportResult_Supported = 0,
-    NVSDK_NGX_FeatureSupportResult_CheckNotPresent = 1,
-    NVSDK_NGX_FeatureSupportResult_DriverVersionUnsupported = 2,
-    NVSDK_NGX_FeatureSupportResult_AdapterUnsupported = 4,
-    NVSDK_NGX_FeatureSupportResult_OSVersionBelowMinimumSupported = 8,
-    NVSDK_NGX_FeatureSupportResult_NotImplemented = 16,
+pub struct NVSDK_NGX_EngineType(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_Feature_Support_Result {
+    pub const NVSDK_NGX_FeatureSupportResult_Supported: NVSDK_NGX_Feature_Support_Result =
+        NVSDK_NGX_Feature_Support_Result(0);
+    pub const NVSDK_NGX_FeatureSupportResult_CheckNotPresent: NVSDK_NGX_Feature_Support_Result =
+        NVSDK_NGX_Feature_Support_Result(1);
+    pub const NVSDK_NGX_FeatureSupportResult_DriverVersionUnsupported:
+        NVSDK_NGX_Feature_Support_Result = NVSDK_NGX_Feature_Support_Result(2);
+    pub const NVSDK_NGX_FeatureSupportResult_AdapterUnsupported: NVSDK_NGX_Feature_Support_Result =
+        NVSDK_NGX_Feature_Support_Result(4);
+    pub const NVSDK_NGX_FeatureSupportResult_OSVersionBelowMinimumSupported:
+        NVSDK_NGX_Feature_Support_Result = NVSDK_NGX_Feature_Support_Result(8);
+    pub const NVSDK_NGX_FeatureSupportResult_NotImplemented: NVSDK_NGX_Feature_Support_Result =
+        NVSDK_NGX_Feature_Support_Result(16);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_Application_Identifier_Type {
-    NVSDK_NGX_Application_Identifier_Type_Application_Id = 0,
-    NVSDK_NGX_Application_Identifier_Type_Project_Id = 1,
+pub struct NVSDK_NGX_Feature_Support_Result(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_Application_Identifier_Type {
+    pub const NVSDK_NGX_Application_Identifier_Type_Application_Id:
+        NVSDK_NGX_Application_Identifier_Type = NVSDK_NGX_Application_Identifier_Type(0);
+    pub const NVSDK_NGX_Application_Identifier_Type_Project_Id:
+        NVSDK_NGX_Application_Identifier_Type = NVSDK_NGX_Application_Identifier_Type(1);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_Application_Identifier_Type(pub ::std::os::raw::c_int);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct NVSDK_NGX_ProjectIdDescription {
@@ -1653,48 +1697,86 @@ pub type PFN_NVSDK_NGX_DLSS_GetStatsCallback = ::std::option::Option<
 pub type PFN_NVSDK_NGX_DLSS_GetOptimalSettingsCallback = ::std::option::Option<
     unsafe extern "C" fn(InParams: *mut NVSDK_NGX_Parameter) -> NVSDK_NGX_Result,
 >;
-#[repr(i32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_DLSS_Denoise_Mode {
-    NVSDK_NGX_DLSS_Denoise_Mode_Off = 0,
-    NVSDK_NGX_DLSS_Denoise_Mode_DLUnified = 1,
+impl NVSDK_NGX_DLSS_Denoise_Mode {
+    pub const NVSDK_NGX_DLSS_Denoise_Mode_Off: NVSDK_NGX_DLSS_Denoise_Mode =
+        NVSDK_NGX_DLSS_Denoise_Mode(0);
+    pub const NVSDK_NGX_DLSS_Denoise_Mode_DLUnified: NVSDK_NGX_DLSS_Denoise_Mode =
+        NVSDK_NGX_DLSS_Denoise_Mode(1);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_DLSS_Roughness_Mode {
-    NVSDK_NGX_DLSS_Roughness_Mode_Unpacked = 0,
-    NVSDK_NGX_DLSS_Roughness_Mode_Packed = 1,
+pub struct NVSDK_NGX_DLSS_Denoise_Mode(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_DLSS_Roughness_Mode {
+    pub const NVSDK_NGX_DLSS_Roughness_Mode_Unpacked: NVSDK_NGX_DLSS_Roughness_Mode =
+        NVSDK_NGX_DLSS_Roughness_Mode(0);
+    pub const NVSDK_NGX_DLSS_Roughness_Mode_Packed: NVSDK_NGX_DLSS_Roughness_Mode =
+        NVSDK_NGX_DLSS_Roughness_Mode(1);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_DLSS_Depth_Type {
-    NVSDK_NGX_DLSS_Depth_Type_Linear = 0,
-    NVSDK_NGX_DLSS_Depth_Type_HW = 1,
+pub struct NVSDK_NGX_DLSS_Roughness_Mode(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_DLSS_Depth_Type {
+    pub const NVSDK_NGX_DLSS_Depth_Type_Linear: NVSDK_NGX_DLSS_Depth_Type =
+        NVSDK_NGX_DLSS_Depth_Type(0);
+    pub const NVSDK_NGX_DLSS_Depth_Type_HW: NVSDK_NGX_DLSS_Depth_Type =
+        NVSDK_NGX_DLSS_Depth_Type(1);
 }
-#[repr(i32)]
-#[non_exhaustive]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_RayReconstruction_Hint_Render_Preset {
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_Default = 0,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_A = 1,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_B = 2,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_C = 3,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_D = 4,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_E = 5,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_F = 6,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_G = 7,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_H = 8,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_I = 9,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_J = 10,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_K = 11,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_L = 12,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_M = 13,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_N = 14,
-    NVSDK_NGX_RayReconstruction_Hint_Render_Preset_O = 15,
+pub struct NVSDK_NGX_DLSS_Depth_Type(pub ::std::os::raw::c_int);
+impl NVSDK_NGX_RayReconstruction_Hint_Render_Preset {
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_Default:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(0);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_A:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(1);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_B:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(2);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_C:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(3);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_D:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(4);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_E:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(5);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_F:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(6);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_G:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(7);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_H:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(8);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_I:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(9);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_J:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(10);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_K:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(11);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_L:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(12);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_M:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(13);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_N:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(14);
+    pub const NVSDK_NGX_RayReconstruction_Hint_Render_Preset_O:
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset =
+        NVSDK_NGX_RayReconstruction_Hint_Render_Preset(15);
 }
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct NVSDK_NGX_RayReconstruction_Hint_Render_Preset(pub ::std::os::raw::c_int);
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct NVSDK_NGX_DLSSD_Create_Params {
