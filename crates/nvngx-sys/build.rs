@@ -89,7 +89,7 @@ fn compile_general() {
             .default_enum_style(bindgen::EnumVariation::Rust {
                 non_exhaustive: false,
             })
-            .size_t_is_usize(true)
+            .prepend_enum_name(false)
             // Types and functions defined by the SDK:
             .allowlist_item("(PFN_)?NVSDK_NGX_\\w+")
             // Single exception for a function that doesn't adhere to the naming standard:
