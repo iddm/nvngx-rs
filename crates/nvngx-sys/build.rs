@@ -36,9 +36,9 @@ fn main() {
         x => todo!("No libraries for {x}"),
     }
 
-    compile_general();
-    #[cfg(feature = "dx")]
-    compile_dx();
+    // compile_general();
+    // #[cfg(feature = "dx")]
+    // compile_dx();
     #[cfg(feature = "vk")]
     compile_vk();
 }
@@ -71,7 +71,9 @@ fn generate_bindings(header: &str) -> bindgen::Builder {
         .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
         .disable_name_namespacing()
         .disable_nested_struct_naming()
-        .default_enum_style(bindgen::EnumVariation::NewType { is_bitfield: false, is_global: false })
+        .default_enum_style(bindgen::EnumVariation::Rust {
+            non_exhaustive: true,
+        })
 }
 
 fn compile_general() {

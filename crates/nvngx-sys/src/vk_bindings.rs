@@ -43,15 +43,13 @@ impl<T> ::std::cmp::PartialEq for __BindgenUnionField<T> {
     }
 }
 impl<T> ::std::cmp::Eq for __BindgenUnionField<T> {}
-impl NVSDK_NGX_Resource_VK_Type {
-    pub const NVSDK_NGX_RESOURCE_VK_TYPE_VK_IMAGEVIEW: NVSDK_NGX_Resource_VK_Type =
-        NVSDK_NGX_Resource_VK_Type(0);
-    pub const NVSDK_NGX_RESOURCE_VK_TYPE_VK_BUFFER: NVSDK_NGX_Resource_VK_Type =
-        NVSDK_NGX_Resource_VK_Type(1);
-}
-#[repr(transparent)]
+#[repr(i32)]
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct NVSDK_NGX_Resource_VK_Type(pub ::std::os::raw::c_int);
+pub enum NVSDK_NGX_Resource_VK_Type {
+    NVSDK_NGX_RESOURCE_VK_TYPE_VK_IMAGEVIEW = 0,
+    NVSDK_NGX_RESOURCE_VK_TYPE_VK_BUFFER = 1,
+}
 #[repr(C)]
 pub struct NVSDK_NGX_ImageViewInfo_VK {
     pub ImageView: VkImageView,
