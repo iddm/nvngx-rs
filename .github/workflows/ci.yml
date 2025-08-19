@@ -205,7 +205,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Clean
         run: | 
           rm -rf crates/nvngx-sys/src/ngx_bindings.rs
@@ -225,26 +224,5 @@ jobs:
             crates/nvngx-sys/src/vk_bindings.rs
             crates/nvngx-sys/src/dx_bindings.rs
           retention-days: 1
-      - name: Check and commit bindings
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          # Check if there are differences
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Generated bindings differ from committed versions:"
-            git diff
-            
-            # Add the generated files
-            git add crates/nvngx-sys/src/ngx_bindings.rs
-            git add crates/nvngx-sys/src/vk_bindings.rs
-            git add crates/nvngx-sys/src/dx_bindings.rs
-            
-            # Commit with [skip ci] to avoid infinite loop
-            git commit -m "chore: update generated nvngx-sys bindings to match Linux output [skip ci]"
-            git push
-            
-            echo "Committed updated bindings generated on Linux"
-          else
-            echo "Generated bindings match committed versions - no changes needed"
-          fi
+      - name: Diff generated Rust code
+        run: test -z "$(git status --porcelain)" || (echo "::error::Generated files are different, please regenerate with cargo build -F generate-bindings!"; git diff; false)
