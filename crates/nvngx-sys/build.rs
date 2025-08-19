@@ -77,9 +77,7 @@ fn generate_bindings(header: &str) -> bindgen::Builder {
         .bitfield_enum("NVSDK_NGX_DLSS_Feature_Flags")
         .disable_name_namespacing()
         .disable_nested_struct_naming()
-        .default_enum_style(bindgen::EnumVariation::Rust {
-            non_exhaustive: true,
-        })
+        .default_enum_style(bindgen::EnumVariation::Consts)
 }
 
 fn compile_general() {
