@@ -198,53 +198,53 @@ jobs:
         run: cargo doc --workspace --no-deps --all-features --document-private-items
 
   generate-bindings:
-  name: Generate nvngx-sys bindings
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout sources
-      uses: actions/checkout@v4
-      with:
-        submodules: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Clean
-      run: | 
-        rm -rf crates/nvngx-sys/src/ngx_bindings.rs
-        rm -rf crates/nvngx-sys/src/vk_bindings.rs
-        rm -rf crates/nvngx-sys/src/dx_bindings.rs
-    - name: Install Vulkan SDK
-      if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get install libvulkan-dev
-    - name: Generate
-      run: cargo build -p nvngx-sys -F generate-bindings
-    - name: Upload generated bindings
-      uses: actions/upload-artifact@v4
-      with:
-        name: nvngx-sys-bindings-${{ runner.os }}
-        path: |
-          crates/nvngx-sys/src/ngx_bindings.rs
-          crates/nvngx-sys/src/vk_bindings.rs
-          crates/nvngx-sys/src/dx_bindings.rs
-        retention-days: 1
-    - name: Check and commit bindings
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-        # Check if there are differences
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "Generated bindings differ from committed versions:"
-          git diff
+    name: Generate nvngx-sys bindings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clean
+        run: | 
+          rm -rf crates/nvngx-sys/src/ngx_bindings.rs
+          rm -rf crates/nvngx-sys/src/vk_bindings.rs
+          rm -rf crates/nvngx-sys/src/dx_bindings.rs
+      - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install libvulkan-dev
+      - name: Generate
+        run: cargo build -p nvngx-sys -F generate-bindings
+      - name: Upload generated bindings
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvngx-sys-bindings-${{ runner.os }}
+          path: |
+            crates/nvngx-sys/src/ngx_bindings.rs
+            crates/nvngx-sys/src/vk_bindings.rs
+            crates/nvngx-sys/src/dx_bindings.rs
+          retention-days: 1
+      - name: Check and commit bindings
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           
-          # Add the generated files
-          git add crates/nvngx-sys/src/ngx_bindings.rs
-          git add crates/nvngx-sys/src/vk_bindings.rs
-          git add crates/nvngx-sys/src/dx_bindings.rs
-          
-          # Commit with [skip ci] to avoid infinite loop
-          git commit -m "chore: update generated nvngx-sys bindings to match Linux output [skip ci]"
-          git push
-          
-          echo "Committed updated bindings generated on Linux"
-        else
-          echo "Generated bindings match committed versions - no changes needed"
-        fi
+          # Check if there are differences
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Generated bindings differ from committed versions:"
+            git diff
+            
+            # Add the generated files
+            git add crates/nvngx-sys/src/ngx_bindings.rs
+            git add crates/nvngx-sys/src/vk_bindings.rs
+            git add crates/nvngx-sys/src/dx_bindings.rs
+            
+            # Commit with [skip ci] to avoid infinite loop
+            git commit -m "chore: update generated nvngx-sys bindings to match Linux output [skip ci]"
+            git push
+            
+            echo "Committed updated bindings generated on Linux"
+          else
+            echo "Generated bindings match committed versions - no changes needed"
+          fi
