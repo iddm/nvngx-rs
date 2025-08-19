@@ -223,6 +223,6 @@ jobs:
             crates/nvngx-sys/src/ngx_bindings.rs
             crates/nvngx-sys/src/vk_bindings.rs
             crates/nvngx-sys/src/dx_bindings.rs
-        retention-days: 1
+          retention-days: 1
       - name: Diff generated Rust code
         run: test -z "$(git status --porcelain)" || (echo "::error::Generated files are different, please regenerate with cargo build -F generate-bindings!"; git diff; false)
