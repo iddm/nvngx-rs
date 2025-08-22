@@ -7,7 +7,7 @@ use ash::vk;
 use nvngx_sys::{
     vulkan::{
         NVSDK_NGX_ImageViewInfo_VK, NVSDK_NGX_Resource_VK, NVSDK_NGX_Resource_VK_Type,
-        NVSDK_NGX_Resource_VK__bindgen_ty_1,
+        NVSDK_NGX_Resource_VK__bindgen_ty_1, NVSDK_NGX_VULKAN_DestroyParameters,
     },
     NVSDK_NGX_Coordinates, NVSDK_NGX_Dimensions, NVSDK_NGX_Feature, NVSDK_NGX_PerfQuality_Value,
     Result,

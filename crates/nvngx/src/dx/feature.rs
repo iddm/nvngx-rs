@@ -136,10 +136,10 @@ impl FeatureParameters {
         Self::dx_get_capability_parameters()?.supports_ray_reconstruction()
     }
 
-    // /// Deallocates the feature parameter set.
-    // fn dx_release(&self) -> Result {
-    //     unsafe { nvngx_sys::directx::NVSDK_NGX_D3D12_DestroyParameters(self.0) }.into()
-    // }
+    /// Deallocates the feature parameter set.
+    pub fn dx_release(&self) -> Result {
+        unsafe { nvngx_sys::directx::NVSDK_NGX_D3D12_DestroyParameters(self.0) }.into()
+    }
 }
 
 /// Describes a single NGX feature.

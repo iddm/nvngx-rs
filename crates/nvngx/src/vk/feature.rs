@@ -109,10 +109,10 @@ impl FeatureParameters {
         Self::vk_get_capability_parameters()?.supports_ray_reconstruction()
     }
 
-    // /// Deallocates the feature parameter set.
-    // fn vk_release(&self) -> Result {
-    //  unsafe { nvngx_sys::vulkan::NVSDK_NGX_VULKAN_DestroyParameters(self.0) }.into()
-    // }
+    /// Deallocates the feature parameter set.
+    pub fn vk_release(&self) -> Result {
+        unsafe { nvngx_sys::vulkan::NVSDK_NGX_VULKAN_DestroyParameters(self.0) }.into()
+    }
 }
 
 /// Describes a single NGX feature.
