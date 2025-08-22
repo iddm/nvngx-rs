@@ -1,6 +1,6 @@
 //! The errors the NGX crate might have.
 
-use crate as bindings;
+use crate::{self as bindings};
 
 /// The result type used within the crate.
 pub type Result<T = (), E = Error> = std::result::Result<T, E>;
@@ -13,7 +13,6 @@ pub enum Error {
     /// Any other error which doesn't originate from the NVIDIA NGX.
     Other(String),
 }
-
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&match self {
@@ -24,6 +23,8 @@ impl std::fmt::Display for Error {
         })
     }
 }
+
+impl std::error::Error for Error {}
 
 impl From<bindings::NVSDK_NGX_Result> for Error {
     fn from(value: bindings::NVSDK_NGX_Result) -> Self {

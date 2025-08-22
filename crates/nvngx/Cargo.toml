@@ -12,8 +12,16 @@ repository = "https://github.com/iddm/nvngx-rs"
 
 [dependencies]
 widestring = "1"
-ash = "0.38"
+ash = { version = "0.38", optional = true }
 log = "0.4"
 uuid = { version = "1", features = ["v4"] }
 derive_builder = "0.12"
-nvngx-sys = { version = "0.3.0",  path = "../nvngx-sys" }
+nvngx-sys = { version = "0.3.0", path = "../nvngx-sys" }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = ["Win32_Graphics_Direct3D12", "Win32_Graphics_Dxgi_Common"], optional = true }
+
+[features]
+default = ["dx", "vk"]
+vk = ["nvngx-sys/vk", "dep:ash"]
+dx = ["nvngx-sys/dx", "dep:windows"]
