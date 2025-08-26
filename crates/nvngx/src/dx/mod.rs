@@ -15,8 +15,6 @@ use crate::ngx::{FeatureParameters, SuperSamplingCreateParameters};
 
 pub mod super_sampling;
 pub use super_sampling::*;
-pub mod ray_reconstruction;
-// pub use ray_reconstruction::*;
 
 /// API the application is using.
 #[derive(Debug)]
@@ -105,7 +103,7 @@ impl System {
         Feature::new_frame_generation(command_buffer, feature_parameters)
     }
 
-    // TODO: generate dlssD bindings to turn this back on.
+    // TODO: implement ray reconstruction for dx12
     // /// Creates a ray reconstruction feature.
     // pub fn create_ray_reconstruction_feature(
     //     &self,

@@ -12,57 +12,6 @@ use super::*;
 /// A helpful type alias to quickly mention "DLSS".
 pub type DlssFeature = SuperSamplingFeature;
 
-// impl From<SuperSamplingOptimalSettings> for SuperSamplingCreateParameters {
-//     fn from(value: SuperSamplingOptimalSettings) -> Self {
-//         unsafe {
-//             Self::new(
-//                 value.render_width,
-//                 value.render_height,
-//                 value.target_width,
-//                 value.target_height,
-//                 Some(value.desired_quality_level),
-//                 Some(
-//                     NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_AutoExposure
-//                         | NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_MVLowRes,
-//                 ),
-//             )
-//         }
-//     }
-// }
-
-// /// Only mandatory parameters for the SuperSampling feature evaluation.
-// #[derive(Debug, derive_builder::Builder)]
-// pub struct SuperSamplingEvaluationParametersSimple {
-//     /// The feature evaluation parameters, specific to Vulkan.
-//     feature_evaluation_parameters: nvngx_sys::NVSDK_NGX_VK_Feature_Eval_Params,
-//     /// The depth information.
-//     depth: nvngx_sys::NVSDK_NGX_Resource_VK,
-//     /// The motion vectors.
-//     motion_vectors: nvngx_sys::NVSDK_NGX_Resource_VK,
-//     /// Jitter offset x.
-//     jitter_offset_x: f32,
-//     /// Jitter offset y.
-//     jitter_offset_y: f32,
-//     /// The dimensions of the viewport.
-//     dimensions: nvngx_sys::NVSDK_NGX_Dimensions,
-// }
-
-// impl From<SuperSamplingEvaluationParametersSimple> for SuperSamplingEvaluationParameters {
-//     fn from(value: SuperSamplingEvaluationParametersSimple) -> Self {
-//         let mut params: nvngx_sys::NVSDK_NGX_VK_DLSS_Eval_Params = unsafe { std::mem::zeroed() };
-//         params.Feature = value.feature_evaluation_parameters;
-//         params.pInDepth = value.depth;
-//         unsafe {
-//             nvngx_sys::HELPERS_NVSDK_NGX_Create_ImageView_Resource_VK(imageView, image, subresourceRange, format, width, height, readWrite)
-//         }
-//         Self(params)
-//     }
-// }
-
-// struct Desc<'a> {
-//    pub input_color_resource: &'a ID3D12Resource,
-// }
-
 /// The SuperSampling evaluation parameters.
 #[derive(Debug, Default)]
 pub struct SuperSamplingEvaluationParameters {
@@ -91,11 +40,7 @@ pub struct SuperSamplingEvaluationParameters {
     parameters: NVSDK_NGX_D3D12_DLSS_Eval_Params,
 }
 
-// impl Default for SuperSamplingEvaluationParameters {
-//     fn default() -> Self {
-//         unsafe { std::mem::zeroed() }
-//     }
-// }
+
 
 impl SuperSamplingEvaluationParameters {
     /// Creates a new set of evaluation parameters for SuperSampling.
@@ -106,14 +51,9 @@ impl SuperSamplingEvaluationParameters {
     /// Sets the color input parameter (the image to upscale).
     pub fn set_color_input(
         &mut self,
-        // feature_parameters: FeatureParameters,
-        // eval_parameters: NVSDK_NGX_D3D12_DLSS_Eval_Params)
+
         resource: &ID3D12Resource,
     ) {
-        // let name = std::ffi::CStr::from_bytes_with_nul(b"Color\0").unwrap();        unsafe {
-        // NVSDK_NGX_Parameter_SetD3d12Resource(feature_parameters.0,
-        // name.as_ptr(),
-        // eval_parameters.Feature.pInColor) };
 
         self.input_color_resource = Some(resource.clone());
         self.parameters.Feature.pInColor = resource.as_raw().cast();
@@ -190,26 +130,6 @@ impl SuperSamplingEvaluationParameters {
     ) -> *mut NVSDK_NGX_D3D12_DLSS_Eval_Params {
         std::ptr::addr_of_mut!(self.parameters)
     }
-
-    // /// Returns an immutable reference to the color output.
-    // pub fn get_color_output(&self) -> &VkImageResourceDescription {
-    //     &self.color_output
-    // }
-
-    // /// Returns a mutable reference to the color output.
-    // pub fn get_color_output_mut(&mut self) -> &mut VkImageResourceDescription {
-    //     &mut self.color_output
-    // }
-
-    // /// Returns an immutable reference to the depth.
-    // pub fn get_color(&self) -> &VkBufferResourceDescription {
-    //     &self.depth
-    // }
-
-    // /// Returns a mutable reference to the depth.
-    // pub fn get_color_mut(&mut self) -> &mut VkBufferResourceDescription {
-    //     &mut self.depth
-    // }
 }
 
 /// A SuperSamling (or "DLSS") feature.
