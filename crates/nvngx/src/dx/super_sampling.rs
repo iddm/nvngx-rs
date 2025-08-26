@@ -40,8 +40,6 @@ pub struct SuperSamplingEvaluationParameters {
     parameters: NVSDK_NGX_D3D12_DLSS_Eval_Params,
 }
 
-
-
 impl SuperSamplingEvaluationParameters {
     /// Creates a new set of evaluation parameters for SuperSampling.
     pub fn new() -> Self {
@@ -49,12 +47,7 @@ impl SuperSamplingEvaluationParameters {
     }
 
     /// Sets the color input parameter (the image to upscale).
-    pub fn set_color_input(
-        &mut self,
-
-        resource: &ID3D12Resource,
-    ) {
-
+    pub fn set_color_input(&mut self, resource: &ID3D12Resource) {
         self.input_color_resource = Some(resource.clone());
         self.parameters.Feature.pInColor = resource.as_raw().cast();
     }
