@@ -30,6 +30,8 @@ fn main() {
                 // TODO select debug and/or _iterator0/1 when /MTd or /MDd are set.
                 let dbg_suffix = if true { "" } else { "_dbg" };
                 println!("cargo:rustc-link-lib=nvsdk_ngx{windows_mt_suffix}{dbg_suffix}");
+                // println!("cargo:rustc-link-lib=stdc++");
+                // println!("cargo:rustc-link-lib=libc++");
                 println!("cargo:rustc-link-search={}", link_library_path.display());
             }
             "linux" => {
@@ -156,16 +158,15 @@ fn vulkan_sdk() -> Option<PathBuf> {
 
 #[cfg(feature = "vk")]
 fn compile_vk() {
-    const SOURCE_FILE_PATH: &str = "src/vk_helpers.c";
+    const SOURCE_FILE_PATH: &str = "src/vk_helpers.cpp";
 
     let vulkan_sdk = vulkan_sdk();
 
     let mut build = cc::Build::new();
-    build.file(SOURCE_FILE_PATH);
     if let Some(vulkan_sdk) = &vulkan_sdk {
         build.include(vulkan_sdk.join("Include"));
     }
-    build.cpp(true);
+    build.cpp(true).file(SOURCE_FILE_PATH);
     build.compile("vk_helpers");
 
     #[cfg(feature = "generate-bindings")]
