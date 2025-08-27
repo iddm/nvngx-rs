@@ -4,8 +4,10 @@
 #include "../DLSS/include/nvsdk_ngx_helpers_vk.h"
 #include "../DLSS/include/nvsdk_ngx_helpers_dlssd_vk.h"
 
+#ifdef __cplusplus
 extern "C"
 {
+    #endif
     // Super-Sampling
 
     NVSDK_NGX_Result HELPERS_NGX_VULKAN_CREATE_DLSS_EXT1(
@@ -39,4 +41,6 @@ extern "C"
         NVSDK_NGX_Handle *pInHandle,
         NVSDK_NGX_Parameter *pInParams,
         NVSDK_NGX_VK_DLSSD_Eval_Params *pInDlssDEvalParams);
+#ifdef __cplusplus
 }
+#endif

@@ -1,7 +1,9 @@
 #include "vk_wrapper.h"
 
+#ifdef __cplusplus
 extern "C"
 {
+#endif
 
     NVSDK_NGX_Result HELPERS_NGX_VULKAN_CREATE_DLSS_EXT1(
         VkDevice InDevice,
@@ -71,4 +73,6 @@ extern "C"
             pInParams,
             pInDlssDEvalParams);
     }
+#ifdef __cplusplus
 }
+#endif
