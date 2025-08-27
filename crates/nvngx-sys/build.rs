@@ -165,6 +165,7 @@ fn compile_vk() {
     if let Some(vulkan_sdk) = &vulkan_sdk {
         build.include(vulkan_sdk.join("Include"));
     }
+    build.cpp(true);
     build.compile("vk_helpers");
 
     #[cfg(feature = "generate-bindings")]
