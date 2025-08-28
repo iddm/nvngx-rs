@@ -116,9 +116,9 @@ impl System {
     ) -> Result<Self> {
         let sdk_supported = check_vk_version(entry);
         if sdk_supported.is_err() {
-            return Err(nvngx_sys::Error::Other(format!(
-                "Vulkan SDK version not supported"
-            )));
+            return Err(nvngx_sys::Error::Other(
+                "Vulkan SDK version not supported".to_string(),
+            ));
         }
         let engine_type = nvngx_sys::NVSDK_NGX_EngineType::NVSDK_NGX_ENGINE_TYPE_CUSTOM;
         let project_id =
