@@ -3,7 +3,7 @@
 
 use std::rc::Rc;
 
-use ash::vk;
+use ash::vk::{self, api_version_major, api_version_minor};
 use nvngx_sys::{
     vulkan::{
         NVSDK_NGX_ImageViewInfo_VK, NVSDK_NGX_Resource_VK, NVSDK_NGX_Resource_VK_Type,
@@ -114,6 +114,12 @@ impl System {
         physical_device: vk::PhysicalDevice,
         logical_device: vk::Device,
     ) -> Result<Self> {
+        let sdk_supported = check_vk_version(entry);
+        if sdk_supported.is_err() {
+            return Err(nvngx_sys::Error::Other(format!(
+                "Vulkan SDK version not supported"
+            )));
+        }
         let engine_type = nvngx_sys::NVSDK_NGX_EngineType::NVSDK_NGX_ENGINE_TYPE_CUSTOM;
         let project_id =
             std::ffi::CString::new(project_id.unwrap_or_else(uuid::Uuid::new_v4).to_string())
@@ -206,6 +212,32 @@ impl Drop for System {
         if let Err(e) = self.shutdown() {
             log::error!("Couldn't shutdown the NGX system {self:?}: {e}");
         }
+    }
+}
+
+fn check_vk_version(entry: &ash::Entry) -> Result {
+    let api_version = unsafe {
+        entry
+            .try_enumerate_instance_version()
+            .unwrap()
+            .unwrap_or(vk::API_VERSION_1_0)
+    };
+
+    let major = api_version_major(api_version);
+    let minor = api_version_minor(api_version);
+    // DLSS needs vulkan sdk version 1.4 bacause the function vkCreateCuModuleNVX() has a VkCuModuleCreateInfoNVX struct.
+    // The field pNext of this function in versions below 1.4 have to be set to NULL,
+    // while the field can be set to NULL or a pointer to a valid instance of VkCuModuleTexturingModeCreateInfoNVX in versions 1.4+.
+    let meets_requirements = (major >= 1) || (major == 1 && minor >= 4);
+    if !meets_requirements {
+        let msg = format!(
+            "DLSS is not supported for Vulkan {} {}. Please update to SDK version 1.4 or higher.",
+            major, minor
+        );
+        log::error!("{}", msg);
+        Err(nvngx_sys::Error::Other(msg))
+    } else {
+        Ok(())
     }
 }
 
