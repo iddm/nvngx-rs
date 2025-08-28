@@ -143,7 +143,15 @@ fn vulkan_sdk() -> Option<PathBuf> {
     // Mostly on Windows, the Vulkan headers don't exist in a common location but can be found based
     // on VULKAN_SDK, set by the Vulkan SDK installer.
     match env::var("VULKAN_SDK") {
-        Ok(v) => Some(PathBuf::from(v)),
+        Ok(v) => {
+            // Extracts the version from the vulkan sdk path.
+            if let Some((major, minor, _patch, _build)) = parse_version_numbers(&v) {
+                if !((major > 1) || (major == 1 && minor >= 4)) {
+                    panic!("Vulkan SDK does not meet DLSS requirements. Please upgrade to SDK version 1.4 or higher.")
+                }
+            }
+            Some(PathBuf::from(v))
+        }
         Err(env::VarError::NotPresent) if cfg!(windows) => {
             panic!("On Windows, the VULKAN_SDK environment variable must be set")
         }
@@ -197,5 +205,28 @@ fn windows_mt_suffix() -> &'static str {
         "_s"
     } else {
         "_d"
+    }
+}
+
+fn extract_version_from_path(path: &str) -> Option<String> {
+    use regex::Regex;
+    let re = Regex::new(r"(\d+\.\d+\.\d+(?:\.\d+)?)").ok()?;
+    re.find(path).map(|m| m.as_str().to_string())
+}
+
+fn parse_version_numbers(path: &str) -> Option<(u32, u32, u32, u32)> {
+    let version_str = extract_version_from_path(path)?;
+    println!("SDK Version: {}", version_str);
+    let parts: Vec<u32> = version_str
+        .split('.')
+        .filter_map(|s| s.parse().ok())
+        .collect();
+
+    if parts.len() >= 4 {
+        Some((parts[0], parts[1], parts[2], parts[3]))
+    } else if parts.len() >= 3 {
+        Some((parts[0], parts[1], parts[2], 0))
+    } else {
+        None
     }
 }

@@ -257,6 +257,7 @@ dependencies = [
  "bindgen",
  "cc",
  "libc",
+ "regex",
  "widestring",
  "windows",
 ]
