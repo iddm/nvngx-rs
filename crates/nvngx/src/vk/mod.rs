@@ -102,7 +102,6 @@ impl RequiredExtensions {
 pub struct System {
     device: vk::Device,
 }
-
 impl System {
     /// Creates a new NVIDIA NGX system.
     pub fn new(
@@ -114,32 +113,37 @@ impl System {
         physical_device: vk::PhysicalDevice,
         logical_device: vk::Device,
     ) -> Result<Self> {
-        let engine_type = nvngx_sys::NVSDK_NGX_EngineType::NVSDK_NGX_ENGINE_TYPE_CUSTOM;
-        let project_id =
-            std::ffi::CString::new(project_id.unwrap_or_else(uuid::Uuid::new_v4).to_string())
-                .unwrap();
-        let engine_version = std::ffi::CString::new(engine_version).unwrap();
-        let application_data_path =
-            widestring::WideString::from_str(application_data_path.to_str().unwrap());
-        Result::from(unsafe {
-            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_Init_with_ProjectID(
-                project_id.as_ptr(),
-                engine_type,
-                engine_version.as_ptr(),
-                application_data_path.as_ptr().cast(),
-                instance.handle(),
-                physical_device,
-                logical_device,
-                entry.static_fn().get_instance_proc_addr,
-                instance.fp_v1_0().get_device_proc_addr,
-                std::ptr::null(),
-                nvngx_sys::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
-            )
-        })?;
+        let valid_sdk = check_sdk_suitability();
+        if valid_sdk.is_ok() {
+            let engine_type = nvngx_sys::NVSDK_NGX_EngineType::NVSDK_NGX_ENGINE_TYPE_CUSTOM;
+            let project_id =
+                std::ffi::CString::new(project_id.unwrap_or_else(uuid::Uuid::new_v4).to_string())
+                    .unwrap();
+            let engine_version = std::ffi::CString::new(engine_version).unwrap();
+            let application_data_path =
+                widestring::WideString::from_str(application_data_path.to_str().unwrap());
+            Result::from(unsafe {
+                nvngx_sys::vulkan::NVSDK_NGX_VULKAN_Init_with_ProjectID(
+                    project_id.as_ptr(),
+                    engine_type,
+                    engine_version.as_ptr(),
+                    application_data_path.as_ptr().cast(),
+                    instance.handle(),
+                    physical_device,
+                    logical_device,
+                    entry.static_fn().get_instance_proc_addr,
+                    instance.fp_v1_0().get_device_proc_addr,
+                    std::ptr::null(),
+                    nvngx_sys::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
+                )
+            })?;
 
-        Ok(Self {
-            device: logical_device,
-        })
+            Ok(Self {
+                device: logical_device,
+            })
+        } else {
+            Err(nvngx_sys::Error::Other("Vulkan SDK does not meet DLSS requirements. Please upgrade to SDK version 1.4 or higher.".to_string()))
+        }
     }
 
     fn shutdown(&self) -> Result {
@@ -206,6 +210,55 @@ impl Drop for System {
         if let Err(e) = self.shutdown() {
             log::error!("Couldn't shutdown the NGX system {self:?}: {e}");
         }
+    }
+}
+
+fn check_sdk_suitability() -> Result {
+    match std::env::var("VULKAN_SDK") {
+        Ok(v) => {
+            // Extracts the version from the vulkan sdk path.
+            if let Some((major, minor, _patch, _build)) = parse_version_numbers(&v) {
+                if !((major > 1) || (major == 1 && minor >= 4)) {
+                    Err(nvngx_sys::Error::Other("Vulkan SDK does not meet DLSS requirements. Please upgrade to SDK version 1.4 or higher.".to_string()))
+                } else {
+                    Ok(())
+                }
+            } else {
+                Err(nvngx_sys::Error::Other(
+                    "Failed to parse SDK version".to_string(),
+                ))
+            }
+        }
+        Err(std::env::VarError::NotPresent) if cfg!(windows) => {
+            panic!("On Windows, the VULKAN_SDK environment variable must be set")
+        }
+        Err(std::env::VarError::NotPresent) => todo!(), // linux path TODO, brain is rotting so cant rn but the version should also be checked for this.
+        Err(std::env::VarError::NotUnicode(e)) => {
+            panic!("VULKAN_SDK environment variable is not Unicode: {e:?}")
+        }
+    }
+}
+
+fn extract_version_from_path(path: &str) -> Option<String> {
+    use regex::Regex;
+    let re = Regex::new(r"(\d+\.\d+\.\d+(?:\.\d+)?)").ok()?;
+    re.find(path).map(|m| m.as_str().to_string())
+}
+
+fn parse_version_numbers(path: &str) -> Option<(u32, u32, u32, u32)> {
+    let version_str = extract_version_from_path(path)?;
+    println!("SDK Version: {}", version_str);
+    let parts: Vec<u32> = version_str
+        .split('.')
+        .filter_map(|s| s.parse().ok())
+        .collect();
+
+    if parts.len() >= 4 {
+        Some((parts[0], parts[1], parts[2], parts[3]))
+    } else if parts.len() >= 3 {
+        Some((parts[0], parts[1], parts[2], 0))
+    } else {
+        None
     }
 }
 
