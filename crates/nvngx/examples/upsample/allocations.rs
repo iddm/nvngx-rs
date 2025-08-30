@@ -54,22 +54,21 @@ pub fn create_buffer(
     BufferAllocation { buffer, allocation }
 }
 
-pub fn create_image_rgba8_optimal(
+// Unified generic image creator; use this for any 2D optimal-tiling image
+
+pub fn create_image_optimal(
     device: &ash::Device,
     allocator: &mut vkalloc::Allocator,
     width: u32,
     height: u32,
+    format: vk::Format,
     usage: vk::ImageUsageFlags,
     name: &'static str,
 ) -> ImageAllocation {
     let image_ci = vk::ImageCreateInfo::default()
         .image_type(vk::ImageType::TYPE_2D)
-        .format(vk::Format::R8G8B8A8_UNORM)
-        .extent(vk::Extent3D {
-            width,
-            height,
-            depth: 1,
-        })
+        .format(format)
+        .extent(vk::Extent3D { width, height, depth: 1 })
         .mip_levels(1)
         .array_layers(1)
         .samples(vk::SampleCountFlags::TYPE_1)
