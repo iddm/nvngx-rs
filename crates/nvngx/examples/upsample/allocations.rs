@@ -68,7 +68,11 @@ pub fn create_image_optimal(
     let image_ci = vk::ImageCreateInfo::default()
         .image_type(vk::ImageType::TYPE_2D)
         .format(format)
-        .extent(vk::Extent3D { width, height, depth: 1 })
+        .extent(vk::Extent3D {
+            width,
+            height,
+            depth: 1,
+        })
         .mip_levels(1)
         .array_layers(1)
         .samples(vk::SampleCountFlags::TYPE_1)
@@ -99,9 +103,15 @@ pub fn create_image_optimal(
     ImageAllocation { image, allocation }
 }
 
-pub fn destroy_buffer(device: &ash::Device, allocator: &mut vkalloc::Allocator, b: BufferAllocation) {
+pub fn destroy_buffer(
+    device: &ash::Device,
+    allocator: &mut vkalloc::Allocator,
+    b: BufferAllocation,
+) {
     unsafe { device.destroy_buffer(b.buffer, None) };
-    allocator.free(b.allocation).expect("free buffer allocation");
+    allocator
+        .free(b.allocation)
+        .expect("free buffer allocation");
 }
 
 pub fn destroy_image(device: &ash::Device, allocator: &mut vkalloc::Allocator, i: ImageAllocation) {

@@ -23,7 +23,7 @@ impl VkMiniInit {
         let entry_fn = unsafe { ash::Entry::load().unwrap() };
 
         // Handle validation layers and settings based on debug build and runtime flag
-    let (_layer_names, instance) = {
+        let (_layer_names, instance) = {
             if Self::should_enable_validation() {
                 instance_extensions.push("VK_EXT_layer_settings".to_owned());
                 let layer_names = vec!["VK_LAYER_KHRONOS_validation".to_owned()];
@@ -178,9 +178,11 @@ impl VkMiniInit {
     }
 
     pub fn record_and_submit<F>(&self, record: F) -> ash::prelude::VkResult<()>
-    where F: FnOnce(vk::CommandBuffer, &ash::Device) {
-        let cmd_pool_ci = vk::CommandPoolCreateInfo::default()
-            .queue_family_index(self.queue_family_index);
+    where
+        F: FnOnce(vk::CommandBuffer, &ash::Device),
+    {
+        let cmd_pool_ci =
+            vk::CommandPoolCreateInfo::default().queue_family_index(self.queue_family_index);
         let cmd_pool = unsafe { self.device.create_command_pool(&cmd_pool_ci, None) }?;
 
         // Allocate one primary command buffer
@@ -199,8 +201,11 @@ impl VkMiniInit {
         unsafe { self.device.end_command_buffer(cb) }?;
         let submit_info = vk::SubmitInfo::default().command_buffers(std::slice::from_ref(&cb));
         unsafe {
-            self.device
-                .queue_submit(self.queue, std::slice::from_ref(&submit_info), vk::Fence::null())?;
+            self.device.queue_submit(
+                self.queue,
+                std::slice::from_ref(&submit_info),
+                vk::Fence::null(),
+            )?;
             self.device.device_wait_idle()?;
             self.device.destroy_command_pool(cmd_pool, None);
         }
