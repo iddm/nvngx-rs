@@ -25,7 +25,14 @@ fn compile_helpers() {
     let mut build = cc::Build::new();
     build.file(SOURCE_FILE_PATH);
     if let Some(vulkan_sdk) = vulkan_sdk() {
-        build.include(vulkan_sdk.join("include"));
+        let vulkan_include = vulkan_sdk.join("include");
+        if !vulkan_include.exists() {
+            panic!(
+                "Vulkan SDK include path does not exist: {}",
+                vulkan_include.display()
+            )
+        }
+        build.include(vulkan_include);
     }
     build.compile("ngx_helpers");
 }
