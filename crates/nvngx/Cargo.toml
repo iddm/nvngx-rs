@@ -19,5 +19,5 @@ derive_builder = "0.12"
 nvngx-sys = { version = "0.3.0",  path = "../nvngx-sys" }
 
 [dev-dependencies]
-env_logger = "0.11"
-ash = "0.38"
+image = { version = "0.25.6", default-features = false, features = ["png"] }
+gpu-allocator = {version = "0.27.0", default-features = false, features = ["vulkan"]}

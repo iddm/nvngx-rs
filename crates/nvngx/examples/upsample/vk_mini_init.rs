@@ -1,7 +1,6 @@
 use std::ffi::{c_char, CStr, CString};
 
 use ash::vk;
-use log::{info, warn};
 
 pub struct VkMiniInit {
     pub entry_fn: ash::Entry,
@@ -94,18 +93,8 @@ impl VkMiniInit {
                     };
 
                     match instance.create_device(physical_device, &device_create_info, None) {
-                        Ok(device) => {
-                            info!(
-                                "Device created successfully for {gpu_name:?} with extensions {device_extensions:?}",
-                            );
-                            Some((physical_device, device))
-                        }
-                        Err(e) => {
-                            info!(
-                                "Device creation failed for {gpu_name:?} with error: {e}"
-                            );
-                            None
-                        }
+                        Ok(device) => Some((physical_device, device)),
+                        Err(e) =>  None
                     }
                 })
                 .expect("Could not find suitable physical device")
