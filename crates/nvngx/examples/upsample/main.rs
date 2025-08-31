@@ -4,6 +4,7 @@ mod vk_mini_init;
 
 use ash::vk;
 use image::ColorType;
+use nvngx::SuperSamplingFeature;
 
 fn main() {
     let required_extensions = nvngx::vk::RequiredExtensions::get().unwrap();
@@ -11,7 +12,7 @@ fn main() {
         .buffer_device_address(true);
     let mut vulkan_13_features = vk::PhysicalDeviceVulkan13Features::default()
         .synchronization2(true);
-    let mut physical_device_features2 = vk::PhysicalDeviceFeatures2::default()
+    let physical_device_features2 = vk::PhysicalDeviceFeatures2::default()
         .push_next(&mut vulkan_12_features)
         .push_next(&mut vulkan_13_features);
 
@@ -39,7 +40,7 @@ fn main() {
     ));
     let (dst_width, dst_height) = (src_width * 2, src_height * 2);
 
-    // 2) --- DLSS create + evaluate ---
+    // 2) --- Create DLSS feature ---
     let capability_parameters =
         nvngx::vk::FeatureParameters::get_capability_parameters().expect("capability params");
     assert!(
@@ -54,20 +55,21 @@ fn main() {
         Some(nvngx::sys::NVSDK_NGX_PerfQuality_Value::NVSDK_NGX_PerfQuality_Value_Balanced),
         None,
     );
+    let mut ss: nvngx_sys::Result<SuperSamplingFeature> = Err(nvngx::sys::Error::Other("Not initialized".to_string()));
+    vk_mini_init.record_and_submit(|cb, _| {
+        ss = system.create_super_sampling_feature(cb, capability_parameters, create_params);
+    }).unwrap();
+    let mut ss = ss.expect("create DLSS feature");
 
-    let device = &vk_mini_init.device;
-    // Command submission is handled by helper now
-
+    // 3) Create host-visible staging buffer for uploading the image, and resources for the DLSS input/output
     let mut allocator = vk_mini_init.get_allocator();
 
-    // 3) Create host-visible staging buffer and upload
     let mut staging = allocations::create_buffer(
-        device,
+        &vk_mini_init.device,
         &mut allocator,
         src_rgba.len() as u64,
         vk::BufferUsageFlags::TRANSFER_SRC,
         gpu_allocator::MemoryLocation::CpuToGpu,
-        "staging",
     );
     staging
         .allocation
@@ -75,9 +77,8 @@ fn main() {
         .expect("staging mapped")
         .copy_from_slice(src_rgba.as_raw());
 
-    // Create images and views via helpers
     let mut color_img = allocations::create_image_optimal(
-        device,
+        &vk_mini_init.device,
         &mut allocator,
         src_width,
         src_height,
@@ -85,7 +86,7 @@ fn main() {
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
     );
     let mut mv_img = allocations::create_image_optimal(
-        device,
+        &vk_mini_init.device,
         &mut allocator,
         src_width,
         src_height,
@@ -93,34 +94,30 @@ fn main() {
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
     );
     let mut depth_img = allocations::create_image_optimal(
-        device,
+        &vk_mini_init.device,
         &mut allocator,
         src_width,
         src_height,
         vk::Format::R32_SFLOAT,
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
     );
-
     let mut out_img = allocations::create_image_optimal(
-        device,
+        &vk_mini_init.device,
         &mut allocator,
         dst_width,
         dst_height,
         vk::Format::R8G8B8A8_UNORM,
         vk::ImageUsageFlags::TRANSFER_SRC | vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::STORAGE,
     );
-
-    // 4) Create readback buffer sized for upscaled output
     let readback = allocations::create_buffer(
-        device,
+        &vk_mini_init.device,
         &mut allocator,
-        (dst_width as usize * dst_height as usize * 4) as u64,
+        (dst_width * dst_height * 4) as u64,
         vk::BufferUsageFlags::TRANSFER_DST,
-        gpu_allocator::MemoryLocation::GpuToCpu,
-        "readback",
+        gpu_allocator::MemoryLocation::GpuToCpu
     );
 
-    // 5-6) Record, submit and wait
+    // 5) Record the image upload, DLSS evaluation and readback
     vk_mini_init
         .record_and_submit(|cb, dev| {
             // Prepare images for upload/clear and DLSS
@@ -145,10 +142,6 @@ fn main() {
             mv_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
             depth_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
             out_img.image_barrier(dev, cb, vk::PipelineStageFlags2::CLEAR, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
-
-            let mut ss = system
-                .create_super_sampling_feature(cb, capability_parameters, create_params)
-                .expect("create DLSS feature");
 
             // Fill evaluation params
             let subresource = imgops::default_subresource_range();
@@ -208,7 +201,7 @@ fn main() {
         })
         .unwrap();
 
-    // 7) Read back and save
+    // 7) Host read back and save
     let mapped = readback.allocation.mapped_slice().expect("readback mapped");
 
     image::save_buffer_with_format(
@@ -225,10 +218,10 @@ fn main() {
     .expect("save png");
 
     // Cleanup GPU allocations
-    allocations::destroy_buffer(device, &mut allocator, staging);
-    allocations::destroy_buffer(device, &mut allocator, readback);
-    allocations::destroy_image(device, &mut allocator, color_img);
-    allocations::destroy_image(device, &mut allocator, mv_img);
-    allocations::destroy_image(device, &mut allocator, depth_img);
-    allocations::destroy_image(device, &mut allocator, out_img);
+    allocations::destroy_buffer(&vk_mini_init.device, &mut allocator, staging);
+    allocations::destroy_buffer(&vk_mini_init.device, &mut allocator, readback);
+    allocations::destroy_image(&vk_mini_init.device, &mut allocator, color_img);
+    allocations::destroy_image(&vk_mini_init.device, &mut allocator, mv_img);
+    allocations::destroy_image(&vk_mini_init.device, &mut allocator, depth_img);
+    allocations::destroy_image(&vk_mini_init.device, &mut allocator, out_img);
 }

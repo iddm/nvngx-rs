@@ -17,9 +17,6 @@ impl VkMiniInit {
         device_extensions: Vec<String>,
         desired_physical_device_features2: &vk::PhysicalDeviceFeatures2,
     ) -> Self {
-        #[cfg(debug_assertions)]
-        instance_extensions.push("VK_EXT_debug_utils".to_owned());
-
         let entry_fn = unsafe { ash::Entry::load().unwrap() };
 
         // Handle validation layers and settings based on debug build and runtime flag

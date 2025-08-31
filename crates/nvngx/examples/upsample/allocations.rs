@@ -62,7 +62,6 @@ pub fn create_buffer(
     size: vk::DeviceSize,
     usage: vk::BufferUsageFlags,
     location: gpu_allocator::MemoryLocation,
-    name: &'static str,
 ) -> BufferAllocation {
     let buffer_ci = vk::BufferCreateInfo::default()
         .size(size)
@@ -74,7 +73,7 @@ pub fn create_buffer(
     let requirements = unsafe { device.get_buffer_memory_requirements(buffer) };
     let allocation = allocator
         .allocate(&vkalloc::AllocationCreateDesc {
-            name,
+            name: "",
             requirements,
             location,
             linear: true,
