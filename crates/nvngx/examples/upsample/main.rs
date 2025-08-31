@@ -262,7 +262,7 @@ fn main() {
         })
         .unwrap();
 
-    // 7) Host read back and save
+    // 6) Host read back and save
     let mapped = readback.allocation.mapped_slice().expect("readback mapped");
 
     image::save_buffer_with_format(
@@ -278,7 +278,7 @@ fn main() {
     )
     .expect("save png");
 
-    // Cleanup GPU allocations
+    // 7) Cleanup GPU allocations
     allocations::destroy_buffer(&vk_mini_init.device, &mut allocator, staging);
     allocations::destroy_buffer(&vk_mini_init.device, &mut allocator, readback);
     allocations::destroy_image(&vk_mini_init.device, &mut allocator, color_img);
