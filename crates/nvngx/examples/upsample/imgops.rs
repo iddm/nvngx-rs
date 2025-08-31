@@ -1,7 +1,5 @@
 use ash::vk;
 
-// no allocations import needed
-
 pub fn default_subresource_range() -> vk::ImageSubresourceRange {
     vk::ImageSubresourceRange {
         aspect_mask: vk::ImageAspectFlags::COLOR,

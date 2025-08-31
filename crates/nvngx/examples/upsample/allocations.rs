@@ -96,8 +96,6 @@ pub fn create_buffer(
     BufferAllocation { buffer, allocation }
 }
 
-// Unified generic image creator; use this for any 2D optimal-tiling image
-
 pub fn create_image_optimal(
     device: &ash::Device,
     allocator: &mut vkalloc::Allocator,

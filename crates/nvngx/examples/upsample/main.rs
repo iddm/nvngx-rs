@@ -55,7 +55,7 @@ fn main() {
         Some(nvngx::sys::NVSDK_NGX_PerfQuality_Value::NVSDK_NGX_PerfQuality_Value_Balanced),
         None,
     );
-    
+
     let mut ss: nvngx_sys::Result<SuperSamplingFeature> =
         Err(nvngx::sys::Error::Other("Not initialized".to_string()));
     vk_mini_init
