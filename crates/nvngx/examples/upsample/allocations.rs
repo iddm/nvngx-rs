@@ -10,6 +10,7 @@ pub struct BufferAllocation {
 pub struct ImageAllocation {
     pub image: vk::Image,
     pub allocation: vkalloc::Allocation,
+    pub view: vk::ImageView,
 }
 
 pub fn load_png_rgba8(path: &str) -> (RgbaImage, u32, u32) {
@@ -100,7 +101,22 @@ pub fn create_image_optimal(
             .expect("bind image memory");
     }
 
-    ImageAllocation { image, allocation }
+    // Create a default 2D image view for the image
+    let subresource_range = vk::ImageSubresourceRange {
+        aspect_mask: vk::ImageAspectFlags::COLOR,
+        base_mip_level: 0,
+        level_count: vk::REMAINING_MIP_LEVELS,
+        base_array_layer: 0,
+        layer_count: vk::REMAINING_ARRAY_LAYERS,
+    };
+    let view_ci = vk::ImageViewCreateInfo::default()
+        .image(image)
+        .view_type(vk::ImageViewType::TYPE_2D)
+        .format(format)
+        .subresource_range(subresource_range);
+    let view = unsafe { device.create_image_view(&view_ci, None) }.expect("create image view");
+
+    ImageAllocation { image, allocation, view }
 }
 
 pub fn destroy_buffer(
@@ -115,6 +131,9 @@ pub fn destroy_buffer(
 }
 
 pub fn destroy_image(device: &ash::Device, allocator: &mut vkalloc::Allocator, i: ImageAllocation) {
-    unsafe { device.destroy_image(i.image, None) };
+    unsafe {
+        device.destroy_image_view(i.view, None);
+        device.destroy_image(i.image, None);
+    }
     allocator.free(i.allocation).expect("free image allocation");
 }

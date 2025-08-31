@@ -124,7 +124,7 @@ impl VkMiniInit {
             device: self.device.clone(),
             physical_device: self.physical_device,
             debug_settings: Default::default(),
-            buffer_device_address: false,
+            buffer_device_address: true,
             allocation_sizes: Default::default(),
         })
         .unwrap()

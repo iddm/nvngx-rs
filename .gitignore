@@ -3,4 +3,4 @@ target/
 .vscode
 
 # Sample generated image
-crates/nvngx/examples/upsample/roundtrip.png
+crates/nvngx/examples/upsample/upsampled.png
