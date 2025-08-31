@@ -112,7 +112,7 @@ fn main() {
         dst_width,
         dst_height,
         vk::Format::R8G8B8A8_UNORM,
-        vk::ImageUsageFlags::STORAGE | vk::ImageUsageFlags::TRANSFER_SRC,
+        vk::ImageUsageFlags::TRANSFER_SRC | vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::STORAGE,
         "dlss-output",
     );
 
@@ -131,12 +131,10 @@ fn main() {
         .record_and_submit(|cb, dev| {
             // Prepare images for upload/clear and DLSS
             color_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
-            mv_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
-            depth_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
+            mv_img.image_barrier(dev, cb, vk::PipelineStageFlags2::CLEAR, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
+            depth_img.image_barrier(dev, cb, vk::PipelineStageFlags2::CLEAR, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
 
             // Clear and upload inputs
-            imgops::clear_color_image(dev, cb, mv_img.image, [0.0, 0.0, 0.0, 0.0]);
-            imgops::clear_color_image(dev, cb, depth_img.image, [1.0, 0.0, 0.0, 0.0]);
             imgops::copy_buffer_to_image(
                 dev,
                 cb,
@@ -145,19 +143,20 @@ fn main() {
                 src_width,
                 src_height,
             );
+            imgops::clear_color_image(dev, cb, mv_img.image, [0.0, 0.0, 0.0, 0.0]);
+            imgops::clear_color_image(dev, cb, depth_img.image, [1.0, 0.0, 0.0, 0.0]);
 
             // Transition inputs for sampling and output for storage
             color_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
             mv_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
             depth_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
-            out_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_WRITE, vk::ImageLayout::GENERAL);
+            out_img.image_barrier(dev, cb, vk::PipelineStageFlags2::CLEAR, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
 
             let mut ss = system
                 .create_super_sampling_feature(cb, capability_parameters, create_params)
                 .expect("create DLSS feature");
 
             // Fill evaluation params
-            let eval = ss.get_evaluation_parameters_mut();
             let subresource = imgops::default_subresource_range();
             let out_desc = nvngx::vk::VkImageResourceDescription {
                 image_view: out_img.view,
@@ -197,6 +196,7 @@ fn main() {
             };
 
             // Hook them up
+            let eval = ss.get_evaluation_parameters_mut();
             eval.set_color_input(color_desc);
             eval.set_color_output(out_desc);
             eval.set_motions_vectors(mv_desc, None);

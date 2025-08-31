@@ -36,15 +36,16 @@ impl ImageAllocation {
         .old_layout(self.current_layout)
         .new_layout(new_layout);
 
-        self.current_access = new_access;
-        self.current_layout = new_layout;
-        self.current_stage = new_stage;
-
         let dep_info = vk::DependencyInfo::default()
             .image_memory_barriers(std::slice::from_ref(&barrier));
         unsafe {
             device.cmd_pipeline_barrier2(cb, &dep_info);
         }
+
+        self.current_access = new_access;
+        self.current_layout = new_layout;
+        self.current_stage = new_stage;
+
     }
 }
 
