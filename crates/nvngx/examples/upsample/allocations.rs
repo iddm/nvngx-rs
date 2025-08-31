@@ -100,7 +100,6 @@ pub fn create_image_optimal(
     height: u32,
     format: vk::Format,
     usage: vk::ImageUsageFlags,
-    name: &'static str,
 ) -> ImageAllocation {
     let image_ci = vk::ImageCreateInfo::default()
         .image_type(vk::ImageType::TYPE_2D)
@@ -123,7 +122,7 @@ pub fn create_image_optimal(
     let requirements = unsafe { device.get_image_memory_requirements(image) };
     let allocation = allocator
         .allocate(&vkalloc::AllocationCreateDesc {
-            name,
+            name: "",
             requirements,
             location: gpu_allocator::MemoryLocation::GpuOnly,
             linear: false,

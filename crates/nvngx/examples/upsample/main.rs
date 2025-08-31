@@ -83,7 +83,6 @@ fn main() {
         src_height,
         vk::Format::R8G8B8A8_UNORM,
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
-        "color-input",
     );
     let mut mv_img = allocations::create_image_optimal(
         device,
@@ -92,7 +91,6 @@ fn main() {
         src_height,
         vk::Format::R16G16_SFLOAT,
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
-        "motion-vectors",
     );
     let mut depth_img = allocations::create_image_optimal(
         device,
@@ -101,11 +99,8 @@ fn main() {
         src_height,
         vk::Format::R32_SFLOAT,
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
-        "depth-image",
     );
 
-    // DLSS output image
-    let (dst_width, dst_height) = (src_width * 2, src_height * 2);
     let mut out_img = allocations::create_image_optimal(
         device,
         &mut allocator,
@@ -113,7 +108,6 @@ fn main() {
         dst_height,
         vk::Format::R8G8B8A8_UNORM,
         vk::ImageUsageFlags::TRANSFER_SRC | vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::STORAGE,
-        "dlss-output",
     );
 
     // 4) Create readback buffer sized for upscaled output
