@@ -9,8 +9,11 @@ fn main() {
     let required_extensions = nvngx::vk::RequiredExtensions::get().unwrap();
     let mut vulkan_12_features = vk::PhysicalDeviceVulkan12Features::default()
         .buffer_device_address(true);
+    let mut vulkan_13_features = vk::PhysicalDeviceVulkan13Features::default()
+        .synchronization2(true);
     let mut physical_device_features2 = vk::PhysicalDeviceFeatures2::default()
-        .push_next(&mut vulkan_12_features);
+        .push_next(&mut vulkan_12_features)
+        .push_next(&mut vulkan_13_features);
 
     let vk_mini_init = vk_mini_init::VkMiniInit::new(
         required_extensions.instance.clone(),
@@ -73,7 +76,7 @@ fn main() {
         .copy_from_slice(src_rgba.as_raw());
 
     // Create images and views via helpers
-    let color_img = allocations::create_image_optimal(
+    let mut color_img = allocations::create_image_optimal(
         device,
         &mut allocator,
         src_width,
@@ -82,7 +85,7 @@ fn main() {
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
         "color-input",
     );
-    let mv_img = allocations::create_image_optimal(
+    let mut mv_img = allocations::create_image_optimal(
         device,
         &mut allocator,
         src_width,
@@ -91,7 +94,7 @@ fn main() {
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
         "motion-vectors",
     );
-    let depth_img = allocations::create_image_optimal(
+    let mut depth_img = allocations::create_image_optimal(
         device,
         &mut allocator,
         src_width,
@@ -103,7 +106,7 @@ fn main() {
 
     // DLSS output image
     let (dst_width, dst_height) = (src_width * 2, src_height * 2);
-    let out_img = allocations::create_image_optimal(
+    let mut out_img = allocations::create_image_optimal(
         device,
         &mut allocator,
         dst_width,
@@ -127,9 +130,9 @@ fn main() {
     vk_mini_init
         .record_and_submit(|cb, dev| {
             // Prepare images for upload/clear and DLSS
-            imgops::to_transfer_dst(dev, cb, color_img.image);
-            imgops::to_transfer_dst(dev, cb, mv_img.image);
-            imgops::to_transfer_dst(dev, cb, depth_img.image);
+            color_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
+            mv_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
+            depth_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_WRITE, vk::ImageLayout::GENERAL);
 
             // Clear and upload inputs
             imgops::clear_color_image(dev, cb, mv_img.image, [0.0, 0.0, 0.0, 0.0]);
@@ -144,10 +147,10 @@ fn main() {
             );
 
             // Transition inputs for sampling and output for storage
-            imgops::to_shader_read(dev, cb, color_img.image);
-            imgops::to_shader_read(dev, cb, mv_img.image);
-            imgops::to_shader_read(dev, cb, depth_img.image);
-            imgops::output_to_general(dev, cb, out_img.image);
+            color_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
+            mv_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
+            depth_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_READ, vk::ImageLayout::GENERAL);
+            out_img.image_barrier(dev, cb, vk::PipelineStageFlags2::COMPUTE_SHADER, vk::AccessFlags2::SHADER_WRITE, vk::ImageLayout::GENERAL);
 
             let mut ss = system
                 .create_super_sampling_feature(cb, capability_parameters, create_params)
@@ -206,7 +209,7 @@ fn main() {
             ss.evaluate(cb).expect("DLSS evaluate");
 
             // Prepare output for readback and copy
-            imgops::output_to_transfer_src(dev, cb, out_img.image);
+            out_img.image_barrier(dev, cb, vk::PipelineStageFlags2::TRANSFER, vk::AccessFlags2::TRANSFER_READ, vk::ImageLayout::GENERAL);
             imgops::copy_image_to_buffer(dev, cb, out_img.image, readback.buffer, dst_width, dst_height);
         })
         .unwrap();
