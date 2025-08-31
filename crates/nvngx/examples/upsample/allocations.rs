@@ -17,7 +17,14 @@ pub struct ImageAllocation {
 }
 
 impl ImageAllocation {
-    pub fn image_barrier(&mut self, device: &ash::Device, cb: vk::CommandBuffer, new_stage: vk::PipelineStageFlags2, new_access: vk::AccessFlags2, new_layout: vk::ImageLayout) {
+    pub fn image_barrier(
+        &mut self,
+        device: &ash::Device,
+        cb: vk::CommandBuffer,
+        new_stage: vk::PipelineStageFlags2,
+        new_access: vk::AccessFlags2,
+        new_layout: vk::ImageLayout,
+    ) {
         let sub_range = vk::ImageSubresourceRange {
             aspect_mask: vk::ImageAspectFlags::COLOR,
             base_mip_level: 0,
@@ -27,17 +34,17 @@ impl ImageAllocation {
         };
 
         let barrier = vk::ImageMemoryBarrier2::default()
-        .image(self.image)
-        .subresource_range(sub_range)
-        .src_stage_mask(self.current_stage)
-        .dst_stage_mask(new_stage)
-        .src_access_mask(self.current_access)
-        .dst_access_mask(new_access)
-        .old_layout(self.current_layout)
-        .new_layout(new_layout);
+            .image(self.image)
+            .subresource_range(sub_range)
+            .src_stage_mask(self.current_stage)
+            .dst_stage_mask(new_stage)
+            .src_access_mask(self.current_access)
+            .dst_access_mask(new_access)
+            .old_layout(self.current_layout)
+            .new_layout(new_layout);
 
-        let dep_info = vk::DependencyInfo::default()
-            .image_memory_barriers(std::slice::from_ref(&barrier));
+        let dep_info =
+            vk::DependencyInfo::default().image_memory_barriers(std::slice::from_ref(&barrier));
         unsafe {
             device.cmd_pipeline_barrier2(cb, &dep_info);
         }
@@ -45,7 +52,6 @@ impl ImageAllocation {
         self.current_access = new_access;
         self.current_layout = new_layout;
         self.current_stage = new_stage;
-
     }
 }
 
@@ -150,7 +156,14 @@ pub fn create_image_optimal(
         .subresource_range(subresource_range);
     let view = unsafe { device.create_image_view(&view_ci, None) }.expect("create image view");
 
-    ImageAllocation { image, allocation, view, current_layout: image_ci.initial_layout, current_access: vk::AccessFlags2::empty(), current_stage: vk::PipelineStageFlags2::empty() }
+    ImageAllocation {
+        image,
+        allocation,
+        view,
+        current_layout: image_ci.initial_layout,
+        current_access: vk::AccessFlags2::empty(),
+        current_stage: vk::PipelineStageFlags2::empty(),
+    }
 }
 
 pub fn destroy_buffer(
