@@ -5,14 +5,21 @@ use std::{
 
 const SOURCE_FILE_PATH: &str = "src/bindings.c";
 
-fn vulkan_sdk() -> Option<PathBuf> {
+fn vulkan_sdk_include_directory() -> Option<PathBuf> {
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let is_windows = target_os.as_str() == "windows";
+
     // Mostly on Windows, the Vulkan headers don't exist in a common location but can be found based
     // on VULKAN_SDK, set by the Vulkan SDK installer.
     match env::var("VULKAN_SDK") {
-        Ok(v) => Some(PathBuf::from(v)),
+        Ok(v) => Some(PathBuf::from(v).join(
+            // On the Windows SDK the `Include` directory is capitalized
+            if is_windows { "Include" } else { "include" },
+        )),
         // TODO: On Windows, perhaps this should be an error with a link to the SDK installation?
-        Err(env::VarError::NotPresent) if cfg!(windows) => {
-            panic!("On Windows, the VULKAN_SDK environment variable must be set")
+        Err(env::VarError::NotPresent) if is_windows => {
+            // On Windows there's no common include directory like `/usr/include` where Vulkan headers can be found
+            panic!("When targeting Windows, the VULKAN_SDK environment variable must be set")
         }
         Err(env::VarError::NotPresent) => None,
         Err(env::VarError::NotUnicode(e)) => {
@@ -24,8 +31,8 @@ fn vulkan_sdk() -> Option<PathBuf> {
 fn compile_helpers() {
     let mut build = cc::Build::new();
     build.file(SOURCE_FILE_PATH);
-    if let Some(vulkan_sdk) = vulkan_sdk() {
-        build.include(vulkan_sdk.join("Include"));
+    if let Some(inc) = vulkan_sdk_include_directory() {
+        build.include(inc);
     }
     build.compile("ngx_helpers");
 }
@@ -116,8 +123,8 @@ fn generate_bindings() {
             non_exhaustive: true,
         });
 
-    if let Some(vulkan_sdk) = vulkan_sdk() {
-        bindings = bindings.clang_arg(format!("-I{}", vulkan_sdk.join("include").display()))
+    if let Some(inc) = vulkan_sdk_include_directory() {
+        bindings = bindings.clang_arg(format!("-I{}", inc.display()))
     }
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
