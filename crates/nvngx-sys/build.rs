@@ -6,7 +6,6 @@ use std::{
 fn main() {
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let platform_dlss_lib_path = get_dlss_platform_lib_path(&target_os);
-    // Make the path relative to the crate source, where the DLSS submodule exists
 
     // First link our Rust project against the right version of nvsdk_ngx
     link_dlss_platform_library(&target_os.as_str(), platform_dlss_lib_path);
@@ -179,6 +178,7 @@ fn get_dlss_platform_lib_path(target_os: &String) -> PathBuf {
         _ => "cargo:warning=DLSS is not supported on this platform ({}). Skipping link step.",
     });
 
+    // Make the path relative to the crate source, where the DLSS submodule exists
     PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join(dlss_library_path)
 }
 
