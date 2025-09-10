@@ -1,13 +1,19 @@
 //! Vulkan bindings to NGX.
+#![cfg(feature = "vk")]
 
 use std::rc::Rc;
 
 use ash::vk;
 use nvngx_sys::{
-    NVSDK_NGX_Coordinates, NVSDK_NGX_Dimensions, NVSDK_NGX_Feature, NVSDK_NGX_ImageViewInfo_VK,
-    NVSDK_NGX_PerfQuality_Value, NVSDK_NGX_Resource_VK, NVSDK_NGX_Resource_VK_Type,
-    NVSDK_NGX_Resource_VK__bindgen_ty_1, Result,
+    vulkan::{
+        NVSDK_NGX_ImageViewInfo_VK, NVSDK_NGX_Resource_VK, NVSDK_NGX_Resource_VK_Type,
+        NVSDK_NGX_Resource_VK__bindgen_ty_1,
+    },
+    NVSDK_NGX_Coordinates, NVSDK_NGX_Dimensions, NVSDK_NGX_Feature, NVSDK_NGX_PerfQuality_Value,
+    Result,
 };
+
+use super::ngx::{FeatureParameters, SuperSamplingCreateParameters};
 
 pub mod feature;
 pub use feature::*;
@@ -17,15 +23,11 @@ pub mod ray_reconstruction;
 pub use ray_reconstruction::*;
 
 fn convert_slice_of_strings_to_cstrings(data: &[String]) -> Result<Vec<std::ffi::CString>> {
-    let strings: Vec<_> = data
-        .iter()
+    data.iter()
         .cloned()
         .map(std::ffi::CString::new)
         .collect::<Result<_, _>>()
-        // TODO: Add NulError to our Error enum?
-        .map_err(|_| "Couldn't convert the extensions to CStrings.".to_string())?;
-
-    Ok(strings)
+        .map_err(|_| "Couldn't convert the extensions to CStrings.".into())
 }
 
 /// Vulkan extensions required for the NVIDIA NGX operation.
@@ -57,7 +59,7 @@ impl RequiredExtensions {
         let mut instance_count = 0u32;
         let mut device_count = 0u32;
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_VULKAN_RequiredExtensions(
+            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_RequiredExtensions(
                 &mut instance_count,
                 &mut instance_extensions,
                 &mut device_count,
@@ -100,7 +102,6 @@ impl RequiredExtensions {
 pub struct System {
     device: vk::Device,
 }
-
 impl System {
     /// Creates a new NVIDIA NGX system.
     pub fn new(
@@ -120,7 +121,7 @@ impl System {
         let application_data_path =
             widestring::WideString::from_str(application_data_path.to_str().unwrap());
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_VULKAN_Init_with_ProjectID(
+            nvngx_sys::vulkan::NVSDK_NGX_VULKAN_Init_with_ProjectID(
                 project_id.as_ptr(),
                 engine_type,
                 engine_version.as_ptr(),
@@ -133,14 +134,15 @@ impl System {
                 std::ptr::null(),
                 nvngx_sys::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
             )
-        })
-        .map(|_| Self {
+        })?;
+
+        Ok(Self {
             device: logical_device,
         })
     }
 
     fn shutdown(&self) -> Result {
-        unsafe { nvngx_sys::NVSDK_NGX_VULKAN_Shutdown1(self.device) }.into()
+        unsafe { nvngx_sys::vulkan::NVSDK_NGX_VULKAN_Shutdown1(self.device) }.into()
     }
 
     /// Creates a new [`Feature`] with the logical device used to create
@@ -148,12 +150,12 @@ impl System {
     pub fn create_feature(
         &self,
         command_buffer: vk::CommandBuffer,
-        feature_type: nvngx_sys::NVSDK_NGX_Feature,
+        feature_type: NVSDK_NGX_Feature,
         parameters: Option<FeatureParameters>,
     ) -> Result<Feature> {
         let parameters = match parameters {
             Some(p) => p,
-            None => FeatureParameters::get_capability_parameters()?,
+            None => FeatureParameters::vk_get_capability_parameters()?,
         };
         Feature::new(self.device, command_buffer, feature_type, parameters)
     }
@@ -354,7 +356,7 @@ mod tests {
     #[ignore]
     fn insert_parameter_debug_macro() -> super::Result {
         let mut map = HashMap::new();
-        let parameters = super::FeatureParameters::get_capability_parameters().unwrap();
+        let parameters = super::FeatureParameters::vk_get_capability_parameters().unwrap();
         crate::insert_parameter_debug!(
             map,
             parameters,
