@@ -63,7 +63,7 @@ impl RayReconstructionCreateParameters {
     }
 }
 
-// /// Similar to [`nvngx_sys::NVSDK_NGX_VK_DLSSD_Eval_Params`].
+/// Similar to [`nvngx_sys::NVSDK_NGX_VK_DLSSD_Eval_Params`].
 /// The Ray Reconstruction evaluation parameters.
 ///
 #[derive(Debug)]

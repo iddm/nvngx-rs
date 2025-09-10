@@ -4,49 +4,18 @@ use std::{
 };
 
 fn main() {
-    let mut supported_platform = true;
-    // Tell cargo to tell rustc to link to the libraries.
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
-    let dlss_library_path = Path::new(match target_os.as_str() {
-        "windows" => "DLSS/lib/Windows_x86_64",
-        "linux" => "DLSS/lib/Linux_x86_64",
-        _ => {
-            supported_platform = false;
-            "cargo:warning=DLSS is not supported on this platform ({}). Skipping link step."
-        }
-    });
+    let platform_dlss_lib_path = get_dlss_platform_lib_path(&target_os);
+    // Make the path relative to the crate source, where the DLSS submodule exists
 
-    if supported_platform {
-        // Make the path relative to the crate source, where the DLSS submodule exists
-        let dlss_library_path =
-            PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join(dlss_library_path);
+    // First link our Rust project against the right version of nvsdk_ngx
+    link_dlss_platform_library(&target_os.as_str(), platform_dlss_lib_path);
 
-        // First link our Rust project against the right version of nvsdk_ngx
-        match target_os.as_str() {
-            "windows" => {
-                // TODO: Only one architecture is included (and for vs201x)
-                let link_library_path = dlss_library_path.join("x64");
-                let windows_mt_suffix = windows_mt_suffix();
-                // TODO select debug and/or _iterator0/1 when /MTd or /MDd are set.
-                let dbg_suffix = if true { "" } else { "_dbg" };
-                println!("cargo:rustc-link-lib=nvsdk_ngx{windows_mt_suffix}{dbg_suffix}");
-                println!("cargo:rustc-link-search={}", link_library_path.display());
-            }
-            "linux" => {
-                // On Linux there is only one link-library
-                println!("cargo:rustc-link-lib=nvsdk_ngx");
-                println!("cargo:rustc-link-lib=stdc++");
-                println!("cargo:rustc-link-search={}", dlss_library_path.display());
-            }
-            x => todo!("No libraries for {x}"),
-        }
-
-        compile_general();
-        #[cfg(feature = "dx")]
-        compile_dx();
-        #[cfg(feature = "vk")]
-        compile_vk();
-    }
+    compile_general();
+    #[cfg(feature = "dx")]
+    compile_dx();
+    #[cfg(feature = "vk")]
+    compile_vk();
 }
 
 #[cfg(feature = "generate-bindings")]
@@ -139,7 +108,7 @@ fn compile_dx() {
 }
 
 #[cfg(feature = "vk")]
-fn vulkan_sdk() -> Option<PathBuf> {
+fn get_vulkan_sdk_path() -> Option<PathBuf> {
     // Mostly on Windows, the Vulkan headers don't exist in a common location but can be found based
     // on VULKAN_SDK, set by the Vulkan SDK installer.
     match env::var("VULKAN_SDK") {
@@ -158,11 +127,11 @@ fn vulkan_sdk() -> Option<PathBuf> {
 fn compile_vk() {
     const SOURCE_FILE_PATH: &str = "src/vk_helpers.cpp";
 
-    let vulkan_sdk = vulkan_sdk();
+    let vulkan_sdk_path = get_vulkan_sdk_path();
 
     let mut build = cc::Build::new();
-    if let Some(vulkan_sdk) = &vulkan_sdk {
-        build.include(vulkan_sdk.join("Include"));
+    if let Some(vulkan_sdk_path) = &vulkan_sdk_path {
+        build.include(vulkan_sdk_path.join("Include"));
     }
     build.cpp(true).file(SOURCE_FILE_PATH);
     build.compile("vk_helpers");
@@ -176,8 +145,9 @@ fn compile_vk() {
             .allowlist_function("HELPERS_NGX_VULKAN_.*")
             .allowlist_type("NVSDK_NGX_.*VK.*");
 
-        if let Some(vulkan_sdk) = &vulkan_sdk {
-            bindings = bindings.clang_arg(format!("-I{}", vulkan_sdk.join("Include").display()));
+        if let Some(vulkan_sdk_path) = &vulkan_sdk_path {
+            bindings =
+                bindings.clang_arg(format!("-I{}", vulkan_sdk_path.join("Include").display()));
         }
 
         // Finish the builder and generate the bindings.
@@ -197,5 +167,38 @@ fn windows_mt_suffix() -> &'static str {
         "_s"
     } else {
         "_d"
+    }
+}
+
+fn get_dlss_platform_lib_path(target_os: &String) -> PathBuf {
+    // Tell cargo to tell rustc to link to the libraries.
+
+    let dlss_library_path = Path::new(match target_os.as_str() {
+        "windows" => "DLSS/lib/Windows_x86_64",
+        "linux" => "DLSS/lib/Linux_x86_64",
+        _ => "cargo:warning=DLSS is not supported on this platform ({}). Skipping link step.",
+    });
+
+    PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join(dlss_library_path)
+}
+
+fn link_dlss_platform_library(target_os: &str, dlss_lib_path: PathBuf) {
+    match target_os {
+        "windows" => {
+            // TODO: Only one architecture is included (and for vs201x)
+            let link_library_path = dlss_lib_path.join("x64");
+            let windows_mt_suffix = windows_mt_suffix();
+            // TODO select debug and/or _iterator0/1 when /MTd or /MDd are set.
+            let dbg_suffix = if true { "" } else { "_dbg" };
+            println!("cargo:rustc-link-lib=nvsdk_ngx{windows_mt_suffix}{dbg_suffix}");
+            println!("cargo:rustc-link-search={}", link_library_path.display());
+        }
+        "linux" => {
+            // On Linux there is only one link-library
+            println!("cargo:rustc-link-lib=nvsdk_ngx");
+            println!("cargo:rustc-link-lib=stdc++");
+            println!("cargo:rustc-link-search={}", dlss_lib_path.display());
+        }
+        x => todo!("No libraries for {x}"),
     }
 }

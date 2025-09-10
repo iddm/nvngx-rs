@@ -73,6 +73,7 @@ extern "C"
             pInParams,
             pInDlssDEvalParams);
     }
+
 #ifdef __cplusplus
 }
 #endif

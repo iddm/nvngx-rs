@@ -184,11 +184,6 @@ impl SuperSamplingFeature {
     //     Self::new(parameters)
     // }
 
-    /// get feature handle
-    pub fn get_feature_handle(&self) -> *mut nvngx_sys::NVSDK_NGX_Handle {
-        self.feature.handle.0
-    }
-
     /// See [`FeatureParameters::is_super_sampling_initialised`].
     pub fn is_initialised(&self) -> bool {
         self.feature

@@ -1,6 +1,6 @@
 //! Generic Features
 
-use super::super::sys::Result;
+use crate::sys::Result;
 /// A type alias for feature parameter, like
 /// [`nvngx_sys::NVSDK_NGX_Parameter_NumFrames`].
 // pub type FeatureParameterName = std::ffi::CStr;

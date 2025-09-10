@@ -58,7 +58,7 @@ impl FeatureParameters {
     /// does not support this API call is being used. In such a case, NVSDK_NGX_GetParameters
     /// may be used as a fallback.
     /// This function may only be called after a successful call into NVSDK_NGX_Init.
-    pub fn vk_new(&self) -> Result<Self> {
+    pub fn create_vk(&self) -> Result<Self> {
         let mut ptr: *mut nvngx_sys::NVSDK_NGX_Parameter = std::ptr::null_mut();
         Result::from(unsafe {
             nvngx_sys::vulkan::NVSDK_NGX_VULKAN_AllocateParameters(&mut ptr as *mut _)

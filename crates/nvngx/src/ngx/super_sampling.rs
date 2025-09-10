@@ -102,24 +102,4 @@ impl SuperSamplingCreateParameters {
         params.InFeatureCreateFlags = flags.map(|f| f.0).unwrap_or(0);
         Self(params)
     }
-
-    /// doc
-    pub fn from_settings(
-        target_width: u32,
-        target_height: u32,
-        desired_quality_level: Option<NVSDK_NGX_PerfQuality_Value>,
-        settings: SuperSamplingOptimalSettings,
-    ) -> Self {
-        Self::new(
-            settings.render_width,
-            settings.render_height,
-            target_width,
-            target_height,
-            desired_quality_level,
-            Some(
-                NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_AutoExposure
-                    | NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_MVLowRes,
-            ),
-        )
-    }
 }

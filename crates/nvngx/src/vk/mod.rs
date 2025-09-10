@@ -3,7 +3,7 @@
 
 use std::rc::Rc;
 
-use ash::vk::{self};
+use ash::vk;
 use nvngx_sys::{
     vulkan::{
         NVSDK_NGX_ImageViewInfo_VK, NVSDK_NGX_Resource_VK, NVSDK_NGX_Resource_VK_Type,
