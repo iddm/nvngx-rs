@@ -270,7 +270,7 @@ fn main() {
             env!("CARGO_MANIFEST_DIR"),
             "/examples/upsample/upsampled.png"
         ),
-        &mapped,
+        mapped,
         dst_width,
         dst_height,
         ColorType::Rgba8,
