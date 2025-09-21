@@ -1,3 +1,6 @@
 .gdb_history
 target/
 .vscode
+
+# Sample generated image
+crates/nvngx/examples/upsample/upsampled.png
