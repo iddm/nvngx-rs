@@ -7,19 +7,21 @@
 
 A Rust wrapper over the NVIDIA NGX library.
 
-The DLSS version used by this crate: [`3.10.1.0`](https://github.com/NVIDIA/DLSS/releases/tag/v310.1.0).
+The DLSS version used by this crate: [`3.10.4.0`](https://github.com/NVIDIA/DLSS/releases/tag/v310.4.0).
 
 ## Supported features
 
 - DLSS
 - Ray Reconstruction
 
+The `Frame Generation` support is on the way.
+
 ## Supported graphics APIs
 
-- Vulkan (via [`ash`](https://crates.io/crates/ash) bindings).
+- Vulkan (via [`ash:0.38`](https://crates.io/crates/ash/0.38.0+1.3.281) bindings).
 
 ## MSRV
-1.70
+1.71
 
 ## DLSS integration example
 

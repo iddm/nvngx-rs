@@ -113,12 +113,13 @@ impl std::fmt::Debug for FeatureParameters {
                 let mut fmt = fmt.debug_struct("FeatureParameters");
                 fmt.field("pointer_address", &self.0 .0);
 
-                let populate_map = || -> HashMap<String, String> {
-                    let mut map = HashMap::new();
-                    let parameters = self.0;
+                let populate_map =
+                    || -> HashMap<String, String> {
+                        let mut map = HashMap::new();
+                        let parameters = self.0;
 
-                    // TODO: add more
-                    insert_parameter_debug!(
+                        // TODO: add more
+                        insert_parameter_debug!(
                         map,
                         parameters,
                         (nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available, bool),
@@ -126,6 +127,7 @@ impl std::fmt::Debug for FeatureParameters {
                             nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_Available,
                             bool
                         ),
+                        (nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_Available, bool),
                         (nvngx_sys::NVSDK_NGX_Parameter_InPainting_Available, bool),
                         (
                             nvngx_sys::NVSDK_NGX_Parameter_ImageSuperResolution_Available,
@@ -153,6 +155,7 @@ impl std::fmt::Debug for FeatureParameters {
                             nvngx_sys::NVSDK_NGX_Parameter_ImageSuperResolution_NeedsUpdatedDriver,
                             bool
                         ),
+                        (nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_NeedsUpdatedDriver, bool),
                         (
                             nvngx_sys::NVSDK_NGX_Parameter_SlowMotion_NeedsUpdatedDriver,
                             bool
@@ -182,8 +185,8 @@ impl std::fmt::Debug for FeatureParameters {
                             f32
                         ),
                     );
-                    map
-                };
+                        map
+                    };
                 let map = populate_map();
                 fmt.field("parameters", &map).finish()
             }
@@ -402,21 +405,27 @@ impl FeatureParameters {
     /// Returns [`Ok`] if the parameters claim to support the
     /// ray reconstruction feature ([`nvngx_sys::NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction`]).
     pub fn supports_ray_reconstruction(&self) -> Result<()> {
-        if self
-            .get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_NeedsUpdatedDriver)?
-        {
-            let major = self.get_u32(
-                nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_MinDriverVersionMajor,
-            )?;
-            let minor = self.get_u32(
-                nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_MinDriverVersionMinor,
-            )?;
-            return Err(nvngx_sys::Error::Other(format!("The Ray Reconstruction feature requires a driver update. The driver version required should be higher or equal to {major}.{minor}")));
+        // TODO: should attempt to create a feature with this type and
+        // see if it succeeds.
+        // NVSDK_NGX_Feature_RayReconstruction
+
+        unimplemented!()
+    }
+
+    /// Returns [`Ok`] if the parameters claim to support the
+    /// frame generation feature ([`nvngx_sys::NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration`]).
+    pub fn supports_frame_generation(&self) -> Result<()> {
+        if self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_NeedsUpdatedDriver)? {
+            let major =
+                self.get_u32(nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_MinDriverVersionMajor)?;
+            let minor =
+                self.get_u32(nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_MinDriverVersionMinor)?;
+            return Err(nvngx_sys::Error::Other(format!("The Frame Generation feature requires a driver update. The driver version required should be higher or equal to {major}.{minor}")));
         }
-        match self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_Available) {
+        match self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_Available) {
             Ok(true) => Ok(()),
             Ok(false) => Err(nvngx_sys::Error::Other(
-                "The Ray Reconstruction feature isn't supported on this platform.".to_string(),
+                "The Frame Generation feature isn't supported on this platform.".to_string(),
             )),
             Err(e) => Err(e),
         }
@@ -428,10 +437,15 @@ impl FeatureParameters {
         Self::get_capability_parameters()?.supports_super_sampling()
     }
 
-    /// Returns [`Ok`] if the parameters claim to support the
-    /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
+    /// See [`Self::supports_ray_reconstruction`].
     pub fn supports_ray_reconstruction_static() -> Result<()> {
         Self::get_capability_parameters()?.supports_ray_reconstruction()
+    }
+
+    /// Returns [`Ok`] if the parameters claim to support the
+    /// frame generation feature ([`nvngx_sys::NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration`]).
+    pub fn supports_frame_generation_static() -> Result<()> {
+        Self::get_capability_parameters()?.supports_frame_generation()
     }
 
     /// Returns [`true`] if the SuperSampling feature is initialised
