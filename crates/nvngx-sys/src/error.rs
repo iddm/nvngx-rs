@@ -55,7 +55,7 @@ impl From<bindings::NVSDK_NGX_Result> for Result {
 impl std::fmt::Display for bindings::NVSDK_NGX_Result {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let chars = unsafe { bindings::GetNGXResultAsString(*self as _) };
-        let length = unsafe { libc::wcslen(chars) };
+        let length = unsafe { libc::wcslen(chars.cast()) };
         let string = unsafe { widestring::WideCString::from_ptr(chars.cast(), length) }
             .map_err(|_| std::fmt::Error)?;
         let string = string.to_string().map_err(|_| std::fmt::Error)?;

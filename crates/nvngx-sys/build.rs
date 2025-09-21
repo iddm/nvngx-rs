@@ -34,7 +34,10 @@ fn compile_helpers() {
     if let Some(inc) = vulkan_sdk_include_directory() {
         build.include(inc);
     }
-    build.compile("ngx_helpers");
+    build
+        .cpp(true)
+        .flag("-Wno-missing-field-initializers")
+        .compile("ngx_helpers");
 }
 
 fn main() {
@@ -91,6 +94,10 @@ fn generate_bindings() {
     // the resulting bindings.
     let mut bindings = bindgen::Builder::default()
         .rust_target(msrv)
+        .clang_arg("-x")
+        .clang_arg("c++")
+        .clang_arg("-std=c++17")
+        .clang_arg("-Wno-missing-field-initializers") // From your previous issue
         // The input header we would like to generate
         // bindings for.
         .header(HEADER_FILE_PATH)
@@ -107,6 +114,11 @@ fn generate_bindings() {
         .blocklist_item(r"\w+D3[Dd]1[12]\w+")
         .blocklist_type("PFN_NVSDK_NGX_ResourceReleaseCallback")
         .blocklist_item(r"\w+CUDA\w+")
+        // Disallow default implementation for this type, as bindgen
+        // does not generate the proper default values for the
+        // inline-initialised members. We provide the `Default`
+        // implementation manually.
+        .no_default("NVSDK_NGX_DLSSG_Opt_Eval_Params")
         // Disallow all other dependencies, like those from libc or Vulkan.
         .allowlist_recursively(false)
         .impl_debug(true)

@@ -6,6 +6,7 @@
 #include "../DLSS/include/nvsdk_ngx_helpers.h"
 #include "../DLSS/include/nvsdk_ngx_helpers_vk.h"
 #include "../DLSS/include/nvsdk_ngx_helpers_dlssd_vk.h"
+#include "../DLSS/include/nvsdk_ngx_helpers_dlssg_vk.h"
 
 NVSDK_NGX_Resource_VK HELPERS_NVSDK_NGX_Create_ImageView_Resource_VK(
     VkImageView imageView,

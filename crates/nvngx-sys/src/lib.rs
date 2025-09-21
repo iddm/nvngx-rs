@@ -12,9 +12,23 @@ use ash::vk::{
     Instance as VkInstance, PFN_vkGetDeviceProcAddr, PFN_vkGetInstanceProcAddr,
     PhysicalDevice as VkPhysicalDevice,
 };
-use libc::wchar_t;
 
 include!("bindings.rs");
 
 pub mod error;
 pub use error::*;
+
+/// The correct way to implement [`Default`] for this type, as bindgen
+/// does not generate the proper default values for the
+/// inline-initialised members. We provide the [`Default`]
+/// implementation manually.
+impl Default for NVSDK_NGX_DLSSG_Opt_Eval_Params {
+    fn default() -> Self {
+        Self {
+            multiFrameCount: 1,
+            multiFrameIndex: 1,
+            minRelativeLinearDepthObjectSeparation: 40.0f32,
+            ..unsafe { ::std::mem::zeroed() }
+        }
+    }
+}
