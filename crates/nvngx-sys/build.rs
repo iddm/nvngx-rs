@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-const SOURCE_FILE_PATH: &str = "src/bindings.c";
+const SOURCE_FILE_PATH: &str = "src/bindings.cpp";
 
 fn vulkan_sdk_include_directory() -> Option<PathBuf> {
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
@@ -34,10 +34,12 @@ fn compile_helpers() {
     if let Some(inc) = vulkan_sdk_include_directory() {
         build.include(inc);
     }
-    build
-        .cpp(true)
-        .flag("-Wno-missing-field-initializers")
-        .compile("ngx_helpers");
+    build.cpp(true);
+    // MSVC doesn't have this warning, apparently, but GCC and Clang do.
+    if env::var("CARGO_CFG_TARGET_OS").unwrap().as_str() != "windows" {
+        build.flag("-Wno-missing-field-initializers");
+    }
+    build.compile("ngx_helpers");
 }
 
 fn main() {
@@ -87,7 +89,7 @@ fn generate_bindings() {
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed={HEADER_FILE_PATH}");
 
-    let msrv = bindgen::RustTarget::stable(70, 0).unwrap();
+    let msrv = bindgen::RustTarget::stable(71, 0).unwrap();
 
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
@@ -97,7 +99,7 @@ fn generate_bindings() {
         .clang_arg("-x")
         .clang_arg("c++")
         .clang_arg("-std=c++17")
-        .clang_arg("-Wno-missing-field-initializers") // From your previous issue
+        .clang_arg("-Wno-missing-field-initializers")
         // The input header we would like to generate
         // bindings for.
         .header(HEADER_FILE_PATH)
@@ -108,7 +110,7 @@ fn generate_bindings() {
         .allowlist_item(r"(PFN_)?NVSDK_NGX_\w+")
         // Single exception for a function that doesn't adhere to the naming standard:
         .allowlist_function("GetNGXResultAsString")
-        // Exportable symbols defined by our `bindings.c/h`, wrapping `static inline` helpers
+        // Exportable symbols defined by our `bindings.cpp/h`, wrapping `static inline` helpers
         .allowlist_function(r"HELPERS_NGX_\w+")
         // Disallow DirectX and CUDA APIs, for which we do not yet provide/implement bindings
         .blocklist_item(r"\w+D3[Dd]1[12]\w+")
