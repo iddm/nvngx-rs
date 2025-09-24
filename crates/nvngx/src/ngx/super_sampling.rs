@@ -1,8 +1,131 @@
 //! Generic Supersampling code
-
 use nvngx_sys::{
     NVSDK_NGX_DLSS_Create_Params, NVSDK_NGX_DLSS_Feature_Flags, NVSDK_NGX_PerfQuality_Value, Result,
 };
+use std::fmt::Debug;
+
+/// Common trait for SuperSampling evaluation parameters across platforms
+pub trait SuperSamplingEvaluationOps: Debug + Default {
+    type ColorResource;
+    type DepthResource;
+    type MotionVectorResource;
+    type CommandBuffer;
+
+    /// Creates new evaluation parameters
+    fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets the color input parameter (the image to upscale)
+    fn set_color_input(&mut self, resource: Self::ColorResource);
+
+    /// Sets the color output (the upscaled image)
+    fn set_color_output(&mut self, resource: Self::ColorResource);
+
+    /// Sets the motion vectors with optional scaling
+    fn set_motion_vectors(&mut self, resource: Self::MotionVectorResource, scale: Option<[f32; 2]>);
+
+    /// Sets the depth buffer
+    fn set_depth_buffer(&mut self, resource: Self::DepthResource);
+
+    /// Sets the jitter offsets (like TAA)
+    fn set_jitter_offsets(&mut self, x: f32, y: f32);
+
+    /// Sets the rendering dimensions
+    fn set_rendering_dimensions(&mut self, rendering_offset: [u32; 2], rendering_size: [u32; 2]);
+
+    /// Evaluates the feature with the given command buffer and feature data
+    fn evaluate(
+        &mut self,
+        command_buffer: Self::CommandBuffer,
+        handle: *mut nvngx_sys::NVSDK_NGX_Handle,
+        parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
+    ) -> Result<()>;
+}
+
+/// Generic SuperSampling feature that works across platforms
+#[derive(Debug)]
+pub struct SuperSamplingFeature<T, P>
+where
+    T: super::feature::FeatureHandleOps
+        + super::feature::FeatureParameterOps
+        + super::feature::FeatureOps,
+    P: SuperSamplingEvaluationOps,
+{
+    feature: super::feature::Feature<T>,
+    parameters: P,
+    rendering_resolution: [u32;2],
+    target_resolution: [u32;2],
+}
+
+impl<T, P> SuperSamplingFeature<T, P>
+where
+    T: super::feature::FeatureHandleOps
+        + super::feature::FeatureParameterOps
+        + super::feature::FeatureOps,
+    P: SuperSamplingEvaluationOps,
+{
+    /// Creates a new Super Sampling feature
+    pub fn new(
+        feature: super::feature::Feature<T>,
+        rendering_resolution: [u32;2],
+        target_resolution: [u32;2],
+    ) -> Result<Self, nvngx_sys::Error> {
+        if !feature.is_super_sampling() {
+            return Err(nvngx_sys::Error::Other(
+                "Attempt to create a super sampling feature with another feature.".to_owned(),
+            ));
+        }
+
+        Ok(Self {
+            feature,
+            parameters: P::new(),
+            rendering_resolution,
+            target_resolution,
+        })
+    }
+
+    /// Returns the inner feature object
+    pub fn get_inner(&self) -> &super::feature::Feature<T> {
+        &self.feature
+    }
+
+    /// Returns the inner feature object (mutable)
+    pub fn get_inner_mut(&mut self) -> &mut super::feature::Feature<T> {
+        &mut self.feature
+    }
+
+    /// Returns the rendering resolution
+    pub const fn get_rendering_resolution(&self) -> [u32;2] {
+        self.rendering_resolution
+    }
+
+    /// Returns the target resolution
+    pub const fn get_target_resolution(&self) -> [u32;2] {
+        self.target_resolution
+    }
+
+    /// See [`FeatureParameters::is_super_sampling_initialised`]
+    pub fn is_initialised(&self) -> bool {
+        self.feature
+            .get_parameters()
+            .is_super_sampling_initialised()
+    }
+
+    /// Returns the evaluation parameters
+    pub fn get_evaluation_parameters_mut(&mut self) -> &mut P {
+        &mut self.parameters
+    }
+
+    /// Evaluates the feature
+    pub fn evaluate(&mut self, command_buffer: P::CommandBuffer) -> Result<()> {
+        self.parameters.evaluate(
+            command_buffer,
+            self.feature.handle.get_handle(),
+            self.feature.parameters.get_params(),
+        )
+    }
+}
 
 /// Optimal settings for the DLSS based on the desired quality level and
 /// resolution.

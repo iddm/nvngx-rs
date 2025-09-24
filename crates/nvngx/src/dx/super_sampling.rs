@@ -7,10 +7,9 @@ use nvngx_sys::{
 };
 use windows::{core::Interface as _, Win32::Graphics::Direct3D12::ID3D12Resource};
 
-use super::*;
+use crate::ngx::SuperSamplingEvaluationOps;
 
-/// A helpful type alias to quickly mention "DLSS".
-pub type DlssFeature = SuperSamplingFeature;
+use super::*;
 
 /// The SuperSampling evaluation parameters.
 #[derive(Debug, Default)]
@@ -40,20 +39,25 @@ pub struct SuperSamplingEvaluationParameters {
     parameters: NVSDK_NGX_D3D12_DLSS_Eval_Params,
 }
 
-impl SuperSamplingEvaluationParameters {
+impl crate::ngx::super_sampling::SuperSamplingEvaluationOps for SuperSamplingEvaluationParameters {
+    type ColorResource = ID3D12Resource;
+    type DepthResource = ID3D12Resource;
+    type MotionVectorResource = ID3D12Resource;
+    type CommandBuffer = ID3D12GraphicsCommandList;
+
     /// Creates a new set of evaluation parameters for SuperSampling.
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self::default()
     }
 
     /// Sets the color input parameter (the image to upscale).
-    pub fn set_color_input(&mut self, resource: &ID3D12Resource) {
+    fn set_color_input(&mut self, resource: Self::ColorResource) {
         self.input_color_resource = Some(resource.clone());
         self.parameters.Feature.pInColor = resource.as_raw().cast();
     }
 
     /// Sets the color output (the upscaled image) information.
-    pub fn set_color_output(&mut self, resource: &ID3D12Resource) {
+    fn set_color_output(&mut self, resource: Self::ColorResource) {
         self.output_color_resource = Some(resource.clone());
         self.parameters.Feature.pInOutput = resource.as_raw().cast();
     }
@@ -61,7 +65,11 @@ impl SuperSamplingEvaluationParameters {
     /// Sets the motion vectors.
     /// In case the `scale` argument is omitted, the `1.0f32` scaling is
     /// used.
-    pub fn set_motions_vectors(&mut self, resource: &ID3D12Resource, scale: Option<[f32; 2]>) {
+    fn set_motion_vectors(
+        &mut self,
+        resource: Self::MotionVectorResource,
+        scale: Option<[f32; 2]>,
+    ) {
         // 1.0f32 means no scaling (they are already in the pixel space).
         const DEFAULT_SCALING: [f32; 2] = [1.0f32, 1.0f32];
 
@@ -73,28 +81,19 @@ impl SuperSamplingEvaluationParameters {
     }
 
     /// Sets the depth buffer.
-    pub fn set_depth_buffer(&mut self, resource: &ID3D12Resource) {
+    fn set_depth_buffer(&mut self, resource: Self::DepthResource) {
         self.depth_resource = Some(resource.clone());
         self.parameters.pInDepth = resource.as_raw().cast();
     }
 
     /// Sets the jitter offsets (like TAA).
-    pub fn set_jitter_offsets(&mut self, x: f32, y: f32) {
+    fn set_jitter_offsets(&mut self, x: f32, y: f32) {
         self.parameters.InJitterOffsetX = x;
         self.parameters.InJitterOffsetY = y;
     }
 
-    /// Sets/unsets the reset flag.
-    pub fn set_reset(&mut self, should_reset: bool) {
-        self.parameters.InReset = if should_reset { 1 } else { 0 };
-    }
-
     /// Sets the rendering dimensions.
-    pub fn set_rendering_dimensions(
-        &mut self,
-        rendering_offset: [u32; 2],
-        rendering_size: [u32; 2],
-    ) {
+    fn set_rendering_dimensions(&mut self, rendering_offset: [u32; 2], rendering_size: [u32; 2]) {
         self.parameters.InColorSubrectBase = NVSDK_NGX_Coordinates {
             X: rendering_offset[0],
             Y: rendering_offset[1],
@@ -117,29 +116,45 @@ impl SuperSamplingEvaluationParameters {
         };
     }
 
-    /// Returns the filled DLSS parameters.
-    pub(crate) fn get_dlss_evaluation_parameters(
+    // Applies the actual upscaling algorithm
+    fn evaluate(
         &mut self,
-    ) -> *mut NVSDK_NGX_D3D12_DLSS_Eval_Params {
-        std::ptr::addr_of_mut!(self.parameters)
+        command_buffer: Self::CommandBuffer,
+        handle: *mut nvngx_sys::NVSDK_NGX_Handle,
+        parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
+    ) -> Result<()> {
+        nvngx_sys::Result::from(unsafe {
+            nvngx_sys::directx::HELPERS_NGX_D3D12_EVALUATE_DLSS_EXT(
+                command_buffer.as_raw().cast(),
+                handle,
+                parameters,
+                std::ptr::addr_of_mut!(self.parameters),
+            )
+        })
     }
 }
 
 /// A SuperSamling (or "DLSS") feature.
 #[derive(Debug)]
-pub struct SuperSamplingFeature {
-    feature: Feature,
+pub struct SuperSamplingFeature<T>
+where
+    T: crate::ngx::FeatureHandleOps + crate::ngx::FeatureParameterOps + crate::ngx::FeatureOps,
+{
+    feature: crate::ngx::Feature<T>,
     parameters: SuperSamplingEvaluationParameters,
-    rendering_resolution: Extent2D,
-    target_resolution: Extent2D,
+    rendering_resolution: [u32; 2],
+    target_resolution: [u32; 2],
 }
 
-impl SuperSamplingFeature {
+impl<T> SuperSamplingFeature<T>
+where
+    T: crate::ngx::FeatureHandleOps + crate::ngx::FeatureParameterOps + crate::ngx::FeatureOps,
+{
     /// Creates a new Super Sampling feature.
     pub fn new(
-        feature: Feature,
-        rendering_resolution: Extent2D,
-        target_resolution: Extent2D,
+        feature: crate::ngx::Feature<T>,
+        rendering_resolution: [u32; 2],
+        target_resolution: [u32; 2],
     ) -> Result<Self> {
         if !feature.is_super_sampling() {
             return Err(nvngx_sys::Error::Other(
@@ -156,24 +171,24 @@ impl SuperSamplingFeature {
     }
 
     /// Returns the inner feature object.
-    pub fn get_inner(&self) -> &Feature {
+    pub fn get_inner(&self) -> &crate::ngx::Feature<T> {
         &self.feature
     }
 
     /// Returns the inner feature object (mutable).
-    pub fn get_inner_mut(&mut self) -> &mut Feature {
+    pub fn get_inner_mut(&mut self) -> &mut crate::ngx::Feature<T> {
         &mut self.feature
     }
 
     /// Returns the rendering resolution (input resolution) of the
     /// image that needs to be upscaled to the `target_resolution`.
-    pub const fn get_rendering_resolution(&self) -> Extent2D {
+    pub const fn get_rendering_resolution(&self) -> [u32; 2] {
         self.rendering_resolution
     }
 
     /// Returns the target resolution (output resolution) of the
     /// image that the original image should be upscaled to.
-    pub const fn get_target_resolution(&self) -> Extent2D {
+    pub const fn get_target_resolution(&self) -> [u32; 2] {
         self.target_resolution
     }
 
@@ -196,14 +211,21 @@ impl SuperSamplingFeature {
         &mut self.parameters
     }
 
+    /// Returns the filled DLSS parameters.
+    pub(crate) fn get_dlss_evaluation_parameters(
+        &mut self,
+    ) -> *mut NVSDK_NGX_D3D12_DLSS_Eval_Params {
+        std::ptr::addr_of_mut!(self.parameters.parameters)
+    }
+
     /// Evaluates the feature.
     pub fn evaluate(&mut self, command_buffer: &ID3D12GraphicsCommandList) -> Result {
         Result::from(unsafe {
             nvngx_sys::directx::HELPERS_NGX_D3D12_EVALUATE_DLSS_EXT(
                 command_buffer.as_raw().cast(),
-                self.feature.handle.0,
-                self.feature.parameters.0,
-                self.parameters.get_dlss_evaluation_parameters(),
+                self.feature.handle.get_handle(),
+                self.feature.parameters.get_params(),
+                self.get_dlss_evaluation_parameters(),
             )
         })
     }
