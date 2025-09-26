@@ -21,6 +21,21 @@ The DLSS version used by this crate: [`3.10.1.0`](https://github.com/NVIDIA/DLSS
 ## MSRV
 1.70
 
+## Platform support
+
+As of writing NVIDIA only distributes Linux (under `glibc`) and Windows libraries for the `x86_64` architecture.  Use the following `cfg()`-conditional to ensure that this crate and your code only compile under those conditions, and implement a fallback otherwise:
+
+```rust
+cfg(all(target_arch = "x86_64", any(target_os = "windows", target_os = "linux")))
+```
+
+Such as in a `Cargo.toml`:
+
+```toml
+[target.'cfg(all(target_arch = "x86_64", any(target_os = "windows", target_os = "linux")))'.dependencies]
+nvngx = "current.version"
+```
+
 ## DLSS integration example
 
 One can have something like that:
