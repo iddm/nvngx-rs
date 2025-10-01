@@ -1,7 +1,6 @@
 //! Vulkan bindings to NGX.
 #![cfg(feature = "vk")]
 
-
 use ash::vk;
 use nvngx_sys::{
     vulkan::{
