@@ -140,9 +140,12 @@ unsafe extern "C" fn feature_progress_callback(progress: f32, _should_cancel: *m
     log::debug!("Feature evalution progress={progress}.");
 }
 
-// pub type VulkanFeature = crate::ngx::feature::Feature<VulkanPlatform>;
-// pub type VulkanFeatureParameters = crate::ngx::feature::FeatureParameters<VulkanPlatform>;
-// pub type VulkanFeatureHandle = crate::ngx::feature::FeatureHandle<VulkanPlatform>;
+/// Feature used outside the crate
+pub type VulkanFeature = crate::ngx::feature::Feature<VulkanPlatform>;
+/// Parameters used outside the crate
+pub type VulkanFeatureParameters = crate::ngx::feature::FeatureParameters<VulkanPlatform>;
+/// Handle used outside the crate
+pub type VulkanFeatureHandle = crate::ngx::feature::FeatureHandle<VulkanPlatform>;
 
 // impl VulkanFeature {
 //     /// Creates a new Vulkan Feature
