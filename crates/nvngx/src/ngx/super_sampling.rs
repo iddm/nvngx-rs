@@ -109,7 +109,7 @@ where
         self.target_resolution
     }
 
-    /// See FeatureParameters<T>::is_super_sampling_initialised below
+    /// See FeatureParameters::is_super_sampling_initialised below
     pub fn is_initialised(&self) -> bool {
         self.feature
             .get_parameters()
