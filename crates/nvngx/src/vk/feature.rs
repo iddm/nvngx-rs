@@ -2,7 +2,6 @@
 use crate::ngx::{FeatureHandleOps, FeatureOps, FeatureParameterOps};
 use ash::vk;
 
-
 /// Holds backend data for featurehandle, featureparameters and feature
 #[derive(Debug, Clone, Copy)]
 pub struct VulkanPlatform;
@@ -161,9 +160,9 @@ unsafe extern "C" fn feature_progress_callback(progress: f32, _should_cancel: *m
 //         device: vk::Device,
 //         command_buffer: vk::CommandBuffer,
 //         parameters: VulkanFeatureParameters,
-//         create_parameters: &mut [u8], 
-//     ) -> Result<crate::ngx::super_sampling::SuperSamplingFeature<VulkanPlatform, VulkanPlatform>, nvngx_sys::Error> 
-//     where 
+//         create_parameters: &mut [u8],
+//     ) -> Result<crate::ngx::super_sampling::SuperSamplingFeature<VulkanPlatform, VulkanPlatform>, nvngx_sys::Error>
+//     where
 //         VulkanPlatform: crate::ngx::super_sampling::SuperSamplingEvaluationOps,
 //     {
 //         Self::new_super_sampling(device, command_buffer, parameters, create_parameters)

@@ -6,14 +6,14 @@ use nvngx_sys::NVSDK_NGX_Feature;
 
 use crate::{ngx, sys::Result};
 
-fn extract_rendering_resolution() -> [u32;2] {
+fn extract_rendering_resolution() -> [u32; 2] {
     // This is platform-specific - you'll need to implement based on your platform
     // For now, returning a placeholder
     // TODO: Extract actual resolution from create_parameters based on your platform
     [1920, 1080] // placeholder
 }
 
-fn extract_target_resolution() -> [u32;2] {
+fn extract_target_resolution() -> [u32; 2] {
     // This is platform-specific - you'll need to implement based on your platform
     // For now, returning a placeholder
     // TODO: Extract actual resolution from create_parameters based on your platform
@@ -21,7 +21,7 @@ fn extract_target_resolution() -> [u32;2] {
 }
 
 /// Generic FeatureHandle
-pub trait FeatureHandleOps{
+pub trait FeatureHandleOps {
     /// Release the platform specific API
     fn release_handle(handle: *mut nvngx_sys::NVSDK_NGX_Handle) -> Result<(), nvngx_sys::Error>;
 }
@@ -33,12 +33,14 @@ pub trait FeatureParameterOps {
 
     /// Create a new parameter set
     fn create_parameters() -> Result<*mut nvngx_sys::NVSDK_NGX_Parameter, nvngx_sys::Error>;
-    
+
     /// Get capability parameters
     fn get_capability_parameters() -> Result<*mut nvngx_sys::NVSDK_NGX_Parameter, nvngx_sys::Error>;
-    
+
     /// Release parameters
-    fn release_parameters(params: *mut nvngx_sys::NVSDK_NGX_Parameter) -> Result<(), nvngx_sys::Error>;
+    fn release_parameters(
+        params: *mut nvngx_sys::NVSDK_NGX_Parameter,
+    ) -> Result<(), nvngx_sys::Error>;
 }
 
 /// Platform-specific operations for features
@@ -47,7 +49,7 @@ pub trait FeatureOps {
     type Device;
     /// Generic CommandBuffer
     type CommandBuffer;
-    
+
     /// Create a feature
     fn create_feature(
         device: Self::Device,
@@ -56,7 +58,7 @@ pub trait FeatureOps {
         parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
         handle: &mut *mut nvngx_sys::NVSDK_NGX_Handle,
     ) -> Result<(), nvngx_sys::Error>;
-    
+
     /// Create super sampling feature
     fn create_super_sampling_feature(
         device: Self::Device,
@@ -65,7 +67,7 @@ pub trait FeatureOps {
         parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
         create_params: *mut ngx::super_sampling::SuperSamplingCreateParameters, // Platform-specific create params
     ) -> Result<(), nvngx_sys::Error>;
-    
+
     /// Create ray reconstruction feature
     fn create_ray_reconstruction_feature(
         device: Self::Device,
@@ -74,13 +76,13 @@ pub trait FeatureOps {
         parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
         create_params: *mut u8, // Platform-specific create params
     ) -> Result<(), nvngx_sys::Error>;
-    
+
     /// Get scratch buffer size
     fn get_scratch_buffer_size(
         feature_type: nvngx_sys::NVSDK_NGX_Feature,
         parameters: *const nvngx_sys::NVSDK_NGX_Parameter,
     ) -> Result<usize, nvngx_sys::Error>;
-    
+
     /// Evaluate feature
     fn evaluate_feature(
         command_buffer: Self::CommandBuffer,
@@ -89,7 +91,7 @@ pub trait FeatureOps {
     ) -> Result<(), nvngx_sys::Error>;
 }
 
-/// Generic FeatureHandle 
+/// Generic FeatureHandle
 /// PhantomData is used to maintain platform association
 #[repr(transparent)]
 #[derive(Debug)]
@@ -159,7 +161,7 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
             _phantom: std::marker::PhantomData,
         })
     }
-    
+
     /// Get capability parameters
     pub fn get_capability_parameters() -> Result<Self, nvngx_sys::Error> {
         T::get_capability_parameters().map(|params| Self {
@@ -167,17 +169,17 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
             _phantom: std::marker::PhantomData,
         })
     }
-    
+
     /// Get raw parameter pointer
     pub fn get_params(&self) -> *mut nvngx_sys::NVSDK_NGX_Parameter {
         self.params
     }
-    
+
     /// Release parameters
     pub fn release(&self) -> Result<(), nvngx_sys::Error> {
         T::release_parameters(self.params)
     }
-    
+
     /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
     pub fn supports_super_sampling(&self) -> Result<()> {
@@ -229,11 +231,10 @@ impl<T: FeatureParameterOps> Drop for FeatureParameters<T> {
     }
 }
 
-
 /// Generic feature
 #[derive(Debug)]
-pub struct Feature<T> 
-where 
+pub struct Feature<T>
+where
     T: FeatureHandleOps + FeatureParameterOps + FeatureOps,
 {
     /// The feature handle.
@@ -244,8 +245,8 @@ where
     pub parameters: Rc<FeatureParameters<T>>,
 }
 
-impl<T> Feature<T> 
-where 
+impl<T> Feature<T>
+where
     T: FeatureHandleOps + FeatureParameterOps + FeatureOps,
 {
     /// Creates a new feature
@@ -263,23 +264,23 @@ where
             parameters.get_params(),
             &mut handle.handle,
         )?;
-        
+
         Ok(Self {
             handle: Rc::new(handle),
             feature_type,
             parameters: Rc::new(parameters),
         })
     }
-    
+
     /// Creates a new SuperSampling feature
     pub fn new_super_sampling<P>(
         device: T::Device,
         command_buffer: T::CommandBuffer,
         parameters: FeatureParameters<T>,
         create_parameters: *mut ngx::SuperSamplingCreateParameters, // Platform-specific create params
-    ) -> Result<super::SuperSamplingFeature<T, P>, nvngx_sys::Error> 
-    where 
-    P: ngx::super_sampling::SuperSamplingEvaluationOps,
+    ) -> Result<super::SuperSamplingFeature<T, P>, nvngx_sys::Error>
+    where
+        P: ngx::super_sampling::SuperSamplingEvaluationOps,
     {
         let mut handle = FeatureHandle::new();
         T::create_super_sampling_feature(
@@ -289,12 +290,12 @@ where
             parameters.get_params(),
             create_parameters,
         )?;
-        
+
         // Extract resolution info from create_parameters (platform-specific)
         let rendering_resolution = extract_rendering_resolution();
         let target_resolution = extract_target_resolution();
-        
-        super::SuperSamplingFeature::<T,P>::new(
+
+        super::SuperSamplingFeature::<T, P>::new(
             Self {
                 handle: Rc::new(handle),
                 feature_type: NVSDK_NGX_Feature::NVSDK_NGX_Feature_SuperSampling,
@@ -304,16 +305,21 @@ where
             target_resolution,
         )
     }
-    
+
     /// Creates the Frame Generation feature
     pub fn new_frame_generation(
         device: T::Device,
         command_buffer: T::CommandBuffer,
         parameters: FeatureParameters<T>,
     ) -> Result<Self, nvngx_sys::Error> {
-        Self::new(device, command_buffer, NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration, parameters)
+        Self::new(
+            device,
+            command_buffer,
+            NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration,
+            parameters,
+        )
     }
-    
+
     // /// Creates the Ray Reconstruction feature
     // pub fn new_ray_reconstruction(
     //     device: T::Device,
@@ -329,11 +335,11 @@ where
     //         parameters.get_params(),
     //         create_parameters.as_mut_ptr(),
     //     )?;
-        
+
     //     // Extract resolution info from create_parameters (platform-specific)
     //     let rendering_resolution = extract_rendering_resolution(create_parameters);
     //     let target_resolution = extract_target_resolution(create_parameters);
-        
+
     //     RayReconstructionFeature::new(
     //         Self {
     //             handle: Rc::new(handle),
@@ -344,45 +350,49 @@ where
     //         target_resolution,
     //     )
     // }
-    
+
     /// Returns the parameters associated with this feature
     pub fn get_parameters(&self) -> &FeatureParameters<T> {
         &self.parameters
     }
-    
+
     /// Returns the parameters associated with this feature
     pub fn get_parameters_mut(&mut self) -> &mut FeatureParameters<T> {
         Rc::get_mut(&mut self.parameters).unwrap()
     }
-    
+
     /// Returns the type of this feature
     pub fn get_feature_type(&self) -> NVSDK_NGX_Feature {
         self.feature_type
     }
-    
+
     /// Returns [`true`] if this feature is the super sampling one
     pub fn is_super_sampling(&self) -> bool {
         self.feature_type == NVSDK_NGX_Feature::NVSDK_NGX_Feature_SuperSampling
     }
-    
+
     /// Returns [`true`] if this feature is the frame generation one
     pub fn is_frame_generation(&self) -> bool {
         self.feature_type == NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration
     }
-    
+
     /// Returns [`true`] if this feature is the ray reconstruction one
     pub fn is_ray_reconstruction(&self) -> bool {
         self.feature_type == NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction
     }
-    
+
     /// Returns the number of bytes needed for the scratch buffer
     pub fn get_scratch_buffer_size(&self) -> Result<usize, nvngx_sys::Error> {
         T::get_scratch_buffer_size(self.feature_type, self.parameters.get_params())
     }
-    
+
     /// Evaluates the feature
     pub fn evaluate(&self, command_buffer: T::CommandBuffer) -> Result<(), nvngx_sys::Error> {
-        T::evaluate_feature(command_buffer, self.handle.get_handle(), self.parameters.get_params())
+        T::evaluate_feature(
+            command_buffer,
+            self.handle.get_handle(),
+            self.parameters.get_params(),
+        )
     }
 }
 
@@ -449,24 +459,24 @@ macro_rules! insert_parameter_debug {
 }
 
 impl<T> std::fmt::Debug for FeatureParameters<T>
-where 
-T: FeatureParameterOps
- {
+where
+    T: FeatureParameterOps,
+{
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         #[repr(transparent)]
         struct FeatureParametersDebugPrinter<'a, T>(&'a FeatureParameters<T>)
-        where 
-        T: FeatureParameterOps;
+        where
+            T: FeatureParameterOps;
 
-        impl<'a, T> std::fmt::Debug for FeatureParametersDebugPrinter<'a, T> 
-        where 
-        T: FeatureParameterOps
+        impl<'a, T> std::fmt::Debug for FeatureParametersDebugPrinter<'a, T>
+        where
+            T: FeatureParameterOps,
         {
             fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 use std::collections::HashMap;
 
                 let mut fmt = fmt.debug_struct("FeatureParameters");
-                fmt.field("pointer_address", &self.0 .params);
+                fmt.field("pointer_address", &self.0.params);
 
                 let populate_map = || -> HashMap<String, String> {
                     let mut map = HashMap::new();
@@ -658,7 +668,11 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
     pub fn get_bool(&self, name: &FeatureParameterName) -> Result<bool> {
         let mut value = 0i32;
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_Parameter_GetI(self.params, name.as_ptr().cast(), &mut value as *mut _)
+            nvngx_sys::NVSDK_NGX_Parameter_GetI(
+                self.params,
+                name.as_ptr().cast(),
+                &mut value as *mut _,
+            )
         })
         .map(|_| value == 1)
     }
@@ -672,7 +686,11 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
     pub fn get_f32(&self, name: &FeatureParameterName) -> Result<f32> {
         let mut value = 0f32;
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_Parameter_GetF(self.params, name.as_ptr().cast(), &mut value as *mut _)
+            nvngx_sys::NVSDK_NGX_Parameter_GetF(
+                self.params,
+                name.as_ptr().cast(),
+                &mut value as *mut _,
+            )
         })
         .map(|_| value)
     }
@@ -686,7 +704,11 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
     pub fn get_u32(&self, name: &FeatureParameterName) -> Result<u32> {
         let mut value = 0u32;
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_Parameter_GetUI(self.params, name.as_ptr().cast(), &mut value as *mut _)
+            nvngx_sys::NVSDK_NGX_Parameter_GetUI(
+                self.params,
+                name.as_ptr().cast(),
+                &mut value as *mut _,
+            )
         })
         .map(|_| value)
     }
@@ -700,7 +722,11 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
     pub fn get_f64(&self, name: &FeatureParameterName) -> Result<f64> {
         let mut value = 0f64;
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_Parameter_GetD(self.params, name.as_ptr().cast(), &mut value as *mut _)
+            nvngx_sys::NVSDK_NGX_Parameter_GetD(
+                self.params,
+                name.as_ptr().cast(),
+                &mut value as *mut _,
+            )
         })
         .map(|_| value)
     }
@@ -714,7 +740,11 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
     pub fn get_i32(&self, name: &FeatureParameterName) -> Result<i32> {
         let mut value = 0i32;
         Result::from(unsafe {
-            nvngx_sys::NVSDK_NGX_Parameter_GetI(self.params, name.as_ptr().cast(), &mut value as *mut _)
+            nvngx_sys::NVSDK_NGX_Parameter_GetI(
+                self.params,
+                name.as_ptr().cast(),
+                &mut value as *mut _,
+            )
         })
         .map(|_| value)
     }
@@ -798,4 +828,3 @@ impl<T: FeatureParameterOps> FeatureParameters<T> {
 #[repr(transparent)]
 #[derive(Debug)]
 pub struct FeatureRequirement(nvngx_sys::NVSDK_NGX_FeatureRequirement);
-

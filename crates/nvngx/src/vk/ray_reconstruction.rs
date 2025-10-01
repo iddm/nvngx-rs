@@ -204,7 +204,7 @@ pub type RRFeature<T> = RayReconstructionFeature<T>;
 
 /// A Ray Reconstruction (or "DLSS-RR") feature.
 #[derive(Debug)]
-pub struct RayReconstructionFeature<T> 
+pub struct RayReconstructionFeature<T>
 where
     T: FeatureHandleOps
         + FeatureParameterOps
@@ -216,7 +216,7 @@ where
     target_resolution: vk::Extent2D,
 }
 
-impl<T> RayReconstructionFeature<T> 
+impl<T> RayReconstructionFeature<T>
 where
     T: FeatureHandleOps
         + FeatureParameterOps

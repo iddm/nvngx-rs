@@ -44,7 +44,6 @@ impl crate::ngx::super_sampling::SuperSamplingEvaluationOps for SuperSamplingEva
     type DepthResource = ID3D12Resource;
     type MotionVectorResource = ID3D12Resource;
     type CommandBuffer = ID3D12GraphicsCommandList;
-    
 
     /// Creates a new set of evaluation parameters for SuperSampling.
     fn new() -> Self {

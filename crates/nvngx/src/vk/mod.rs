@@ -156,7 +156,9 @@ impl System {
         parameters: Option<FeatureParameters<T>>,
     ) -> Result<Feature<T>>
     where
-        T: FeatureParameterOps + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer> + FeatureHandleOps,
+        T: FeatureParameterOps
+            + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>
+            + FeatureHandleOps,
     {
         let parameters = match parameters {
             Some(p) => p,
@@ -171,12 +173,13 @@ impl System {
         command_buffer: vk::CommandBuffer,
         feature_parameters: FeatureParameters<T>,
         create_parameters: *mut SuperSamplingCreateParameters,
-    ) -> Result<ngx::SuperSamplingFeature<T, P>> 
-    where 
-    T: FeatureParameterOps + FeatureHandleOps + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>,
-    P: ngx::super_sampling::SuperSamplingEvaluationOps
+    ) -> Result<ngx::SuperSamplingFeature<T, P>>
+    where
+        T: FeatureParameterOps
+            + FeatureHandleOps
+            + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>,
+        P: ngx::super_sampling::SuperSamplingEvaluationOps,
     {
-
         Feature::new_super_sampling(
             self.device,
             command_buffer,
@@ -191,9 +194,11 @@ impl System {
         command_buffer: vk::CommandBuffer,
         feature_parameters: FeatureParameters<T>,
     ) -> Result<Feature<T>>
-    where 
-    T: FeatureHandleOps + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer> + FeatureParameterOps,
-     {
+    where
+        T: FeatureHandleOps
+            + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>
+            + FeatureParameterOps,
+    {
         Feature::new_frame_generation(self.device, command_buffer, feature_parameters)
     }
 
@@ -204,8 +209,8 @@ impl System {
     //     command_buffer: vk::CommandBuffer,
     //     feature_parameters: FeatureParameters<T>,
     //     create_parameters: RayReconstructionCreateParameters,
-    // ) -> Result<RayReconstructionFeature> 
-    // where 
+    // ) -> Result<RayReconstructionFeature>
+    // where
     // T: FeatureHandleOps + FeatureOps + FeatureParameterOps
     // {
     //     Feature::new_ray_reconstruction(
@@ -373,7 +378,9 @@ mod tests {
     #[ignore]
     fn insert_parameter_debug_macro() -> super::Result {
         let mut map = HashMap::new();
-        let parameters = super::FeatureParameters::<crate::vk::VulkanPlatform>::get_capability_parameters().unwrap();
+        let parameters =
+            super::FeatureParameters::<crate::vk::VulkanPlatform>::get_capability_parameters()
+                .unwrap();
         crate::insert_parameter_debug!(
             map,
             parameters,

@@ -6,7 +6,6 @@ use crate::ngx::SuperSamplingEvaluationOps;
 
 use super::*;
 
-
 // impl From<SuperSamplingOptimalSettings> for SuperSamplingCreateParameters {
 //     fn from(value: SuperSamplingOptimalSettings) -> Self {
 //         unsafe {
@@ -267,9 +266,7 @@ where
     }
 
     /// Returns the filled DLSS parameters.
-    pub(crate) fn get_dlss_evaluation_parameters(
-        &mut self,
-    ) -> *mut NVSDK_NGX_VK_DLSS_Eval_Params {
+    pub(crate) fn get_dlss_evaluation_parameters(&mut self) -> *mut NVSDK_NGX_VK_DLSS_Eval_Params {
         std::ptr::addr_of_mut!(self.parameters.parameters)
     }
 

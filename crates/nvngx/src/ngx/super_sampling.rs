@@ -58,8 +58,8 @@ where
 {
     feature: super::feature::Feature<T>,
     parameters: P,
-    rendering_resolution: [u32;2],
-    target_resolution: [u32;2],
+    rendering_resolution: [u32; 2],
+    target_resolution: [u32; 2],
 }
 
 impl<T, P> SuperSamplingFeature<T, P>
@@ -72,8 +72,8 @@ where
     /// Creates a new Super Sampling feature
     pub fn new(
         feature: super::feature::Feature<T>,
-        rendering_resolution: [u32;2],
-        target_resolution: [u32;2],
+        rendering_resolution: [u32; 2],
+        target_resolution: [u32; 2],
     ) -> Result<Self, nvngx_sys::Error> {
         if !feature.is_super_sampling() {
             return Err(nvngx_sys::Error::Other(
@@ -100,12 +100,12 @@ where
     }
 
     /// Returns the rendering resolution
-    pub const fn get_rendering_resolution(&self) -> [u32;2] {
+    pub const fn get_rendering_resolution(&self) -> [u32; 2] {
         self.rendering_resolution
     }
 
     /// Returns the target resolution
-    pub const fn get_target_resolution(&self) -> [u32;2] {
+    pub const fn get_target_resolution(&self) -> [u32; 2] {
         self.target_resolution
     }
 
