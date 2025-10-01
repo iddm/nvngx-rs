@@ -140,7 +140,7 @@ impl<T: FeatureHandleOps> Drop for FeatureHandle<T> {
             return;
         }
 
-        if let Err(e) = self.release() {
+        if let Err(_e) = self.release() {
             log::error!("Couldn't release the feature handle");
         }
     }

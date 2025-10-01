@@ -130,7 +130,11 @@ fn compile_vk() {
 
     let mut build = cc::Build::new();
     if let Some(vulkan_sdk_path) = &vulkan_sdk_path {
-        build.include(vulkan_sdk_path.join("Include"));
+        if cfg!(windows) {
+            build.include(vulkan_sdk_path.join("Include"));
+        } else {
+            build.include(vulkan_sdk_path.join("include"));
+        }
     }
     build.cpp(true).file(SOURCE_FILE_PATH);
     build.compile("vk_helpers");
@@ -175,7 +179,7 @@ fn get_dlss_platform_lib_path(target_os: &String) -> PathBuf {
     let dlss_library_path = Path::new(match target_os.as_str() {
         "windows" => "DLSS/lib/Windows_x86_64",
         "linux" => "DLSS/lib/Linux_x86_64",
-        _ => "cargo:warning=DLSS is not supported on this platform ({}). Skipping link step.",
+        x => todo!("No libraries for {x}"),
     });
 
     // Make the path relative to the crate source, where the DLSS submodule exists
