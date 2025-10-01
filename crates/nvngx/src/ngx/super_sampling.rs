@@ -6,9 +6,13 @@ use std::fmt::Debug;
 
 /// Common trait for SuperSampling evaluation parameters across platforms
 pub trait SuperSamplingEvaluationOps: Debug + Default {
+    /// Generic Resources
     type ColorResource;
+    /// Generic Resources
     type DepthResource;
+    /// Generic Resources
     type MotionVectorResource;
+    /// Generic Resources
     type CommandBuffer;
 
     /// Creates new evaluation parameters

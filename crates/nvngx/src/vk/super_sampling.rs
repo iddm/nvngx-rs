@@ -2,10 +2,10 @@
 
 use nvngx_sys::vulkan::NVSDK_NGX_VK_DLSS_Eval_Params;
 
+use crate::ngx::SuperSamplingEvaluationOps;
+
 use super::*;
 
-/// A helpful type alias to quickly mention "DLSS".
-pub type DlssFeature = SuperSamplingFeature;
 
 // impl From<SuperSamplingOptimalSettings> for SuperSamplingCreateParameters {
 //     fn from(value: SuperSamplingOptimalSettings) -> Self {
@@ -75,20 +75,25 @@ pub struct SuperSamplingEvaluationParameters {
     parameters: NVSDK_NGX_VK_DLSS_Eval_Params,
 }
 
-impl SuperSamplingEvaluationParameters {
+impl crate::ngx::super_sampling::SuperSamplingEvaluationOps for SuperSamplingEvaluationParameters {
+    type ColorResource = VkImageResourceDescription;
+    type DepthResource = VkImageResourceDescription;
+    type MotionVectorResource = VkImageResourceDescription;
+    type CommandBuffer = vk::CommandBuffer;
+
     /// Creates a new set of evaluation parameters for SuperSampling.
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self::default()
     }
 
     /// Sets the color input parameter (the image to upscale).
-    pub fn set_color_input(&mut self, description: VkImageResourceDescription) {
+    fn set_color_input(&mut self, description: VkImageResourceDescription) {
         self.input_color_resource = description.into();
         self.parameters.Feature.pInColor = std::ptr::addr_of_mut!(self.input_color_resource);
     }
 
     /// Sets the color output (the upscaled image) information.
-    pub fn set_color_output(&mut self, description: VkImageResourceDescription) {
+    fn set_color_output(&mut self, description: VkImageResourceDescription) {
         self.output_color_resource = description.into();
         self.parameters.Feature.pInOutput = std::ptr::addr_of_mut!(self.output_color_resource);
     }
@@ -96,9 +101,9 @@ impl SuperSamplingEvaluationParameters {
     /// Sets the motion vectors.
     /// In case the `scale` argument is omitted, the `1.0f32` scaling is
     /// used.
-    pub fn set_motions_vectors(
+    fn set_motion_vectors(
         &mut self,
-        description: VkImageResourceDescription,
+        description: Self::MotionVectorResource,
         scale: Option<[f32; 2]>,
     ) {
         // 1.0f32 means no scaling (they are already in the pixel space).
@@ -112,28 +117,19 @@ impl SuperSamplingEvaluationParameters {
     }
 
     /// Sets the depth buffer.
-    pub fn set_depth_buffer(&mut self, description: VkImageResourceDescription) {
+    fn set_depth_buffer(&mut self, description: VkImageResourceDescription) {
         self.depth_resource = description.into();
         self.parameters.pInDepth = std::ptr::addr_of_mut!(self.depth_resource);
     }
 
     /// Sets the jitter offsets (like TAA).
-    pub fn set_jitter_offsets(&mut self, x: f32, y: f32) {
+    fn set_jitter_offsets(&mut self, x: f32, y: f32) {
         self.parameters.InJitterOffsetX = x;
         self.parameters.InJitterOffsetY = y;
     }
 
-    /// Sets/unsets the reset flag.
-    pub fn set_reset(&mut self, should_reset: bool) {
-        self.parameters.InReset = if should_reset { 1 } else { 0 };
-    }
-
     /// Sets the rendering dimensions.
-    pub fn set_rendering_dimensions(
-        &mut self,
-        rendering_offset: [u32; 2],
-        rendering_size: [u32; 2],
-    ) {
+    fn set_rendering_dimensions(&mut self, rendering_offset: [u32; 2], rendering_size: [u32; 2]) {
         self.parameters.InColorSubrectBase = NVSDK_NGX_Coordinates {
             X: rendering_offset[0],
             Y: rendering_offset[1],
@@ -156,9 +152,20 @@ impl SuperSamplingEvaluationParameters {
         };
     }
 
-    /// Returns the filled DLSS parameters.
-    pub(crate) fn get_dlss_evaluation_parameters(&mut self) -> *mut NVSDK_NGX_VK_DLSS_Eval_Params {
-        std::ptr::addr_of_mut!(self.parameters)
+    fn evaluate(
+        &mut self,
+        command_buffer: Self::CommandBuffer,
+        handle: *mut nvngx_sys::NVSDK_NGX_Handle,
+        parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
+    ) -> Result<()> {
+        Result::from(unsafe {
+            nvngx_sys::vulkan::HELPERS_NGX_VULKAN_EVALUATE_DLSS_EXT(
+                command_buffer,
+                handle,
+                parameters,
+                std::ptr::addr_of_mut!(self.parameters),
+            )
+        })
     }
 
     // /// Returns an immutable reference to the color output.
@@ -184,17 +191,23 @@ impl SuperSamplingEvaluationParameters {
 
 /// A SuperSamling (or "DLSS") feature.
 #[derive(Debug)]
-pub struct SuperSamplingFeature {
-    feature: Feature,
+pub struct SuperSamplingFeature<T>
+where
+    T: FeatureHandleOps + FeatureOps + FeatureParameterOps,
+{
+    feature: Feature<T>,
     parameters: SuperSamplingEvaluationParameters,
     rendering_resolution: vk::Extent2D,
     target_resolution: vk::Extent2D,
 }
 
-impl SuperSamplingFeature {
+impl<T> SuperSamplingFeature<T>
+where
+    T: FeatureHandleOps + FeatureOps + FeatureParameterOps,
+{
     /// Creates a new Super Sampling feature.
     pub fn new(
-        feature: Feature,
+        feature: Feature<T>,
         rendering_resolution: vk::Extent2D,
         target_resolution: vk::Extent2D,
     ) -> Result<Self> {
@@ -213,12 +226,12 @@ impl SuperSamplingFeature {
     }
 
     /// Returns the inner feature object.
-    pub fn get_inner(&self) -> &Feature {
+    pub fn get_inner(&self) -> &Feature<T> {
         &self.feature
     }
 
     /// Returns the inner feature object (mutable).
-    pub fn get_inner_mut(&mut self) -> &mut Feature {
+    pub fn get_inner_mut(&mut self) -> &mut Feature<T> {
         &mut self.feature
     }
 
@@ -253,14 +266,21 @@ impl SuperSamplingFeature {
         &mut self.parameters
     }
 
+    /// Returns the filled DLSS parameters.
+    pub(crate) fn get_dlss_evaluation_parameters(
+        &mut self,
+    ) -> *mut NVSDK_NGX_VK_DLSS_Eval_Params {
+        std::ptr::addr_of_mut!(self.parameters.parameters)
+    }
+
     /// Evaluates the feature.
     pub fn evaluate(&mut self, command_buffer: vk::CommandBuffer) -> Result {
         Result::from(unsafe {
             nvngx_sys::vulkan::HELPERS_NGX_VULKAN_EVALUATE_DLSS_EXT(
                 command_buffer,
-                self.feature.handle.0,
-                self.feature.parameters.0,
-                self.parameters.get_dlss_evaluation_parameters(),
+                self.feature.handle.get_handle(),
+                self.feature.parameters.get_params(),
+                self.get_dlss_evaluation_parameters(),
             )
         })
     }

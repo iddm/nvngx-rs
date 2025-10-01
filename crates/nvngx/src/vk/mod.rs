@@ -13,6 +13,8 @@ use nvngx_sys::{
     Result,
 };
 
+use crate::ngx::{self, Feature, FeatureHandleOps, FeatureOps, FeatureParameterOps};
+
 use super::ngx::{FeatureParameters, SuperSamplingCreateParameters};
 
 pub mod feature;
@@ -147,26 +149,34 @@ impl System {
 
     /// Creates a new [`Feature`] with the logical device used to create
     /// this [`System`].
-    pub fn create_feature(
+    pub fn create_feature<T>(
         &self,
         command_buffer: vk::CommandBuffer,
         feature_type: NVSDK_NGX_Feature,
-        parameters: Option<FeatureParameters>,
-    ) -> Result<Feature> {
+        parameters: Option<FeatureParameters<T>>,
+    ) -> Result<Feature<T>>
+    where
+        T: FeatureParameterOps + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer> + FeatureHandleOps,
+    {
         let parameters = match parameters {
             Some(p) => p,
-            None => FeatureParameters::vk_get_capability_parameters()?,
+            None => FeatureParameters::get_capability_parameters()?,
         };
         Feature::new(self.device, command_buffer, feature_type, parameters)
     }
 
     /// Creates a supersampling (or "DLSS") feature.
-    pub fn create_super_sampling_feature(
+    pub fn create_super_sampling_feature<T, P>(
         &self,
         command_buffer: vk::CommandBuffer,
-        feature_parameters: FeatureParameters,
-        create_parameters: SuperSamplingCreateParameters,
-    ) -> Result<SuperSamplingFeature> {
+        feature_parameters: FeatureParameters<T>,
+        create_parameters: *mut SuperSamplingCreateParameters,
+    ) -> Result<ngx::SuperSamplingFeature<T, P>> 
+    where 
+    T: FeatureParameterOps + FeatureHandleOps + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>,
+    P: ngx::super_sampling::SuperSamplingEvaluationOps
+    {
+
         Feature::new_super_sampling(
             self.device,
             command_buffer,
@@ -176,28 +186,35 @@ impl System {
     }
 
     /// Creates a frame generation feature.
-    pub fn create_frame_generation_feature(
+    pub fn create_frame_generation_feature<T>(
         &self,
         command_buffer: vk::CommandBuffer,
-        feature_parameters: FeatureParameters,
-    ) -> Result<Feature> {
+        feature_parameters: FeatureParameters<T>,
+    ) -> Result<Feature<T>>
+    where 
+    T: FeatureHandleOps + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer> + FeatureParameterOps,
+     {
         Feature::new_frame_generation(self.device, command_buffer, feature_parameters)
     }
 
-    /// Creates a ray reconstruction feature.
-    pub fn create_ray_reconstruction_feature(
-        &self,
-        command_buffer: vk::CommandBuffer,
-        feature_parameters: FeatureParameters,
-        create_parameters: RayReconstructionCreateParameters,
-    ) -> Result<RayReconstructionFeature> {
-        Feature::new_ray_reconstruction(
-            self.device,
-            command_buffer,
-            feature_parameters,
-            create_parameters,
-        )
-    }
+    // TURN BACK ON
+    // /// Creates a ray reconstruction feature.
+    // pub fn create_ray_reconstruction_feature<T>(
+    //     &self,
+    //     command_buffer: vk::CommandBuffer,
+    //     feature_parameters: FeatureParameters<T>,
+    //     create_parameters: RayReconstructionCreateParameters,
+    // ) -> Result<RayReconstructionFeature> 
+    // where 
+    // T: FeatureHandleOps + FeatureOps + FeatureParameterOps
+    // {
+    //     Feature::new_ray_reconstruction(
+    //         self.device,
+    //         command_buffer,
+    //         feature_parameters,
+    //         create_parameters,
+    //     )
+    // }
 }
 
 impl Drop for System {
@@ -356,7 +373,7 @@ mod tests {
     #[ignore]
     fn insert_parameter_debug_macro() -> super::Result {
         let mut map = HashMap::new();
-        let parameters = super::FeatureParameters::vk_get_capability_parameters().unwrap();
+        let parameters = super::FeatureParameters::<crate::vk::VulkanPlatform>::get_capability_parameters().unwrap();
         crate::insert_parameter_debug!(
             map,
             parameters,

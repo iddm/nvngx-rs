@@ -2,6 +2,8 @@
 use crate::ngx::{FeatureHandleOps, FeatureOps, FeatureParameterOps};
 use ash::vk;
 
+
+/// Holds backend data for featurehandle, featureparameters and feature
 #[derive(Debug, Clone, Copy)]
 pub struct VulkanPlatform;
 
@@ -65,7 +67,7 @@ impl FeatureOps for VulkanPlatform {
         command_buffer: Self::CommandBuffer,
         handle: &mut *mut nvngx_sys::NVSDK_NGX_Handle,
         parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
-        create_params: *mut u8, // Platform-specific create params
+        create_params: *mut crate::ngx::super_sampling::SuperSamplingCreateParameters, // Platform-specific create params
     ) -> nvngx_sys::Result<(), nvngx_sys::Error> {
         unsafe {
             nvngx_sys::vulkan::HELPERS_NGX_VULKAN_CREATE_DLSS_EXT1(

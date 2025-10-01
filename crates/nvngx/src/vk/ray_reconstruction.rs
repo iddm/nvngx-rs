@@ -200,21 +200,31 @@ impl RayReconstructionEvaluationParameters {
 }
 
 /// A helpful type alias to quickly mention "DLSS-RR".
-pub type RRFeature = RayReconstructionFeature;
+pub type RRFeature<T> = RayReconstructionFeature<T>;
 
 /// A Ray Reconstruction (or "DLSS-RR") feature.
 #[derive(Debug)]
-pub struct RayReconstructionFeature {
-    feature: Feature,
+pub struct RayReconstructionFeature<T> 
+where
+    T: FeatureHandleOps
+        + FeatureParameterOps
+        + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>,
+{
+    feature: Feature<T>,
     parameters: RayReconstructionEvaluationParameters,
     rendering_resolution: vk::Extent2D,
     target_resolution: vk::Extent2D,
 }
 
-impl RayReconstructionFeature {
+impl<T> RayReconstructionFeature<T> 
+where
+    T: FeatureHandleOps
+        + FeatureParameterOps
+        + FeatureOps<Device = vk::Device, CommandBuffer = vk::CommandBuffer>,
+{
     /// Creates a new Super Sampling feature.
     pub fn new(
-        feature: Feature,
+        feature: Feature<T>,
         rendering_resolution: vk::Extent2D,
         target_resolution: vk::Extent2D,
     ) -> Result<Self> {
@@ -233,12 +243,12 @@ impl RayReconstructionFeature {
     }
 
     /// Returns the inner feature object.
-    pub fn get_inner(&self) -> &Feature {
+    pub fn get_inner(&self) -> &Feature<T> {
         &self.feature
     }
 
     /// Returns the inner feature object (mutable).
-    pub fn get_inner_mut(&mut self) -> &mut Feature {
+    pub fn get_inner_mut(&mut self) -> &mut Feature<T> {
         &mut self.feature
     }
 
@@ -278,8 +288,8 @@ impl RayReconstructionFeature {
         Result::from(unsafe {
             nvngx_sys::vulkan::HELPERS_NGX_VULKAN_EVALUATE_DLSSD_EXT(
                 command_buffer,
-                self.feature.handle.0,
-                self.feature.parameters.0,
+                self.feature.handle.get_handle(),
+                self.feature.parameters.get_params(),
                 self.parameters.get_rr_evaluation_parameters(),
             )
         })

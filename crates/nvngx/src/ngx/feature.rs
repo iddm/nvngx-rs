@@ -6,25 +6,27 @@ use nvngx_sys::NVSDK_NGX_Feature;
 
 use crate::{ngx, sys::Result};
 
-fn extract_rendering_resolution(create_parameters: &[u8]) -> [u32;2] {
+fn extract_rendering_resolution() -> [u32;2] {
     // This is platform-specific - you'll need to implement based on your platform
     // For now, returning a placeholder
     // TODO: Extract actual resolution from create_parameters based on your platform
     [1920, 1080] // placeholder
 }
 
-fn extract_target_resolution(create_parameters: &[u8]) -> [u32;2] {
+fn extract_target_resolution() -> [u32;2] {
     // This is platform-specific - you'll need to implement based on your platform
     // For now, returning a placeholder
     // TODO: Extract actual resolution from create_parameters based on your platform
     [3840, 2160] // placeholder
 }
 
+/// Generic FeatureHandle
 pub trait FeatureHandleOps{
     /// Release the platform specific API
     fn release_handle(handle: *mut nvngx_sys::NVSDK_NGX_Handle) -> Result<(), nvngx_sys::Error>;
 }
 
+/// Generic FeatureParameter
 pub trait FeatureParameterOps {
     // type Device;
     // type CommandBuffer;
@@ -41,7 +43,9 @@ pub trait FeatureParameterOps {
 
 /// Platform-specific operations for features
 pub trait FeatureOps {
+    /// Generic Device
     type Device;
+    /// Generic CommandBuffer
     type CommandBuffer;
     
     /// Create a feature
@@ -59,7 +63,7 @@ pub trait FeatureOps {
         command_buffer: Self::CommandBuffer,
         handle: &mut *mut nvngx_sys::NVSDK_NGX_Handle,
         parameters: *mut nvngx_sys::NVSDK_NGX_Parameter,
-        create_params: *mut u8, // Platform-specific create params
+        create_params: *mut ngx::super_sampling::SuperSamplingCreateParameters, // Platform-specific create params
     ) -> Result<(), nvngx_sys::Error>;
     
     /// Create ray reconstruction feature
@@ -104,6 +108,7 @@ impl<T: FeatureHandleOps> Default for FeatureHandle<T> {
 }
 
 impl<T: FeatureHandleOps> FeatureHandle<T> {
+    /// Create new default FeatureHandle
     pub fn new() -> Self {
         Self::default()
     }
@@ -271,7 +276,7 @@ where
         device: T::Device,
         command_buffer: T::CommandBuffer,
         parameters: FeatureParameters<T>,
-        create_parameters: &mut [u8], // Platform-specific create params
+        create_parameters: *mut ngx::SuperSamplingCreateParameters, // Platform-specific create params
     ) -> Result<super::SuperSamplingFeature<T, P>, nvngx_sys::Error> 
     where 
     P: ngx::super_sampling::SuperSamplingEvaluationOps,
@@ -282,12 +287,12 @@ where
             command_buffer,
             &mut handle.handle,
             parameters.get_params(),
-            create_parameters.as_mut_ptr(),
+            create_parameters,
         )?;
         
         // Extract resolution info from create_parameters (platform-specific)
-        let rendering_resolution = extract_rendering_resolution(create_parameters);
-        let target_resolution = extract_target_resolution(create_parameters);
+        let rendering_resolution = extract_rendering_resolution();
+        let target_resolution = extract_target_resolution();
         
         super::SuperSamplingFeature::<T,P>::new(
             Self {

@@ -11,7 +11,7 @@ pub mod feature;
 pub use feature::*;
 
 // use windows::Win32::Graphics::Dxgi::Common::DXGI_FORMAT;
-use crate::ngx::{FeatureParameters, SuperSamplingCreateParameters};
+use crate::ngx::{Feature, FeatureHandleOps, FeatureOps, FeatureParameterOps, FeatureParameters, SuperSamplingCreateParameters};
 
 pub mod super_sampling;
 pub use super_sampling::*;
@@ -71,36 +71,46 @@ impl System {
 
     /// Creates a new [`Feature`] with the logical device used to create
     /// this [`System`].
-    pub fn create_feature(
+    pub fn create_feature<T>(
         &self,
         command_buffer: &ID3D12GraphicsCommandList,
         feature_type: NVSDK_NGX_Feature,
-        parameters: Option<FeatureParameters>,
-    ) -> Result<Feature> {
+        parameters: Option<FeatureParameters<T>>,
+    ) -> Result<Feature<T>> 
+     where
+     T: FeatureParameterOps + FeatureOps<Device = (), CommandBuffer = ID3D12GraphicsCommandList> + FeatureHandleOps,
+    {
         let parameters = match parameters {
             Some(p) => p,
-            None => FeatureParameters::dx_get_capability_parameters()?,
+            None => FeatureParameters::get_capability_parameters()?,
         };
-        Feature::new(command_buffer, feature_type, parameters)
+        Feature::new((), command_buffer.clone(), feature_type, parameters) // TODO device needs to be optional
     }
 
     /// Creates a supersampling (or "DLSS") feature.
-    pub fn create_super_sampling_feature(
+    pub fn create_super_sampling_feature<T, P>(
         &self,
         command_buffer: &ID3D12GraphicsCommandList,
-        feature_parameters: FeatureParameters,
-        create_parameters: SuperSamplingCreateParameters,
-    ) -> Result<SuperSamplingFeature> {
-        Feature::new_super_sampling(command_buffer, feature_parameters, create_parameters)
+        feature_parameters: FeatureParameters<T>,
+        create_parameters: *mut SuperSamplingCreateParameters,
+    ) -> Result<crate::ngx::SuperSamplingFeature<T, P>>
+    where
+     T: FeatureParameterOps + FeatureOps<Device = (), CommandBuffer = ID3D12GraphicsCommandList> + FeatureHandleOps,
+     P: crate::ngx::super_sampling::SuperSamplingEvaluationOps
+     {
+        Feature::new_super_sampling((), command_buffer.clone(), feature_parameters, create_parameters) // TODO device needs to be optional.
     }
 
     /// Creates a frame generation feature.
-    pub fn create_frame_generation_feature(
+    pub fn create_frame_generation_feature<T>(
         &self,
         command_buffer: &ID3D12GraphicsCommandList,
-        feature_parameters: FeatureParameters,
-    ) -> Result<Feature> {
-        Feature::new_frame_generation(command_buffer, feature_parameters)
+        feature_parameters: FeatureParameters<T>,
+    ) -> Result<Feature<T>> 
+     where
+     T: FeatureParameterOps + FeatureOps<Device = (), CommandBuffer = ID3D12GraphicsCommandList> + FeatureHandleOps,
+    {
+        Feature::new_frame_generation((), command_buffer.clone(), feature_parameters) // Also device
     }
 
     // TODO: implement ray reconstruction for dx12

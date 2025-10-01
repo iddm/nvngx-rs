@@ -2,6 +2,7 @@
 
 use crate::ngx::FeatureHandleOps;
 
+/// Holds backend data for featurehandle, featureparameters and feature
 #[derive(Debug, Clone, Copy)]
 pub struct DX12Platform;
 
