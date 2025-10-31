@@ -45,12 +45,18 @@ fn compile_helpers() {
 fn main() {
     compile_helpers();
 
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    assert_eq!(
+        target_arch, "x86_64",
+        "No libraries available for architecture `{target_arch}`"
+    );
+
     // Tell cargo to tell rustc to link to the libraries.
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let dlss_library_path = Path::new(match target_os.as_str() {
         "windows" => "DLSS/lib/Windows_x86_64",
         "linux" => "DLSS/lib/Linux_x86_64",
-        x => todo!("No libraries for {x}"),
+        x => panic!("No libraries available for OS `{x}`"),
     });
 
     // Make the path relative to the crate source, where the DLSS submodule exists
