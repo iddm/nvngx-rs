@@ -73,6 +73,9 @@ fn main() {
             let dbg_suffix = if true { "" } else { "_dbg" };
             println!("cargo:rustc-link-lib=nvsdk_ngx{windows_mt_suffix}{dbg_suffix}");
             println!("cargo:rustc-link-search={}", link_library_path.display());
+            // Link Windows system libraries required by nvsdk_ngx
+            println!("cargo:rustc-link-lib=advapi32");
+            println!("cargo:rustc-link-lib=user32");
         }
         "linux" => {
             // On Linux there is only one link-library
