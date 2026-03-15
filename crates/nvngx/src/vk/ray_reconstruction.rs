@@ -76,6 +76,26 @@ pub struct RayReconstructionEvaluationParameters {
     pub(crate) depth_resource: NVSDK_NGX_Resource_VK,
     /// The motion vectors.
     pub(crate) motion_vectors_resource: NVSDK_NGX_Resource_VK,
+    /// The diffuse albedo.
+    pub(crate) diffuse_albedo_resource: NVSDK_NGX_Resource_VK,
+    /// The specular albedo.
+    pub(crate) specular_albedo_resource: NVSDK_NGX_Resource_VK,
+    /// The normals.
+    pub(crate) normals_resource: NVSDK_NGX_Resource_VK,
+    /// The roughness.
+    pub(crate) roughness_resource: NVSDK_NGX_Resource_VK,
+    /// The alpha channel.
+    pub(crate) alpha_resource: NVSDK_NGX_Resource_VK,
+    /// The output alpha channel.
+    pub(crate) output_alpha_resource: NVSDK_NGX_Resource_VK,
+    /// The transparency mask.
+    pub(crate) transparency_mask_resource: NVSDK_NGX_Resource_VK,
+    /// The exposure texture.
+    pub(crate) exposure_texture_resource: NVSDK_NGX_Resource_VK,
+    /// The diffuse hit distance.
+    pub(crate) diffuse_hit_distance_resource: NVSDK_NGX_Resource_VK,
+    /// The specular hit distance.
+    pub(crate) specular_hit_distance_resource: NVSDK_NGX_Resource_VK,
 
     /// This member isn't visible, as it shouldn't be managed by
     /// the user of this struct. Instead, this struct provides an
@@ -130,6 +150,83 @@ impl RayReconstructionEvaluationParameters {
     pub fn set_depth_buffer(&mut self, description: VkImageResourceDescription) {
         self.depth_resource = description.into();
         self.parameters.pInDepth = std::ptr::addr_of_mut!(self.depth_resource);
+    }
+
+    /// Sets the diffuse albedo.
+    pub fn set_diffuse_albedo(&mut self, description: VkImageResourceDescription) {
+        self.diffuse_albedo_resource = description.into();
+        self.parameters.pInDiffuseAlbedo =
+            std::ptr::addr_of_mut!(self.diffuse_albedo_resource);
+    }
+
+    /// Sets the specular albedo.
+    pub fn set_specular_albedo(&mut self, description: VkImageResourceDescription) {
+        self.specular_albedo_resource = description.into();
+        self.parameters.pInSpecularAlbedo =
+            std::ptr::addr_of_mut!(self.specular_albedo_resource);
+    }
+
+    /// Sets the normals.
+    pub fn set_normals(&mut self, description: VkImageResourceDescription) {
+        self.normals_resource = description.into();
+        self.parameters.pInNormals = std::ptr::addr_of_mut!(self.normals_resource);
+    }
+
+    /// Sets the roughness.
+    pub fn set_roughness(&mut self, description: VkImageResourceDescription) {
+        self.roughness_resource = description.into();
+        self.parameters.pInRoughness = std::ptr::addr_of_mut!(self.roughness_resource);
+    }
+
+    /// Sets the alpha channel.
+    pub fn set_alpha(&mut self, description: VkImageResourceDescription) {
+        self.alpha_resource = description.into();
+        self.parameters.pInAlpha = std::ptr::addr_of_mut!(self.alpha_resource);
+    }
+
+    /// Sets the output alpha channel.
+    pub fn set_output_alpha(&mut self, description: VkImageResourceDescription) {
+        self.output_alpha_resource = description.into();
+        self.parameters.pInOutputAlpha =
+            std::ptr::addr_of_mut!(self.output_alpha_resource);
+    }
+
+    /// Sets the transparency mask.
+    pub fn set_transparency_mask(&mut self, description: VkImageResourceDescription) {
+        self.transparency_mask_resource = description.into();
+        self.parameters.pInTransparencyMask =
+            std::ptr::addr_of_mut!(self.transparency_mask_resource);
+    }
+
+    /// Sets the exposure texture.
+    pub fn set_exposure_texture(&mut self, description: VkImageResourceDescription) {
+        self.exposure_texture_resource = description.into();
+        self.parameters.pInExposureTexture =
+            std::ptr::addr_of_mut!(self.exposure_texture_resource);
+    }
+
+    /// Sets the diffuse hit distance.
+    pub fn set_diffuse_hit_distance(&mut self, description: VkImageResourceDescription) {
+        self.diffuse_hit_distance_resource = description.into();
+        self.parameters.pInDiffuseHitDistance =
+            std::ptr::addr_of_mut!(self.diffuse_hit_distance_resource);
+    }
+
+    /// Sets the specular hit distance.
+    pub fn set_specular_hit_distance(&mut self, description: VkImageResourceDescription) {
+        self.specular_hit_distance_resource = description.into();
+        self.parameters.pInSpecularHitDistance =
+            std::ptr::addr_of_mut!(self.specular_hit_distance_resource);
+    }
+
+    /// Sets the pre-exposure value. Defaults to `1.0` if set to `0.0`.
+    pub fn set_pre_exposure(&mut self, value: f32) {
+        self.parameters.InPreExposure = value;
+    }
+
+    /// Sets the exposure scale. Defaults to `1.0` if set to `0.0`.
+    pub fn set_exposure_scale(&mut self, value: f32) {
+        self.parameters.InExposureScale = value;
     }
 
     /// Sets the jitter offsets (like TAA).
@@ -261,11 +358,11 @@ impl RayReconstructionFeature {
     //     Self::new(parameters)
     // }
 
-    /// See [`FeatureParameters::is_super_sampling_initialised`].
+    /// See [`FeatureParameters::is_ray_reconstruction_initialised`].
     pub fn is_initialised(&self) -> bool {
         self.feature
             .get_parameters()
-            .is_super_sampling_initialised()
+            .is_ray_reconstruction_initialised()
     }
 
     /// Returns the evaluation parameters.

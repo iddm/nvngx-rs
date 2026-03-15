@@ -213,3 +213,36 @@ NVSDK_NGX_Result HELPERS_NGX_VULKAN_EVALUATE_DLSSD_EXT(
         pInDlssDEvalParams
     );
 }
+
+// Frame Generation
+NVSDK_NGX_Result HELPERS_NGX_VULKAN_CREATE_DLSSG(
+    VkCommandBuffer InCmdList,
+    unsigned int InCreationNodeMask,
+    unsigned int InVisibilityNodeMask,
+    NVSDK_NGX_Handle **ppOutHandle,
+    NVSDK_NGX_Parameter *pInParams,
+    NVSDK_NGX_DLSSG_Create_Params *pInDlssgCreateParams) {
+    return NGX_VK_CREATE_DLSSG(
+        InCmdList,
+        InCreationNodeMask,
+        InVisibilityNodeMask,
+        ppOutHandle,
+        pInParams,
+        pInDlssgCreateParams
+    );
+}
+
+NVSDK_NGX_Result HELPERS_NGX_VULKAN_EVALUATE_DLSSG(
+    VkCommandBuffer InCmdList,
+    NVSDK_NGX_Handle *pInHandle,
+    NVSDK_NGX_Parameter *pInParams,
+    NVSDK_NGX_VK_DLSSG_Eval_Params *pInDlssgEvalParams,
+    NVSDK_NGX_DLSSG_Opt_Eval_Params *pInDlssgOptEvalParams) {
+    return NGX_VK_EVALUATE_DLSSG(
+        InCmdList,
+        pInHandle,
+        pInParams,
+        pInDlssgEvalParams,
+        pInDlssgOptEvalParams
+    );
+}

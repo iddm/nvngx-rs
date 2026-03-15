@@ -1,6 +1,6 @@
-mod allocations;
-mod imgops;
-mod vk_mini_init;
+#[path = "../common/mod.rs"]
+mod common;
+use common::{allocations, imgops, vk_mini_init};
 
 use ash::vk;
 use image::ColorType;

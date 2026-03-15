@@ -405,11 +405,24 @@ impl FeatureParameters {
     /// Returns [`Ok`] if the parameters claim to support the
     /// ray reconstruction feature ([`nvngx_sys::NVSDK_NGX_Feature::NVSDK_NGX_Feature_RayReconstruction`]).
     pub fn supports_ray_reconstruction(&self) -> Result<()> {
-        // TODO: should attempt to create a feature with this type and
-        // see if it succeeds.
-        // NVSDK_NGX_Feature_RayReconstruction
-
-        unimplemented!()
+        if self
+            .get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_NeedsUpdatedDriver)?
+        {
+            let major = self.get_u32(
+                nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_MinDriverVersionMajor,
+            )?;
+            let minor = self.get_u32(
+                nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_MinDriverVersionMinor,
+            )?;
+            return Err(nvngx_sys::Error::Other(format!("The Ray Reconstruction feature requires a driver update. The driver version required should be higher or equal to {major}.{minor}")));
+        }
+        match self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_Available) {
+            Ok(true) => Ok(()),
+            Ok(false) => Err(nvngx_sys::Error::Other(
+                "The Ray Reconstruction feature isn't supported on this platform.".to_string(),
+            )),
+            Err(e) => Err(e),
+        }
     }
 
     /// Returns [`Ok`] if the parameters claim to support the
@@ -459,6 +472,13 @@ impl FeatureParameters {
     /// correctly.
     pub fn is_ray_reconstruction_initialised(&self) -> bool {
         self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_SuperSamplingDenoising_FeatureInitResult)
+            .unwrap_or(false)
+    }
+
+    /// Returns [`true`] if the Frame Generation feature is initialised
+    /// correctly.
+    pub fn is_frame_generation_initialised(&self) -> bool {
+        self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_FrameGeneration_FeatureInitResult)
             .unwrap_or(false)
     }
 
@@ -556,12 +576,29 @@ impl Feature {
 
     /// Creates the Frame Generation feature.
     pub fn new_frame_generation(
-        device: vk::Device,
         command_buffer: vk::CommandBuffer,
         parameters: FeatureParameters,
-    ) -> Result<Self> {
+        mut frame_generation_create_parameters: FrameGenerationCreateParameters,
+    ) -> Result<FrameGenerationFeature> {
         let feature_type = NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration;
-        Self::new(device, command_buffer, feature_type, parameters)
+        unsafe {
+            let mut handle = FeatureHandle::new();
+            Result::from(nvngx_sys::HELPERS_NGX_VULKAN_CREATE_DLSSG(
+                command_buffer,
+                1,
+                1,
+                &mut handle.0 as *mut _,
+                parameters.0,
+                &mut frame_generation_create_parameters.0 as *mut _,
+            ))
+            .and_then(|_| {
+                FrameGenerationFeature::new(Self {
+                    handle: handle.into(),
+                    feature_type,
+                    parameters: parameters.into(),
+                })
+            })
+        }
     }
 
     /// Creates the Ray Reconstruction feature.

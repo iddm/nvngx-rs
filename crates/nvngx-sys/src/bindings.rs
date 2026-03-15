@@ -3953,3 +3953,24 @@ extern "C" {
         pInDlssDEvalParams: *mut NVSDK_NGX_VK_DLSSD_Eval_Params,
     ) -> NVSDK_NGX_Result;
 }
+extern "C" {
+    #[link_name = "\u{1}_Z31HELPERS_NGX_VULKAN_CREATE_DLSSGP17VkCommandBuffer_TjjPP16NVSDK_NGX_HandleP19NVSDK_NGX_ParameterP29NVSDK_NGX_DLSSG_Create_Params"]
+    pub fn HELPERS_NGX_VULKAN_CREATE_DLSSG(
+        InCmdList: VkCommandBuffer,
+        InCreationNodeMask: ::std::os::raw::c_uint,
+        InVisibilityNodeMask: ::std::os::raw::c_uint,
+        ppOutHandle: *mut *mut NVSDK_NGX_Handle,
+        pInParams: *mut NVSDK_NGX_Parameter,
+        pInDlssgCreateParams: *mut NVSDK_NGX_DLSSG_Create_Params,
+    ) -> NVSDK_NGX_Result;
+}
+extern "C" {
+    #[link_name = "\u{1}_Z33HELPERS_NGX_VULKAN_EVALUATE_DLSSGP17VkCommandBuffer_TP16NVSDK_NGX_HandleP19NVSDK_NGX_ParameterP30NVSDK_NGX_VK_DLSSG_Eval_ParamsP31NVSDK_NGX_DLSSG_Opt_Eval_Params"]
+    pub fn HELPERS_NGX_VULKAN_EVALUATE_DLSSG(
+        InCmdList: VkCommandBuffer,
+        pInHandle: *mut NVSDK_NGX_Handle,
+        pInParams: *mut NVSDK_NGX_Parameter,
+        pInDlssgEvalParams: *mut NVSDK_NGX_VK_DLSSG_Eval_Params,
+        pInDlssgOptEvalParams: *mut NVSDK_NGX_DLSSG_Opt_Eval_Params,
+    ) -> NVSDK_NGX_Result;
+}
