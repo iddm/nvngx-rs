@@ -15,6 +15,8 @@ pub mod super_sampling;
 pub use super_sampling::*;
 pub mod ray_reconstruction;
 pub use ray_reconstruction::*;
+pub mod frame_generation;
+pub use frame_generation::*;
 
 fn convert_slice_of_strings_to_cstrings(data: &[String]) -> Result<Vec<std::ffi::CString>> {
     let strings: Vec<_> = data
@@ -178,8 +180,9 @@ impl System {
         &self,
         command_buffer: vk::CommandBuffer,
         feature_parameters: FeatureParameters,
-    ) -> Result<Feature> {
-        Feature::new_frame_generation(self.device, command_buffer, feature_parameters)
+        create_parameters: FrameGenerationCreateParameters,
+    ) -> Result<FrameGenerationFeature> {
+        Feature::new_frame_generation(command_buffer, feature_parameters, create_parameters)
     }
 
     /// Creates a ray reconstruction feature.
