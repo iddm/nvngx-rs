@@ -242,6 +242,7 @@ version = "0.3.1+v310.1.0"
 dependencies = [
  "ash",
  "derive_builder",
+ "libc",
  "log",
  "nvngx-sys",
  "uuid",

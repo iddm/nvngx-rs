@@ -103,6 +103,10 @@ pub struct System {
 
 impl System {
     /// Creates a new NVIDIA NGX system.
+    ///
+    /// `common_info` carries optional feature-DLL search paths and a logging
+    /// callback configuration; pass [`None`] to preserve the NGX defaults (no
+    /// extra search paths, logging controlled by the registry on Windows).
     pub fn new(
         project_id: Option<uuid::Uuid>,
         engine_version: &str,
@@ -111,6 +115,7 @@ impl System {
         instance: &ash::Instance,
         physical_device: vk::PhysicalDevice,
         logical_device: vk::Device,
+        common_info: Option<&crate::common::FeatureCommonInfo<'_>>,
     ) -> Result<Self> {
         let engine_type = nvngx_sys::NVSDK_NGX_EngineType::NVSDK_NGX_ENGINE_TYPE_CUSTOM;
         let project_id =
@@ -119,6 +124,54 @@ impl System {
         let engine_version = std::ffi::CString::new(engine_version).unwrap();
         let application_data_path =
             widestring::WideString::from_str(application_data_path.to_str().unwrap());
+
+        // Build `NVSDK_NGX_FeatureCommonInfo` as plain locals scoped to the
+        // FFI call below. NGX consumes the paths synchronously during
+        // `NGXInitContext` (the feature DLL is loaded inline; see breda's
+        // `nvngx.log`) and captures `LoggingInfo` into its own state, so the
+        // buffers do not need to outlive the init call.
+        let path_buffers: Vec<widestring::WideString>;
+        let path_pointers: Vec<*const libc::wchar_t>;
+        let c_common_info: nvngx_sys::NVSDK_NGX_FeatureCommonInfo;
+        let common_info_ptr: *const nvngx_sys::NVSDK_NGX_FeatureCommonInfo = match common_info {
+            None => std::ptr::null(),
+            Some(info) => {
+                path_buffers = info
+                    .search_paths
+                    .iter()
+                    .map(|p| {
+                        widestring::WideString::from_str(
+                            p.to_str().expect("NGX search paths must be valid UTF-8"),
+                        )
+                    })
+                    .collect();
+                path_pointers = path_buffers
+                    .iter()
+                    .map(|s| s.as_ptr().cast::<libc::wchar_t>())
+                    .collect();
+                c_common_info = nvngx_sys::NVSDK_NGX_FeatureCommonInfo {
+                    PathListInfo: nvngx_sys::NVSDK_NGX_PathListInfo {
+                        Path: if path_pointers.is_empty() {
+                            std::ptr::null()
+                        } else {
+                            path_pointers.as_ptr()
+                        },
+                        Length: path_pointers.len() as u32,
+                    },
+                    InternalData: std::ptr::null_mut(),
+                    LoggingInfo: match info.logging {
+                        Some(cfg) => nvngx_sys::NVSDK_NGX_LoggingInfo {
+                            LoggingCallback: Some(crate::common::log_crate_callback),
+                            MinimumLoggingLevel: cfg.minimum_level.into(),
+                            DisableOtherLoggingSinks: cfg.disable_other_sinks,
+                        },
+                        None => nvngx_sys::NVSDK_NGX_LoggingInfo::default(),
+                    },
+                };
+                &c_common_info
+            }
+        };
+
         Result::from(unsafe {
             nvngx_sys::NVSDK_NGX_VULKAN_Init_with_ProjectID(
                 project_id.as_ptr(),
@@ -130,7 +183,7 @@ impl System {
                 logical_device,
                 entry.static_fn().get_instance_proc_addr,
                 instance.fp_v1_0().get_device_proc_addr,
-                std::ptr::null(),
+                common_info_ptr,
                 nvngx_sys::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
             )
         })
@@ -287,52 +340,6 @@ impl From<VkImageResourceDescription> for NVSDK_NGX_Resource_VK {
         }
     }
 }
-
-// #[derive(Debug)]
-// pub struct FeatureCommonInfo {
-//     path_list_info:,
-
-// }
-
-// /// Contains information common to all features, used by NGX in
-// /// determining requested feature availability.
-// #[derive(Debug, Clone)]
-// pub struct FeatureDiscoveryBuilder {
-//     /// API Struct version number.
-//     sdk_version: Option<bindings::NVSDK_NGX_Version>,
-//     /// Valid NVSDK_NGX_Feature enum corresponding to DLSS v3 Feature
-//     /// which is being queried for availability.
-//     feature_type: Option<bindings::NVSDK_NGX_Feature>,
-//     /// Unique Id provided by NVIDIA corresponding to a particular
-//     /// Application or alternatively custom Id set by Engine.
-//     application_identifier: Option<bindings::NVSDK_NGX_Application_Identifier>,
-//     /// Folder to store logs and other temporary files (write access
-//     /// required), normally this would be a location in Documents or
-//     /// ProgramData.
-//     application_data_path: Option<widestring::WideCString>,
-//     /// Contains information common to all features, presently only a
-//     /// list of all paths feature dlls can be located in, other than the
-//     /// default path - application directory.
-//     common_info: Option<FeatureCommonInfo>,
-// }
-
-// impl FeatureDiscoveryBuilder {
-//     /// Creates a new feature discovery builder. The created feature
-//     /// discovery builder contains blanket values.
-//     pub fn new() -> Self {
-//         Self(bindings::NVSDK_NGX_FeatureDiscoveryInfo {
-//             SDKVersion: bindings::NVSDK_NGX_Version::NVSDK_NGX_Version_API,
-//             FeatureID: bindings::NVSDK_NGX_Feature::NVSDK_NGX_Feature_Reserved_Unknown,
-
-//         })
-//     }
-
-//     /// Consumes the builder and obtains the requirements for the
-//     /// requested feature based on the information provided.
-//     pub fn get_requirements(self) -> Result<FeatureRequirement> {
-//         unimplemented!()
-//     }
-// }
 
 #[cfg(test)]
 mod tests {

@@ -2,6 +2,9 @@
 //! providing some abstractions in order to make the use easier.
 #![deny(missing_docs)]
 
+pub mod common;
+pub use common::*;
+
 pub mod vk;
 pub use vk::*;
 
