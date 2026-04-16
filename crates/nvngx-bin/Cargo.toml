@@ -1,0 +1,10 @@
+[package]
+name = "nvngx-bin"
+version.workspace = true
+edition = "2021"
+authors = ["Traverse Research <open-source@traverseresearch.nl>"]
+description = "Prebuilt NVIDIA NGX (DLSS) shared libraries."
+license = "MIT"
+keywords = ["nvidia", "ngx", "DLSS", "upscaling", "supersampling"]
+rust-version = "1.70"
+repository = "https://github.com/Traverse-Research/nvngx-rs"

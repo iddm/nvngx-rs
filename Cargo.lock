@@ -248,6 +248,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "nvngx-bin"
+version = "0.3.1+v310.1.0"
+
+[[package]]
 name = "nvngx-sys"
 version = "0.3.1+v310.5.3"
 dependencies = [
