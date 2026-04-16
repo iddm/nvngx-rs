@@ -24,41 +24,76 @@ fn dlss_version() -> &'static str {
         .1
 }
 
-/// Returns the path to the DLSS Super Resolution shared library (Linux release).
-pub fn dlss_so_path_linux() -> PathBuf {
-    Path::new(DLSS_LIB_DIR).join(format!(
-        "Linux_x86_64/rel/libnvidia-ngx-dlss.so.{}",
-        dlss_version()
-    ))
+/// Target platform for DLSS libraries.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Platform {
+    Linux,
+    Windows,
 }
 
-/// Returns the path to the DLSS Ray Reconstruction shared library (Linux release).
-pub fn dlssd_so_path_linux() -> PathBuf {
-    Path::new(DLSS_LIB_DIR).join(format!(
-        "Linux_x86_64/rel/libnvidia-ngx-dlssd.so.{}",
-        dlss_version()
-    ))
+impl Platform {
+    /// Returns the platform matching the Cargo `CARGO_CFG_TARGET_OS` environment variable.
+    ///
+    /// Cargo sets this for build scripts. Panics outside that context or on
+    /// unsupported targets.
+    pub fn for_current_target() -> Self {
+        let os = std::env::var("CARGO_CFG_TARGET_OS")
+            .expect("CARGO_CFG_TARGET_OS not set (are you in a build script?)");
+        match os.as_str() {
+            "linux" => Self::Linux,
+            "windows" => Self::Windows,
+            _ => panic!("unsupported target OS {os:?} — only Linux and Windows have DLSS binaries"),
+        }
+    }
 }
 
-/// Returns the path to the DLSS Frame Generation shared library (Linux release).
-pub fn dlssg_so_path_linux() -> PathBuf {
-    Path::new(DLSS_LIB_DIR).join(format!(
-        "Linux_x86_64/rel/libnvidia-ngx-dlssg.so.{}",
-        dlss_version()
-    ))
+/// Build configuration.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Config {
+    Release,
+    Dev,
 }
 
-/// Returns the path to the DLSS Super Resolution DLL (Windows release).
-pub fn dlss_dll_path_windows() -> PathBuf {
-    Path::new(DLSS_LIB_DIR).join("Windows_x86_64/rel/nvngx_dlss.dll")
+/// DLSS feature variant.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Feature {
+    /// DLSS Super Resolution.
+    Dlss,
+    /// DLSS Ray Reconstruction.
+    Dlssd,
+    /// DLSS Frame Generation.
+    Dlssg,
 }
 
-/// Returns the path to the DLSS Ray Reconstruction DLL (Windows release).
-pub fn dlssd_dll_path_windows() -> PathBuf {
-    Path::new(DLSS_LIB_DIR).join("Windows_x86_64/rel/nvngx_dlssd.dll")
-}
+/// Returns the path to a DLSS shared library for the given feature, platform, and configuration.
+pub fn dlss_path(feature: Feature, platform: Platform, config: Config) -> PathBuf {
+    let config_dir = match config {
+        Config::Release => "rel",
+        Config::Dev => "dev",
+    };
 
-/// Returns the path to the DLSS Frame Generation DLL (Windows release).
-pub fn dlssg_dll_path_windows() -> PathBuf {
-    Path::new(DLSS_LIB_DIR).join("Windows_x86_64/rel/nvngx_dlssg.dll")
+    let filename = match (feature, platform) {
+        (Feature::Dlss, Platform::Linux) => {
+            format!("libnvidia-ngx-dlss.so.{}", dlss_version())
+        }
+        (Feature::Dlssd, Platform::Linux) => {
+            format!("libnvidia-ngx-dlssd.so.{}", dlss_version())
+        }
+        (Feature::Dlssg, Platform::Linux) => {
+            format!("libnvidia-ngx-dlssg.so.{}", dlss_version())
+        }
+        (Feature::Dlss, Platform::Windows) => "nvngx_dlss.dll".into(),
+        (Feature::Dlssd, Platform::Windows) => "nvngx_dlssd.dll".into(),
+        (Feature::Dlssg, Platform::Windows) => "nvngx_dlssg.dll".into(),
+    };
+
+    let platform_dir = match platform {
+        Platform::Linux => "Linux_x86_64",
+        Platform::Windows => "Windows_x86_64",
+    };
+
+    Path::new(DLSS_LIB_DIR)
+        .join(platform_dir)
+        .join(config_dir)
+        .join(filename)
 }
