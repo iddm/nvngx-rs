@@ -43,10 +43,10 @@ fn main() {
     // 2) --- Create DLSS feature ---
     let capability_parameters =
         nvngx::vk::FeatureParameters::get_capability_parameters().expect("capability params");
-    assert!(
-        capability_parameters.supports_super_sampling().is_ok(),
-        "DLSS not supported on this device"
-    );
+    if let Err(e) = capability_parameters.supports_super_sampling() {
+        eprintln!("DLSS not supported on this device: {e}");
+        std::process::exit(1);
+    }
     let create_params = nvngx::vk::SuperSamplingCreateParameters::new(
         src_width,
         src_height,

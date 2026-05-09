@@ -17,6 +17,17 @@ impl VkMiniInit {
         device_extensions: Vec<String>,
         desired_physical_device_features2: &vk::PhysicalDeviceFeatures2,
     ) -> Self {
+        // VK_EXT_buffer_device_address was promoted to core in Vulkan
+        // 1.2, and the spec forbids enabling both the legacy extension
+        // and `VkPhysicalDeviceVulkan12Features::bufferDeviceAddress`
+        // simultaneously (VUID-VkDeviceCreateInfo-pNext-04748). NGX
+        // still advertises the legacy extension, so drop it here since
+        // the examples target Vulkan 1.3 and rely on the core feature.
+        let device_extensions: Vec<String> = device_extensions
+            .into_iter()
+            .filter(|name| name != "VK_EXT_buffer_device_address")
+            .collect();
+
         let entry_fn = unsafe { ash::Entry::load().unwrap() };
 
         // Handle validation layers and settings based on debug build and runtime flag

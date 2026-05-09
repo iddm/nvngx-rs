@@ -1,8 +1,12 @@
 //! The Ray Reconstruction feature.
+//!
+//! See `DLSS/doc/DLSS-RR Integration Guide.pdf` and the SDK headers
+//! `nvsdk_ngx_helpers_dlssd_vk.h`, `nvsdk_ngx_params_dlssd.h`,
+//! `nvsdk_ngx_defs_dlssd.h` for the canonical API description.
 
 use nvngx_sys::{
     NVSDK_NGX_DLSSD_Create_Params, NVSDK_NGX_DLSS_Denoise_Mode, NVSDK_NGX_DLSS_Depth_Type,
-    NVSDK_NGX_DLSS_Roughness_Mode, NVSDK_NGX_VK_DLSSD_Eval_Params,
+    NVSDK_NGX_DLSS_Roughness_Mode, NVSDK_NGX_ToneMapperType, NVSDK_NGX_VK_DLSSD_Eval_Params,
 };
 
 use super::*;
@@ -59,11 +63,36 @@ impl RayReconstructionCreateParameters {
             InEnableOutputSubrects: false,
         })
     }
+
+    /// OR-merges the given
+    /// [`NVSDK_NGX_DLSS_Feature_Flags`](nvngx_sys::NVSDK_NGX_DLSS_Feature_Flags)
+    /// bits into the existing flag set. The flags advertise
+    /// properties of the host's input (HDR, jittered/low-resolution
+    /// motion vectors, inverted depth, auto-exposure, alpha
+    /// upscaling). Without at least the flags matching the host's
+    /// actual G-buffer encoding, DLSS-RR `CreateFeature` typically
+    /// fails with `Result_FAIL_InvalidParameter`.
+    pub fn with_flags(mut self, flags: nvngx_sys::NVSDK_NGX_DLSS_Feature_Flags) -> Self {
+        self.0.InFeatureCreateFlags |= flags.0;
+        self
+    }
+
+    /// Enables per-evaluation output subrects. When set, evaluation
+    /// can target a sub-region of the output image rather than the
+    /// whole thing.
+    pub fn with_output_subrects(mut self, enabled: bool) -> Self {
+        self.0.InEnableOutputSubrects = enabled;
+        self
+    }
 }
 
 /// The Ray Reconstruction evaluation parameters.
 ///
-/// Similar to [`nvngx_sys::NVSDK_NGX_VK_DLSSD_Eval_Params`].
+/// Similar to [`nvngx_sys::NVSDK_NGX_VK_DLSSD_Eval_Params`]. Pointers
+/// inside the underlying eval struct refer back to the resources
+/// owned by this struct, so it must not be moved between
+/// [`Self::set_*`](RayReconstructionEvaluationParameters::set_color_input)
+/// calls and the matching evaluate call.
 #[derive(Debug)]
 pub struct RayReconstructionEvaluationParameters {
     /// The vulkan resource which is an input to the evaluation
@@ -92,10 +121,34 @@ pub struct RayReconstructionEvaluationParameters {
     pub(crate) transparency_mask_resource: NVSDK_NGX_Resource_VK,
     /// The exposure texture.
     pub(crate) exposure_texture_resource: NVSDK_NGX_Resource_VK,
+    /// Mask used to bias the current color contribution per pixel.
+    pub(crate) bias_current_color_mask_resource: NVSDK_NGX_Resource_VK,
     /// The diffuse hit distance.
     pub(crate) diffuse_hit_distance_resource: NVSDK_NGX_Resource_VK,
     /// The specular hit distance.
     pub(crate) specular_hit_distance_resource: NVSDK_NGX_Resource_VK,
+    /// 3D motion vectors (when supplying full 3D MVs).
+    pub(crate) motion_vectors_3d_resource: NVSDK_NGX_Resource_VK,
+    /// Mask flagging pixels that contain particles.
+    pub(crate) is_particle_mask_resource: NVSDK_NGX_Resource_VK,
+    /// Mask covering pixels with animated textures.
+    pub(crate) animated_texture_mask_resource: NVSDK_NGX_Resource_VK,
+    /// High-resolution depth buffer.
+    pub(crate) depth_high_res_resource: NVSDK_NGX_Resource_VK,
+    /// View-space position buffer.
+    pub(crate) position_view_space_resource: NVSDK_NGX_Resource_VK,
+    /// Ray-tracing hit distance buffer.
+    pub(crate) ray_tracing_hit_distance_resource: NVSDK_NGX_Resource_VK,
+    /// Motion vectors of reflected objects (mirrors etc.).
+    pub(crate) motion_vectors_reflections_resource: NVSDK_NGX_Resource_VK,
+    /// Optional transparency layer color.
+    pub(crate) transparency_layer_resource: NVSDK_NGX_Resource_VK,
+    /// Optional transparency layer opacity.
+    pub(crate) transparency_layer_opacity_resource: NVSDK_NGX_Resource_VK,
+    /// Optional transparency layer motion vectors.
+    pub(crate) transparency_layer_mvecs_resource: NVSDK_NGX_Resource_VK,
+    /// Optional disocclusion mask.
+    pub(crate) disocclusion_mask_resource: NVSDK_NGX_Resource_VK,
 
     /// This member isn't visible, as it shouldn't be managed by
     /// the user of this struct. Instead, this struct provides an
@@ -219,6 +272,96 @@ impl RayReconstructionEvaluationParameters {
             std::ptr::addr_of_mut!(self.specular_hit_distance_resource);
     }
 
+    /// Sets the bias-current-color mask.
+    pub fn set_bias_current_color_mask(&mut self, description: VkImageResourceDescription) {
+        self.bias_current_color_mask_resource = description.into();
+        self.parameters.pInBiasCurrentColorMask =
+            std::ptr::addr_of_mut!(self.bias_current_color_mask_resource);
+    }
+
+    /// Sets the 3D motion vectors resource. (Method spelling
+    /// matches the existing [`Self::set_motions_vectors`].)
+    pub fn set_motions_vectors_3d(&mut self, description: VkImageResourceDescription) {
+        self.motion_vectors_3d_resource = description.into();
+        self.parameters.pInMotionVectors3D =
+            std::ptr::addr_of_mut!(self.motion_vectors_3d_resource);
+    }
+
+    /// Sets the particle-mask resource.
+    pub fn set_is_particle_mask(&mut self, description: VkImageResourceDescription) {
+        self.is_particle_mask_resource = description.into();
+        self.parameters.pInIsParticleMask =
+            std::ptr::addr_of_mut!(self.is_particle_mask_resource);
+    }
+
+    /// Sets the animated-texture mask resource.
+    pub fn set_animated_texture_mask(&mut self, description: VkImageResourceDescription) {
+        self.animated_texture_mask_resource = description.into();
+        self.parameters.pInAnimatedTextureMask =
+            std::ptr::addr_of_mut!(self.animated_texture_mask_resource);
+    }
+
+    /// Sets the high-resolution depth resource.
+    pub fn set_depth_high_res(&mut self, description: VkImageResourceDescription) {
+        self.depth_high_res_resource = description.into();
+        self.parameters.pInDepthHighRes =
+            std::ptr::addr_of_mut!(self.depth_high_res_resource);
+    }
+
+    /// Sets the view-space position resource.
+    pub fn set_position_view_space(&mut self, description: VkImageResourceDescription) {
+        self.position_view_space_resource = description.into();
+        self.parameters.pInPositionViewSpace =
+            std::ptr::addr_of_mut!(self.position_view_space_resource);
+    }
+
+    /// Sets the ray-tracing hit-distance resource (per-effect noise
+    /// approximation).
+    pub fn set_ray_tracing_hit_distance(&mut self, description: VkImageResourceDescription) {
+        self.ray_tracing_hit_distance_resource = description.into();
+        self.parameters.pInRayTracingHitDistance =
+            std::ptr::addr_of_mut!(self.ray_tracing_hit_distance_resource);
+    }
+
+    /// Sets the motion vectors of reflected objects. (Method
+    /// spelling matches the existing [`Self::set_motions_vectors`].)
+    pub fn set_motions_vectors_reflections(
+        &mut self,
+        description: VkImageResourceDescription,
+    ) {
+        self.motion_vectors_reflections_resource = description.into();
+        self.parameters.pInMotionVectorsReflections =
+            std::ptr::addr_of_mut!(self.motion_vectors_reflections_resource);
+    }
+
+    /// Sets the optional transparency-layer color resource.
+    pub fn set_transparency_layer(&mut self, description: VkImageResourceDescription) {
+        self.transparency_layer_resource = description.into();
+        self.parameters.pInTransparencyLayer =
+            std::ptr::addr_of_mut!(self.transparency_layer_resource);
+    }
+
+    /// Sets the optional transparency-layer opacity resource.
+    pub fn set_transparency_layer_opacity(&mut self, description: VkImageResourceDescription) {
+        self.transparency_layer_opacity_resource = description.into();
+        self.parameters.pInTransparencyLayerOpacity =
+            std::ptr::addr_of_mut!(self.transparency_layer_opacity_resource);
+    }
+
+    /// Sets the optional transparency-layer motion vectors resource.
+    pub fn set_transparency_layer_mvecs(&mut self, description: VkImageResourceDescription) {
+        self.transparency_layer_mvecs_resource = description.into();
+        self.parameters.pInTransparencyLayerMvecs =
+            std::ptr::addr_of_mut!(self.transparency_layer_mvecs_resource);
+    }
+
+    /// Sets the optional disocclusion-mask resource.
+    pub fn set_disocclusion_mask(&mut self, description: VkImageResourceDescription) {
+        self.disocclusion_mask_resource = description.into();
+        self.parameters.pInDisocclusionMask =
+            std::ptr::addr_of_mut!(self.disocclusion_mask_resource);
+    }
+
     /// Sets the pre-exposure value. Defaults to `1.0` if set to `0.0`.
     pub fn set_pre_exposure(&mut self, value: f32) {
         self.parameters.InPreExposure = value;
@@ -238,6 +381,24 @@ impl RayReconstructionEvaluationParameters {
     /// Sets/unsets the reset flag.
     pub fn set_reset(&mut self, should_reset: bool) {
         self.parameters.InReset = if should_reset { 1 } else { 0 };
+    }
+
+    /// Sets the time elapsed since the previous frame, in milliseconds.
+    /// Used to scale denoising/anti-aliasing strength based on motion.
+    pub fn set_frame_time_delta_msec(&mut self, msec: f32) {
+        self.parameters.InFrameTimeDeltaInMsec = msec;
+    }
+
+    /// Sets the tone-mapper type used by the application.
+    pub fn set_tone_mapper_type(&mut self, ty: NVSDK_NGX_ToneMapperType) {
+        self.parameters.InToneMapperType = ty;
+    }
+
+    /// Sets the debug-indicator inversion flags (used to flip the
+    /// developer overlay axes).
+    pub fn set_indicator_invert_axes(&mut self, invert_x: bool, invert_y: bool) {
+        self.parameters.InIndicatorInvertXAxis = i32::from(invert_x);
+        self.parameters.InIndicatorInvertYAxis = i32::from(invert_y);
     }
 
     /// Sets the rendering dimensions.
@@ -265,6 +426,71 @@ impl RayReconstructionEvaluationParameters {
         self.parameters.InRenderSubrectDimensions = NVSDK_NGX_Dimensions {
             Width: rendering_size[0],
             Height: rendering_size[1],
+        };
+    }
+
+    /// Sets the output subrect base (used together with
+    /// `InEnableOutputSubrects`).
+    pub fn set_output_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InOutputSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the diffuse-albedo input.
+    pub fn set_diffuse_albedo_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InDiffuseAlbedoSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the specular-albedo input.
+    pub fn set_specular_albedo_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InSpecularAlbedoSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the normals input.
+    pub fn set_normals_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InNormalsSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the roughness input.
+    pub fn set_roughness_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InRoughnessSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the alpha input.
+    pub fn set_alpha_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InAlphaSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the alpha output.
+    pub fn set_output_alpha_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InOutputAlphaSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
+        };
+    }
+
+    /// Sets the per-resource subrect base for the bias-current-color mask.
+    pub fn set_bias_current_color_subrect_base(&mut self, base: [u32; 2]) {
+        self.parameters.InBiasCurrentColorSubrectBase = NVSDK_NGX_Coordinates {
+            X: base[0],
+            Y: base[1],
         };
     }
 

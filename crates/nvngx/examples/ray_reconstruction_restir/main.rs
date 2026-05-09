@@ -37,10 +37,10 @@ fn main() {
 
     let capability_parameters =
         nvngx::vk::FeatureParameters::get_capability_parameters().expect("capability params");
-    assert!(
-        capability_parameters.supports_ray_reconstruction().is_ok(),
-        "Ray Reconstruction not supported on this device"
-    );
+    if let Err(e) = capability_parameters.supports_ray_reconstruction() {
+        eprintln!("Ray Reconstruction not supported on this device: {e}");
+        std::process::exit(1);
+    }
 
     let (dst_width, dst_height) = (1920, 1080);
 
@@ -52,7 +52,19 @@ fn main() {
     )
     .expect("optimal settings");
 
-    let create_params = nvngx::vk::RayReconstructionCreateParameters::from(optimal_settings);
+    // DLSS-RR requires the host to advertise an HDR color buffer
+    // (the snippet refuses CreateFeature with `Error: HDR Color
+    // required` otherwise). Our color image below is RGBA16F, so
+    // the claim is honest. AutoExposure tells the snippet to derive
+    // exposure internally (no exposure texture supplied);
+    // MVLowRes signals that motion vectors are at the render
+    // resolution, not the upscaled target resolution.
+    let create_params =
+        nvngx::vk::RayReconstructionCreateParameters::from(optimal_settings).with_flags(
+            nvngx::sys::NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_IsHDR
+                | nvngx::sys::NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_AutoExposure
+                | nvngx::sys::NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_MVLowRes,
+        );
 
     let mut rr: nvngx_sys::Result<RayReconstructionFeature> =
         Err(nvngx::sys::Error::Other("Not initialized".to_string()));
@@ -68,13 +80,15 @@ fn main() {
     let render_width = optimal_settings.render_width;
     let render_height = optimal_settings.render_height;
 
-    // Standard inputs
+    // Standard inputs. Color is RGBA16F so it can carry HDR values
+    // — DLSS-RR's `IsHDR` create-flag claim must be backed by an
+    // actual HDR-capable format here.
     let mut color_img = allocations::create_image_optimal(
         &vk_mini_init.device,
         &mut allocator,
         render_width,
         render_height,
-        vk::Format::R8G8B8A8_UNORM,
+        vk::Format::R16G16B16A16_SFLOAT,
         vk::ImageUsageFlags::TRANSFER_DST | vk::ImageUsageFlags::SAMPLED,
     );
     let mut mv_img = allocations::create_image_optimal(
@@ -252,7 +266,7 @@ fn main() {
             let eval = rr.get_evaluation_parameters_mut();
             eval.set_color_input(make_desc(
                 &color_img,
-                vk::Format::R8G8B8A8_UNORM,
+                vk::Format::R16G16B16A16_SFLOAT,
                 render_width,
                 render_height,
                 false,

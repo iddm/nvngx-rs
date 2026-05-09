@@ -36,6 +36,17 @@ pub fn copy_buffer_to_image(
     width: u32,
     height: u32,
 ) {
+    copy_buffer_to_image_with_offset(dev, cb, buffer, image, [0, 0], [width, height]);
+}
+
+pub fn copy_buffer_to_image_with_offset(
+    dev: &ash::Device,
+    cb: vk::CommandBuffer,
+    buffer: vk::Buffer,
+    image: vk::Image,
+    image_offset: [i32; 2],
+    image_extent: [u32; 2],
+) {
     let region = vk::BufferImageCopy::default()
         .buffer_offset(0)
         .buffer_row_length(0)
@@ -47,10 +58,14 @@ pub fn copy_buffer_to_image(
                 .base_array_layer(0)
                 .layer_count(1),
         )
-        .image_offset(vk::Offset3D { x: 0, y: 0, z: 0 })
+        .image_offset(vk::Offset3D {
+            x: image_offset[0],
+            y: image_offset[1],
+            z: 0,
+        })
         .image_extent(vk::Extent3D {
-            width,
-            height,
+            width: image_extent[0],
+            height: image_extent[1],
             depth: 1,
         });
     unsafe {

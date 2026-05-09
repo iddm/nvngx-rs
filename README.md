@@ -7,14 +7,13 @@
 
 A Rust wrapper over the NVIDIA NGX library.
 
-The DLSS version used by this crate: [`3.10.4.0`](https://github.com/NVIDIA/DLSS/releases/tag/v310.4.0).
+The DLSS version used by this crate: [`3.10.5.3`](https://github.com/NVIDIA/DLSS/releases/tag/v310.5.3).
 
 ## Supported features
 
-- DLSS
-- Ray Reconstruction
-
-The `Frame Generation` support is on the way.
+- DLSS (Super Sampling)
+- DLSS-RR (Ray Reconstruction)
+- DLSS-G (Frame Generation, including DLSS 4 multi-frame)
 
 ## Supported graphics APIs
 
@@ -160,6 +159,89 @@ fn update_upscaling_configuration_parameters(&mut self) -> Result {
     Ok(())
 }
 ```
+
+## Running the examples
+
+The repository ships four runnable examples under [crates/nvngx/examples/](crates/nvngx/examples/):
+
+| Example                    | Demonstrates                                                                                           |
+|----------------------------|--------------------------------------------------------------------------------------------------------|
+| `upsample`                 | DLSS super-sampling on a still image (`baboon.png`).                                                   |
+| `ray_reconstruction`       | DLSS-RR denoising a 1-spp Monte Carlo path-traced scene (sphere + plane + sky) over 32 jittered frames. Saves the noisy input and the denoised output side-by-side. |
+| `ray_reconstruction_restir`| DLSS-RR with diffuse/specular hit-distance inputs (resource-set template).                             |
+| `frame_generation`         | DLSS-G (DLSS 4 multi-frame aware) interpolating between two real frames of the panning baboon test image. |
+
+### Hardware & driver
+
+- **GPU:** NVIDIA RTX (Turing or newer for DLSS / DLSS-RR; Ada or newer for DLSS-G).
+- **Driver:** a recent enough version for the requested feature. Each `supports_*()`
+  call reports the minimum driver version when out of date, e.g.
+  `Frame Generation feature requires a driver update. ... should be higher or equal to X.Y`.
+- **OS / arch:** `x86_64` Linux (`glibc`) or Windows (see [Platform support](#platform-support)).
+
+### Build prerequisites
+
+- A C++ toolchain (the helpers in `crates/nvngx-sys/src/bindings.cpp` are compiled with `cc`).
+- Vulkan headers:
+  - **Linux:** install your distro's Vulkan headers (`vulkan-headers`, `libvulkan-dev`, etc.).
+  - **Windows:** install the [Vulkan SDK](https://vulkan.lunarg.com/) and ensure the
+    `VULKAN_SDK` environment variable is set; the build script reads it.
+- The DLSS submodule must be checked out: `git submodule update --init --recursive`.
+
+The Rust side then links `libnvsdk_ngx.a` (Linux) / `nvsdk_ngx_*.lib` (Windows) automatically.
+
+### Runtime requirements
+
+At runtime DLSS dynamically loads the per-feature snippet shared libraries from
+`crates/nvngx-sys/DLSS/lib/`:
+
+- Linux: `libnvidia-ngx-dlss.so.<ver>`, `libnvidia-ngx-dlssd.so.<ver>`, `libnvidia-ngx-dlssg.so.<ver>`
+  in `Linux_x86_64/{rel,dev}/`.
+- Windows: the matching `nvngx_dlss*.dll` files in `Windows_x86_64/{rel,dev}/`.
+
+These need to be reachable by the dynamic loader **before launching the
+example** — without this, NGX silently reports the affected feature as
+unavailable even on supported hardware (this is the most common cause of
+"Frame Generation not supported on this device" on a 4090). Two simplest
+options:
+
+```sh
+# Linux (release snippet — pick `dev` for verbose snippet-side logging)
+export LD_LIBRARY_PATH="$PWD/crates/nvngx-sys/DLSS/lib/Linux_x86_64/rel:$LD_LIBRARY_PATH"
+```
+
+```powershell
+# Windows
+$env:Path = "$pwd\crates\nvngx-sys\DLSS\lib\Windows_x86_64\rel;$env:Path"
+```
+
+Or copy / symlink the snippet next to the example binary in `target/debug/examples/`.
+
+Note that DLSS / DLSS-RR may still work without the path being set (if a
+system-wide DLSS install is present), while DLSS-G will not — so if only
+Frame Generation fails, it is almost always this.
+
+### Running
+
+```sh
+cargo run --example upsample
+cargo run --example ray_reconstruction
+cargo run --example ray_reconstruction_restir
+cargo run --example frame_generation
+```
+
+Each example writes its output PNG next to the example sources
+(`crates/nvngx/examples/<name>/`).
+
+To get verbose logging from the NGX runtime on Linux, set:
+
+```sh
+export __NGX_LOG_LEVEL=1
+```
+
+If a feature is reported as unavailable, double-check the driver version and that
+you are running on the dGPU (e.g. on hybrid laptops force the NVIDIA GPU with
+`__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only`).
 
 ## License
 

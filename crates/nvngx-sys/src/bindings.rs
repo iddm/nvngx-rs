@@ -859,20 +859,6 @@ fn bindgen_test_layout_NVSDK_NGX_Handle() {
         "Offset of field: NVSDK_NGX_Handle::Id"
     );
 }
-#[repr(u32)]
-#[non_exhaustive]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum NVSDK_NGX_GPU_Arch {
-    NVSDK_NGX_GPU_Arch_NotSupported = 0,
-    NVSDK_NGX_GPU_Arch_Volta = 320,
-    NVSDK_NGX_GPU_Arch_Turing = 352,
-    NVSDK_NGX_GPU_Arch_Ampere = 368,
-    NVSDK_NGX_GPU_Arch_Ada = 400,
-    NVSDK_NGX_GPU_Arch_Hopper = 384,
-    NVSDK_NGX_GPU_Arch_Blackwell = 416,
-    NVSDK_NGX_GPU_Arch_Blackwell2 = 432,
-    NVSDK_NGX_GPU_Arch_Unknown = 134217727,
-}
 impl NVSDK_NGX_DLSS_Feature_Flags {
     pub const NVSDK_NGX_DLSS_Feature_Flags_IsInvalid: NVSDK_NGX_DLSS_Feature_Flags =
         NVSDK_NGX_DLSS_Feature_Flags(-2147483648);
