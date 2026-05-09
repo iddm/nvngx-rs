@@ -448,35 +448,6 @@ impl FeatureParameters {
         }
     }
 
-    /// Returns [`Ok`] if the parameters claim to support the frame
-    /// interpolation feature. Frame Interpolation is a separate
-    /// snippet from Frame Generation; the two have distinct
-    /// `*.Available` parameter keys in `nvsdk_ngx_defs_dlssg.h` and
-    /// must not be conflated.
-    pub fn supports_frame_interpolation(&self) -> Result<()> {
-        if self
-            .get_bool(nvngx_sys::NVSDK_NGX_Parameter_FrameInterpolation_NeedsUpdatedDriver)?
-        {
-            let major = self.get_u32(
-                nvngx_sys::NVSDK_NGX_Parameter_FrameInterpolation_MinDriverVersionMajor,
-            )?;
-            let minor = self.get_u32(
-                nvngx_sys::NVSDK_NGX_Parameter_FrameInterpolation_MinDriverVersionMinor,
-            )?;
-            return Err(nvngx_sys::Error::Other(format!(
-                "The Frame Interpolation feature requires a driver update. \
-                 The driver version required should be higher or equal to {major}.{minor}"
-            )));
-        }
-        match self.get_bool(nvngx_sys::NVSDK_NGX_Parameter_FrameInterpolation_Available) {
-            Ok(true) => Ok(()),
-            Ok(false) => Err(nvngx_sys::Error::Other(
-                "The Frame Interpolation feature isn't supported on this platform.".to_string(),
-            )),
-            Err(e) => Err(e),
-        }
-    }
-
     /// Returns [`Ok`] if the parameters claim to support the
     /// super sampling feature ([`nvngx_sys::NVSDK_NGX_Parameter_SuperSampling_Available`]).
     pub fn supports_super_sampling_static() -> Result<()> {
@@ -492,11 +463,6 @@ impl FeatureParameters {
     /// frame generation feature ([`nvngx_sys::NVSDK_NGX_Feature::NVSDK_NGX_Feature_FrameGeneration`]).
     pub fn supports_frame_generation_static() -> Result<()> {
         Self::get_capability_parameters()?.supports_frame_generation()
-    }
-
-    /// See [`Self::supports_frame_interpolation`].
-    pub fn supports_frame_interpolation_static() -> Result<()> {
-        Self::get_capability_parameters()?.supports_frame_interpolation()
     }
 
     /// Returns [`true`] if the SuperSampling feature is initialised

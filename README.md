@@ -162,7 +162,7 @@ fn update_upscaling_configuration_parameters(&mut self) -> Result {
 
 ## Running the examples
 
-The repository ships four runnable examples under [crates/nvngx/examples/](crates/nvngx/examples/):
+The repository ships five runnable examples under [crates/nvngx/examples/](crates/nvngx/examples/):
 
 | Example                    | Demonstrates                                                                                           |
 |----------------------------|--------------------------------------------------------------------------------------------------------|
@@ -170,6 +170,7 @@ The repository ships four runnable examples under [crates/nvngx/examples/](crate
 | `ray_reconstruction`       | DLSS-RR denoising a 1-spp Monte Carlo path-traced scene (sphere + plane + sky) over 32 jittered frames. Saves the noisy input and the denoised output side-by-side. |
 | `ray_reconstruction_restir`| DLSS-RR with diffuse/specular hit-distance inputs (resource-set template).                             |
 | `frame_generation`         | DLSS-G (DLSS 4 multi-frame aware) interpolating between two real frames of the panning baboon test image. |
+| `combined`                 | All three features in one binary: DLSS upscaling on the baboon, then DLSS-RR with ReSTIR-style hit-distance inputs over 32 jittered frames of an orbiting ray-traced scene, then DLSS-G interpolating between the last two DLSS-RR outputs. |
 
 ### Hardware & driver
 
@@ -228,6 +229,7 @@ cargo run --example upsample
 cargo run --example ray_reconstruction
 cargo run --example ray_reconstruction_restir
 cargo run --example frame_generation
+cargo run --example combined
 ```
 
 Each example writes its output PNG next to the example sources
