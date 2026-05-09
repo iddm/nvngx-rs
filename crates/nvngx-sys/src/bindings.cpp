@@ -215,6 +215,13 @@ NVSDK_NGX_Result HELPERS_NGX_VULKAN_EVALUATE_DLSSD_EXT(
 }
 
 // Frame Generation
+//
+// We do not call NVIDIA's `NGX_VK_CREATE_DLSSG` helper because as of
+// DLSS 3.10.5.3 it still sets the generic `NVSDK_NGX_Parameter_Width`
+// / `NVSDK_NGX_Parameter_Height` keys, which the runtime now logs as
+// "creating feature using deprecated parameters … please use
+// NVSDK_NGX_DLSSG_Parameter_Width/Height instead." We mirror what the
+// helper does but use the DLSSG-specific keys.
 NVSDK_NGX_Result HELPERS_NGX_VULKAN_CREATE_DLSSG(
     VkCommandBuffer InCmdList,
     unsigned int InCreationNodeMask,
@@ -222,14 +229,13 @@ NVSDK_NGX_Result HELPERS_NGX_VULKAN_CREATE_DLSSG(
     NVSDK_NGX_Handle **ppOutHandle,
     NVSDK_NGX_Parameter *pInParams,
     NVSDK_NGX_DLSSG_Create_Params *pInDlssgCreateParams) {
-    return NGX_VK_CREATE_DLSSG(
-        InCmdList,
-        InCreationNodeMask,
-        InVisibilityNodeMask,
-        ppOutHandle,
-        pInParams,
-        pInDlssgCreateParams
-    );
+    NVSDK_NGX_Parameter_SetUI(pInParams, NVSDK_NGX_Parameter_CreationNodeMask, InCreationNodeMask);
+    NVSDK_NGX_Parameter_SetUI(pInParams, NVSDK_NGX_Parameter_VisibilityNodeMask, InVisibilityNodeMask);
+    NVSDK_NGX_Parameter_SetUI(pInParams, NVSDK_NGX_DLSSG_Parameter_Width, pInDlssgCreateParams->Width);
+    NVSDK_NGX_Parameter_SetUI(pInParams, NVSDK_NGX_DLSSG_Parameter_Height, pInDlssgCreateParams->Height);
+    NVSDK_NGX_Parameter_SetUI(pInParams, NVSDK_NGX_DLSSG_Parameter_BackbufferFormat, pInDlssgCreateParams->NativeBackbufferFormat);
+
+    return NVSDK_NGX_VULKAN_CreateFeature(InCmdList, NVSDK_NGX_Feature_FrameGeneration, pInParams, ppOutHandle);
 }
 
 NVSDK_NGX_Result HELPERS_NGX_VULKAN_EVALUATE_DLSSG(
