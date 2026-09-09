@@ -1,5 +1,5 @@
 //! Pure Rust reimplementations of the `static inline` DX12 helper functions/macros
-//! from the NVIDIA NGX SDK headers (`nvsdk_ngx_helpers.h`, `nvsdk_ngx_helpers_dlssd.h`).
+//! from the NVIDIA NGX SDK headers (`nvsdk_ngx_helpers.h`, `nvsdk_ngx_helpers_dlssd_d3d.h`).
 
 use crate::{dx::*, NVSDK_NGX_GBufferType::*, *};
 
@@ -315,7 +315,7 @@ pub unsafe fn d3d12_evaluate_dlss_ext(
     NVSDK_NGX_D3D12_EvaluateFeature_C(in_cmd_list, p_in_handle, p_in_params, None)
 }
 
-/// Equivalent of `NGX_D3D12_CREATE_DLSSD_EXT` from `nvsdk_ngx_helpers_dlssd.h`.
+/// Equivalent of `NGX_D3D12_CREATE_DLSSD_EXT` from `nvsdk_ngx_helpers_dlssd_d3d.h`.
 ///
 /// # Safety
 ///
@@ -403,7 +403,7 @@ pub unsafe fn d3d12_create_dlssd_ext(
     )
 }
 
-/// Equivalent of `NGX_D3D12_EVALUATE_DLSSD_EXT` from `nvsdk_ngx_helpers_dlssd.h`.
+/// Equivalent of `NGX_D3D12_EVALUATE_DLSSD_EXT` from `nvsdk_ngx_helpers_dlssd_d3d.h`.
 ///
 /// # Safety
 ///

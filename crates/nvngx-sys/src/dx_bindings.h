@@ -6,6 +6,6 @@
 // items are filtered out by regex in api_gen.
 #include "../DLSS/include/nvsdk_ngx.h"
 #include "../DLSS/include/nvsdk_ngx_helpers.h"
-#include "../DLSS/include/nvsdk_ngx_helpers_dlssd.h"
+#include "../DLSS/include/nvsdk_ngx_helpers_dlssd_d3d.h"
 
 #endif // DX_BINDINGS_H

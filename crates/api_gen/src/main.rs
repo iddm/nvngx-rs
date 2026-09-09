@@ -70,10 +70,9 @@ fn generate_core_bindings(nvngx_sys_dir: &Path, msrv: bindgen::RustTarget) {
         // Core (API-agnostic) types and functions:
         .allowlist_item(r"(PFN_)?NVSDK_NGX_\w+")
         .allowlist_function("GetNGXResultAsString")
-        // Blocklist graphics-API-specific items that leak in via transitive
-        // includes — these belong in the VK / DX binding files instead.
-        .blocklist_item(r"(PFN_)?NVSDK_NGX_(VULKAN|D3D1[12]|CUDA)_\w+")
-        .blocklist_item(r"(PFN_)?NVSDK_NGX_\w+VK\w*")
+        // Blocklist graphics-API-specific items that are defined in generic files or leak in via
+        // transitive includes — these belong in the DX/CUDA binding files instead.
+        .blocklist_item(r"(PFN_)?NVSDK_NGX_(D3D1[12]|CUDA)_\w+")
         .blocklist_item(r"(PFN_)?NVSDK_NGX_Parameter_(Set|Get)D3d1[12]Resource")
         .blocklist_item(r"(PFN_)?NVSDK_NGX_ResourceReleaseCallback");
 
